@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name= "apple-mobile-web-app-capable" content="yes" user-scalable="no" charset="utf-8">
+    <link rel="manifest" href="../manifest.json">
+    <!-- <meta name="apple-mobile-web-app-capable" content="yes" /> -->
+    <title> Chatter </title>
+    <link href="../css/automerge_board.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+
+
+		<!-- <script defer src  ="index.bundle.js"></script> -->
+
+  </head>
+
+  <body oncontextmenu="return false;">
+
+
+
+    <template id="subPanelTemplate">
+      <div class="subPanel">
+          <div class="subPanelNavbar">
+            <span class="subPanelTitle"></span>
+            <span class="subPanelSwitch">-</span>
+          </div>
+          <div class="subPanelContent"></div>
+
+      </div>
+    </template>
+
+    <!-- * {
+        display: none;
+    } -->
+
+    <template id="layerRowTemplate">
+      <div class="layerRow">
+            <div class="viewSwitch" status="on">
+                <i class="material-icons visibility">visibility</i>
+            </div>
+            <div class="viewName"></div>
+            <div class="expandSwitch" status="off">
+                <i class="material-icons expand_more">expand_more</i>
+                <i class="material-icons expand_less">expand_less</i>
+           </div>
+      </div>
+    </template>
+
+    <template id="subPanelItemTemplate">
+      <div class="subPanelItem"></div>
+    </template>
+    <template id="editControllerTemplate">
+      <div class="editController">
+          <div class="attributePanel"></div>
+          <button class="copyButton"> copy </button>
+          <button class="linkButton"> link </button>
+          <button class="deleteButton"> delete </button>
+      </div>
+    </template>
+
+    <template id="layerControllerTemplate">
+      <div class="layerController">
+          <div class="layerView"></div>
+          <div class="layerControllerFunction">
+              <button class="addDivLayerButton" type="button" name="button">addDivLayer</button>
+              <button class="addSvgLayerButton" type="button" name="button">addSvgLayer</button>
+              <button class="showCurrentPageButton" type="button" name="button">showCurrentPage</button>
+          </div>
+      </div>
+    </template>
+
+
+
+    <!-- <div class="latexContainer">
+        <div class="latexOutput">
+
+        </div>
+        <div class="latexInput" contenteditable="true"></div>
+    </div> -->
+
+    <div class="pageWrapper">
+        <div class="panelContainer">
+            <div class="testInfo">
+                testInfofsfd
+            </div>
+
+        </div>
+          <div class="pageContentContainer">
+            <div class="fullPageModeDiv"></div>
+            <div class="overviewModeDiv"></div>
+        </div>
+    </div>
+
+
+    <div class="contentContainer"></div>
+    <div class="testField open"></div>
+  </body>
+
+
+  </script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/automerge@0.14.2/dist/automerge.min.js" charset="utf-8"></script> -->
+  <!-- <script src="../js/dbtest.js" charset="utf-8"></script> -->
+
+
+</html>

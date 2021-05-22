@@ -1,0 +1,531 @@
+@namespace xlink 'http://www.w3.org/1999/xlink';
+
+
+body {
+  overflow-x: hidden;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  margin: 0px;
+}
+
+.attributePanel {
+  .polylineColorController{
+      div.selectedColor {
+          border: 2px solid red;
+      }
+  }
+
+  .penSelectionToolController{
+      height: 150px;
+      margin: 10px;
+      background: CornflowerBlue;
+  }
+}
+
+
+
+
+.pageWrapper{
+    display: grid;
+    grid-template-columns: 1fr 5fr;
+    height: 100vh;
+    width: 100vw;
+
+    .panelContainer {
+      background: gold;
+      height: 100vh;
+      overflow-y: scroll;
+
+      .tabBar {
+          display: flex ;
+          .subPanelTitle {
+              background: white;
+              margin: 0px 5px;
+          }
+      }
+    }
+
+    .groupControllerWrapper {
+        padding: 10px;
+        .groupViewer{
+            min-height: 300px;
+            background: lightblue;
+            padding: 5px 10px;
+
+            .groupRow {
+              display: flex;
+            }
+
+        }
+    }
+
+
+    .toolBoxHtml {
+      background: silver;
+      width : 90%;
+      margin : 0 auto;
+      grid-template-columns: "4fr 3fr";
+      user-select: none;
+      display: flex;
+      flex-wrap: wrap;
+
+      .toolBoxItem {
+        background: gold;
+        margin: 10px 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .toolBoxIcon {
+          width: 32px;
+        }
+      }
+    }
+
+    .toolBoxOption{
+      height: 80px;
+      background: lightblue;
+    }
+
+    .pageContentContainer{
+      background: silver;
+      position: relative;
+      overflow: scroll;
+      z-index: 100;
+
+      .fullPage {
+          transform-origin: top left;
+          transform: scale(1);
+          width: 1150px; height: 1678px; margin: 20px auto;
+          background: white;
+          position: absolute; left: 30px; right: 0;
+
+          .popUpBox{
+            width: 150px;
+            min-height: 100px;
+            background: grey;
+            position: fixed;
+            display: grid;
+            grid-row-gap: 5px;
+
+            .popUpBoxButton {
+                text-align: center;
+                padding: 5px;
+                font-size: 25px;
+            }
+
+            .popUpBoxButton:not(:last-child) {
+                border-bottom: 1px solid white;
+            }
+          } // popUpBox
+
+          .divLayer {
+            width: 100%; height: 100%;
+            position: absolute; left: 0; right: 0;
+          }
+
+          .selectedObjectInDiv{
+            border: 1px solid blue;
+          }
+
+          ._commentContainer{
+              width: 400px;
+              // min-height: 400px;
+              background: wheat;
+              margin: 10px;
+
+              .commentField { margin: 10px; width: 90%;}
+              .replyField { margin: 10px; width: 90%;}
+
+          }
+      } // .divPage
+
+      .overviewModeDiv{
+          position: absolute; top: 0px; left: 0px;
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr 1fr;
+          grid-row-gap: 15px;
+          .divPageSmall { background: pink; margin: 10px; }
+      }
+
+      .fullPageModeDiv[status="off"] { display: none; }
+      .overviewModeDiv[status="off"] { display: none; }
+    }
+
+    .subPanel {
+        .subPanelNavbar {
+            height: 40px;
+            background: lightgreen;
+            display: grid;
+            grid-template-columns: 9fr 1fr;
+            border-bottom: 1px solid black;
+        }
+        .subPanelContent{
+            min-height: 300px;
+            background: coral;
+        }
+        .subPanelContent[status="open"]{
+            // display: grid;
+            // grid-template-columns: 1fr 1fr;
+        }
+        .subPanelContent[status="close"]{ display: none; }
+
+        .subPanelItem{
+            width: 50px; height: 50px;
+            background: azure;
+            margin: 0 auto;
+        }
+        .subPanelItem[status="on"]{
+            background: yellow;
+        }
+    }
+}
+
+.GNBookmarkDiv {
+    width: 400px;
+    background: lightblue;
+
+    .bookmarkHeader {
+        width: 100%;
+        height: 20px;
+        background: blue;
+    }
+
+}
+
+.tabWrapper {
+    .tabBar {
+        height: 40px;
+        background: lightgreen;
+    }
+
+    .tabContent {
+        min-height: 300px;
+        background: coral;
+    }
+
+}
+
+.bookmarkSubPanel{
+    .pageNavigator {
+        text-align: center; display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .pageNumberInput { width: 50%; margin: 0 auto; }
+
+    .functionButton{
+        width: 90%; height: 30px;
+        margin: 10px auto; background: grey;
+    }
+}
+
+.layerController{
+    margin: 10px 10px ;
+
+    .layerControllerFunction {
+      background: lightblue; height: 50px;
+    }
+
+    .layerView{
+        background: grey;
+        height: 150px;
+        overflow-y: scroll;
+
+        .layerLevel[status="off"]{ display: none; }
+
+
+
+        .layerRow {
+          &.selectedRow{ background: skyblue; }
+
+          width: 100%; height: 30px; background: ivory;
+          display: grid; grid-template-columns: 1fr 3fr 1fr;
+          border: 1px black solid;
+
+          div { height: 100%; width: 100%; }
+
+          div:not(:last-child){ border-right: 1px black solid; }
+
+          .viewSwitch, .expandSwitch, .viewName{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .viewName {justify-content: left; font-size: 12px;}
+
+          .viewSwitch {
+            &[status="on"] { .visibility {display: block} }
+            &[status="off"]{ .visibility {display: none} }
+          }
+
+
+          .expandSwitch{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .expand_more, .expand_less { font-size:35px; }
+
+            &[status="off"]{
+                .expand_more{ display: block;}
+                .expand_less{ display: none;}
+            }
+
+            &[status="on"]{
+                .expand_more{ display: none;}
+                .expand_less{ display: block;}
+            }
+          } // expandSwitch
+
+        } // layerRow
+        // .layerlevel
+
+    }
+}
+
+
+.testField {
+    .bookmarkWrapper {
+      width: 80%;
+      height: 100%;
+      background: lightgreen;
+    }
+}
+
+
+.bookmarkWrapper {
+    .selectedBookmark{
+      background: pink
+    }
+}
+
+//
+.testField.open {
+    width: 90vw;
+    height: 100vh;
+    background: lightblue;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    z-index: 1000;
+
+    .scalableDiv {
+      $baseWidth: 600px;
+      $width: 800px;
+      width: $width;
+      height: $width * 3/2;
+      background: ivory;
+      transform-origin: top left;
+      transform: scale(0.1, 0.1);
+      // font-size: calc(100% * $width / $baseWidth);
+      p {margin: 0;}
+    }
+
+    .imageFrame {
+        width: 400px;
+        height: 400px;
+        background: lighten(yellow, 1%);
+        position: absolute;
+        top: 50px;
+        left: 50px;
+        span.imageFrameCorner{
+            position: absolute;
+            display: block;
+            -moz-user-select: none;
+            -webkit-user-drag: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            width: 5px;
+            height: 5px;
+            background: black;
+        }
+
+        span.topLeft {
+          top: calc(0% - 2.5px);
+          left: calc(0% - 2.5px);
+        }
+        span.topRight {
+          top: calc(0% - 2.5px);
+          left: calc(100% - 2.5px);
+        }
+        span.bottomRight {
+          top: calc(100% - 2.5px);
+          left: calc(100% - 2.5px);
+          cursor: nwse-resize;
+        }
+        span.bottomLeft {
+          top: calc(100% - 2.5px);
+          left: calc(0% - 2.5px);
+        }
+    }
+
+}
+
+.commentSubPanel{
+    height: 230px;
+
+    .subPanelContent {
+      height: 400px;
+
+    }
+
+    .commentSidebar{
+        .commentBoxWrapper{
+            width: 85%; margin: auto;
+            min-height: 50px;
+            margin-top: 10px; padding: 8px;
+            background: lightyellow;
+
+            .commentBox { margin: 3px; }
+
+            .commentBoxTagsInput{
+              display: block;
+            }
+
+            .commentTag {
+              display: inline-block; margin-right: 5px;
+            }
+
+            .commentBoxDropdownList {
+                width: 90%;
+                min-height: 0px;
+                max-height: 210px;
+                background: white;
+
+                .newTagChoice:not(:first-child) {
+                    border-top: 1px solid black;
+                }
+            }
+        }
+
+    }
+}
+
+
+
+.container{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  background: black;
+}
+
+.pageContainer {
+
+}
+
+.collectionControllerWrapper {
+    padding: 10px;
+
+    .collectionViewer{
+        min-height: 300px;
+        background: lightblue;
+        padding: 5px 10px;
+
+        .collectionRow {
+          display: flex;
+        }
+
+    }
+}
+
+.collectionPage {
+    width: 80%;
+    height: 100vh;
+    background: pink;
+    display: none;
+    position: absolute;
+    top: 0px;
+    left: 250px;
+    overflow-y: scroll;
+    z-index: 1000;
+
+    .dummySVG{
+    }
+}
+
+
+
+.navBar {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    text-align: center;
+    height: 8vh;
+}
+
+.pageViewController {
+    height: 92svh;
+    background: Aliceblue;
+}
+
+
+.latexContainer{
+    $latexWidth: 800px;
+    $latexHeight: 400px;
+    .latexOutput{
+        width: $latexWidth;
+        height: $latexHeight;
+        background: maroon;
+    }
+    .latexInput{
+        width: $latexWidth;
+        height: $latexHeight - 150px;
+        background: pink;
+    }
+}
+
+.logField {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    height: 100vh;
+    width: 25vw;
+    background: white;
+}
+
+.choiceController{
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  flex-wrap: wrap;
+  width: 90%;
+  margin: auto 10px;
+  min-height: 150px;
+  background: CornflowerBlue;
+}
+
+@media (max-width:1025px){
+  body {
+    width: 100vw;
+  }
+    .pageWrapper{
+      display: grid;
+      grid-template-columns: 1fr 6fr;
+
+        .pageContentContainer{
+            padding: 10px;
+            width: 85.5vw;
+            .divPage {
+                margin: 25px;
+            }
+        }
+
+
+      .panelContainer{
+        width: 150px;
+        overflow-x: hidden;
+
+      }
+    }
+
+
+    .choiceController{
+      width: 150px;
+    }
+}

@@ -1,0 +1,11 @@
+export declare function shortNotice(noticeText: string): void;
+export declare function subPanelTab(panelClassName: string): any[];
+export declare function createSubPanel(name: string): HTMLDivElement[];
+export declare function createSubPanelItem(name: string): HTMLDivElement;
+export declare function functionButtonCreater(name: string, buttonFunction: () => void): HTMLDivElement;
+export declare function createSwitchViewModeButton(fullPageModeDiv: HTMLDivElement, overviewModeDiv: HTMLDivElement): HTMLButtonElement;
+export declare function createNewPage(pageController: any, fullPageModeDiv: HTMLDivElement, overviewModeDiv: HTMLDivElement, fullPageData?: any, overviewPageData?: any, saveToDatabase?: boolean): import("./GreatNoteClass/GreatNoteObjectInterface").GNPageInterface[];
+export declare function fillInNewPageDataContent(newPage: any, fullPageData: any): void;
+export declare function fillInSmallViewDataContent(smallView: any, overviewPageData: any): void;
+export declare function insertNewPage(pageController: any, newFullPage: HTMLDivElement, newSmallView: HTMLDivElement, fullPageModeDiv: HTMLDivElement, overviewModeDiv: HTMLDivElement): void;
+export declare function createNewPageEvent(currentStatus: any, fullPageModeDiv: HTMLDivElement, overviewModeDiv: HTMLDivElement, pageDummyContent: any, htmlObject?: HTMLElement | HTMLDivElement): () => void;

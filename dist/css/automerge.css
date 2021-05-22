@@ -1,0 +1,29 @@
+.cardContainer{
+  /* position: fixed; */
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+}
+
+.notecardDisplay {
+  padding: 10px;
+  overflow-y: scroll;
+
+}
+
+.card {
+  margin: 15px;
+}
+
+.svgContainerOverlay{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+#testing, #testing2 {
+  background: Aliceblue;
+  width: 600px;
+  height: 500px;
+}

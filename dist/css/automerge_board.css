@@ -1,0 +1,475 @@
+@namespace xlink "http://www.w3.org/1999/xlink";
+body {
+  overflow-x: hidden;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  margin: 0px;
+}
+
+.attributePanel .polylineColorController div.selectedColor {
+  border: 2px solid red;
+}
+.attributePanel .penSelectionToolController {
+  height: 150px;
+  margin: 10px;
+  background: CornflowerBlue;
+}
+
+.pageWrapper {
+  display: grid;
+  grid-template-columns: 1fr 5fr;
+  height: 100vh;
+  width: 100vw;
+}
+.pageWrapper .panelContainer {
+  background: gold;
+  height: 100vh;
+  overflow-y: scroll;
+}
+.pageWrapper .panelContainer .tabBar {
+  display: flex;
+}
+.pageWrapper .panelContainer .tabBar .subPanelTitle {
+  background: white;
+  margin: 0px 5px;
+}
+.pageWrapper .groupControllerWrapper {
+  padding: 10px;
+}
+.pageWrapper .groupControllerWrapper .groupViewer {
+  min-height: 300px;
+  background: lightblue;
+  padding: 5px 10px;
+}
+.pageWrapper .groupControllerWrapper .groupViewer .groupRow {
+  display: flex;
+}
+.pageWrapper .toolBoxHtml {
+  background: silver;
+  width: 90%;
+  margin: 0 auto;
+  grid-template-columns: "4fr 3fr";
+  user-select: none;
+  display: flex;
+  flex-wrap: wrap;
+}
+.pageWrapper .toolBoxHtml .toolBoxItem {
+  background: gold;
+  margin: 10px 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pageWrapper .toolBoxHtml .toolBoxItem .toolBoxIcon {
+  width: 32px;
+}
+.pageWrapper .toolBoxOption {
+  height: 80px;
+  background: lightblue;
+}
+.pageWrapper .pageContentContainer {
+  background: silver;
+  position: relative;
+  overflow: scroll;
+  z-index: 100;
+}
+.pageWrapper .pageContentContainer .fullPage {
+  transform-origin: top left;
+  transform: scale(1);
+  width: 1150px;
+  height: 1678px;
+  margin: 20px auto;
+  background: white;
+  position: absolute;
+  left: 30px;
+  right: 0;
+}
+.pageWrapper .pageContentContainer .fullPage .popUpBox {
+  width: 150px;
+  min-height: 100px;
+  background: grey;
+  position: fixed;
+  display: grid;
+  grid-row-gap: 5px;
+}
+.pageWrapper .pageContentContainer .fullPage .popUpBox .popUpBoxButton {
+  text-align: center;
+  padding: 5px;
+  font-size: 25px;
+}
+.pageWrapper .pageContentContainer .fullPage .popUpBox .popUpBoxButton:not(:last-child) {
+  border-bottom: 1px solid white;
+}
+.pageWrapper .pageContentContainer .fullPage .divLayer {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.pageWrapper .pageContentContainer .fullPage .selectedObjectInDiv {
+  border: 1px solid blue;
+}
+.pageWrapper .pageContentContainer .fullPage ._commentContainer {
+  width: 400px;
+  background: wheat;
+  margin: 10px;
+}
+.pageWrapper .pageContentContainer .fullPage ._commentContainer .commentField {
+  margin: 10px;
+  width: 90%;
+}
+.pageWrapper .pageContentContainer .fullPage ._commentContainer .replyField {
+  margin: 10px;
+  width: 90%;
+}
+.pageWrapper .pageContentContainer .overviewModeDiv {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-row-gap: 15px;
+}
+.pageWrapper .pageContentContainer .overviewModeDiv .divPageSmall {
+  background: pink;
+  margin: 10px;
+}
+.pageWrapper .pageContentContainer .fullPageModeDiv[status=off] {
+  display: none;
+}
+.pageWrapper .pageContentContainer .overviewModeDiv[status=off] {
+  display: none;
+}
+.pageWrapper .subPanel .subPanelNavbar {
+  height: 40px;
+  background: lightgreen;
+  display: grid;
+  grid-template-columns: 9fr 1fr;
+  border-bottom: 1px solid black;
+}
+.pageWrapper .subPanel .subPanelContent {
+  min-height: 300px;
+  background: coral;
+}
+.pageWrapper .subPanel .subPanelContent[status=close] {
+  display: none;
+}
+.pageWrapper .subPanel .subPanelItem {
+  width: 50px;
+  height: 50px;
+  background: azure;
+  margin: 0 auto;
+}
+.pageWrapper .subPanel .subPanelItem[status=on] {
+  background: yellow;
+}
+
+.GNBookmarkDiv {
+  width: 400px;
+  background: lightblue;
+}
+.GNBookmarkDiv .bookmarkHeader {
+  width: 100%;
+  height: 20px;
+  background: blue;
+}
+
+.tabWrapper .tabBar {
+  height: 40px;
+  background: lightgreen;
+}
+.tabWrapper .tabContent {
+  min-height: 300px;
+  background: coral;
+}
+
+.bookmarkSubPanel .pageNavigator {
+  text-align: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.bookmarkSubPanel .pageNumberInput {
+  width: 50%;
+  margin: 0 auto;
+}
+.bookmarkSubPanel .functionButton {
+  width: 90%;
+  height: 30px;
+  margin: 10px auto;
+  background: grey;
+}
+
+.layerController {
+  margin: 10px 10px;
+}
+.layerController .layerControllerFunction {
+  background: lightblue;
+  height: 50px;
+}
+.layerController .layerView {
+  background: grey;
+  height: 150px;
+  overflow-y: scroll;
+}
+.layerController .layerView .layerLevel[status=off] {
+  display: none;
+}
+.layerController .layerView .layerRow {
+  width: 100%;
+  height: 30px;
+  background: ivory;
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr;
+  border: 1px black solid;
+}
+.layerController .layerView .layerRow.selectedRow {
+  background: skyblue;
+}
+.layerController .layerView .layerRow div {
+  height: 100%;
+  width: 100%;
+}
+.layerController .layerView .layerRow div:not(:last-child) {
+  border-right: 1px black solid;
+}
+.layerController .layerView .layerRow .viewSwitch, .layerController .layerView .layerRow .expandSwitch, .layerController .layerView .layerRow .viewName {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.layerController .layerView .layerRow .viewName {
+  justify-content: left;
+  font-size: 12px;
+}
+.layerController .layerView .layerRow .viewSwitch[status=on] .visibility {
+  display: block;
+}
+.layerController .layerView .layerRow .viewSwitch[status=off] .visibility {
+  display: none;
+}
+.layerController .layerView .layerRow .expandSwitch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.layerController .layerView .layerRow .expandSwitch .expand_more, .layerController .layerView .layerRow .expandSwitch .expand_less {
+  font-size: 35px;
+}
+.layerController .layerView .layerRow .expandSwitch[status=off] .expand_more {
+  display: block;
+}
+.layerController .layerView .layerRow .expandSwitch[status=off] .expand_less {
+  display: none;
+}
+.layerController .layerView .layerRow .expandSwitch[status=on] .expand_more {
+  display: none;
+}
+.layerController .layerView .layerRow .expandSwitch[status=on] .expand_less {
+  display: block;
+}
+
+.testField .bookmarkWrapper {
+  width: 80%;
+  height: 100%;
+  background: lightgreen;
+}
+
+.bookmarkWrapper .selectedBookmark {
+  background: pink;
+}
+
+.testField.open {
+  width: 90vw;
+  height: 100vh;
+  background: lightblue;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  z-index: 1000;
+}
+.testField.open .scalableDiv {
+  width: 800px;
+  height: 1200px;
+  background: ivory;
+  transform-origin: top left;
+  transform: scale(0.1, 0.1);
+}
+.testField.open .scalableDiv p {
+  margin: 0;
+}
+.testField.open .imageFrame {
+  width: 400px;
+  height: 400px;
+  background: #ffff05;
+  position: absolute;
+  top: 50px;
+  left: 50px;
+}
+.testField.open .imageFrame span.imageFrameCorner {
+  position: absolute;
+  display: block;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  width: 5px;
+  height: 5px;
+  background: black;
+}
+.testField.open .imageFrame span.topLeft {
+  top: calc(0% - 2.5px);
+  left: calc(0% - 2.5px);
+}
+.testField.open .imageFrame span.topRight {
+  top: calc(0% - 2.5px);
+  left: calc(100% - 2.5px);
+}
+.testField.open .imageFrame span.bottomRight {
+  top: calc(100% - 2.5px);
+  left: calc(100% - 2.5px);
+  cursor: nwse-resize;
+}
+.testField.open .imageFrame span.bottomLeft {
+  top: calc(100% - 2.5px);
+  left: calc(0% - 2.5px);
+}
+
+.commentSubPanel {
+  height: 230px;
+}
+.commentSubPanel .subPanelContent {
+  height: 400px;
+}
+.commentSubPanel .commentSidebar .commentBoxWrapper {
+  width: 85%;
+  margin: auto;
+  min-height: 50px;
+  margin-top: 10px;
+  padding: 8px;
+  background: lightyellow;
+}
+.commentSubPanel .commentSidebar .commentBoxWrapper .commentBox {
+  margin: 3px;
+}
+.commentSubPanel .commentSidebar .commentBoxWrapper .commentBoxTagsInput {
+  display: block;
+}
+.commentSubPanel .commentSidebar .commentBoxWrapper .commentTag {
+  display: inline-block;
+  margin-right: 5px;
+}
+.commentSubPanel .commentSidebar .commentBoxWrapper .commentBoxDropdownList {
+  width: 90%;
+  min-height: 0px;
+  max-height: 210px;
+  background: white;
+}
+.commentSubPanel .commentSidebar .commentBoxWrapper .commentBoxDropdownList .newTagChoice:not(:first-child) {
+  border-top: 1px solid black;
+}
+
+.container {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  background: black;
+}
+
+.collectionControllerWrapper {
+  padding: 10px;
+}
+.collectionControllerWrapper .collectionViewer {
+  min-height: 300px;
+  background: lightblue;
+  padding: 5px 10px;
+}
+.collectionControllerWrapper .collectionViewer .collectionRow {
+  display: flex;
+}
+
+.collectionPage {
+  width: 80%;
+  height: 100vh;
+  background: pink;
+  display: none;
+  position: absolute;
+  top: 0px;
+  left: 250px;
+  overflow-y: scroll;
+  z-index: 1000;
+}
+.navBar {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  text-align: center;
+  height: 8vh;
+}
+
+.pageViewController {
+  height: 92svh;
+  background: Aliceblue;
+}
+
+.latexContainer .latexOutput {
+  width: 800px;
+  height: 400px;
+  background: maroon;
+}
+.latexContainer .latexInput {
+  width: 800px;
+  height: 250px;
+  background: pink;
+}
+
+.logField {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  height: 100vh;
+  width: 25vw;
+  background: white;
+}
+
+.choiceController {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  flex-wrap: wrap;
+  width: 90%;
+  margin: auto 10px;
+  min-height: 150px;
+  background: CornflowerBlue;
+}
+
+@media (max-width: 1025px) {
+  body {
+    width: 100vw;
+  }
+
+  .pageWrapper {
+    display: grid;
+    grid-template-columns: 1fr 6fr;
+  }
+  .pageWrapper .pageContentContainer {
+    padding: 10px;
+    width: 85.5vw;
+  }
+  .pageWrapper .pageContentContainer .divPage {
+    margin: 25px;
+  }
+  .pageWrapper .panelContainer {
+    width: 150px;
+    overflow-x: hidden;
+  }
+
+  .choiceController {
+    width: 150px;
+  }
+}
+
+/*# sourceMappingURL=automerge_board.css.map */

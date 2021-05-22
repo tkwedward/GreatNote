@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title> Simple Rich Text Editor </title>
+
+    <link href="css/board.css" rel="stylesheet">
+    <style media="screen">
+      body{
+        width: 100vw;
+        height: 100vh;
+      }
+
+      .pdfCanvas, .baseSvg {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      #noteContainer{
+        position: relative;
+      }
+
+
+    </style>
+  </head>
+
+  <body>
+
+    <div id="functionButtonSet">
+      <div class="defaultButton">
+          <button id="go_previous">Previous</button>
+          <input type="number" value="1" id="current_page">
+          <button id="go_next"> Next </button>
+          <button id="zoom_in"> + </button>
+          <button id="zoom_out"> - </button>
+          <button id="addLayer"> addLayer </button>
+          <button id="addPage"> addPage </button>
+          <button id="nextPage"> nextPage </button>
+          <button id="previousPage"> previousPage </button>
+
+          <button id="pen"> pen </button>
+          <button id="rect"> rect </button>
+          <button id="eraser"> eraser </button>
+          <button id="selector"> selector </button>
+      </div>
+      <div class="buttonSubFunction">
+      </div>
+
+    </div>
+    <div id="noteContainer">
+      <canvas class="pdfCanvas"></canvas>
+      <div id="create">
+      </div>
+
+    </div>
+
+  </body>
+  <script src="/socket.io/socket.io.js" charset="utf-8">
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.0.16/svg.min.js" charset="utf-8"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
+  <script src="http://vivin.net/pub/pdfjs/textlayerbuilder.js"></script>
+  <script type="text/javascript">
+
+
+
+  </script>
+
+
+
+<script src="js/PageController.js" charset="utf-8"></script>
+<script src="js/socketFunctions.js" charset="utf-8"></script>
+<script src="js/ButtonFunctionClass.js" charset="utf-8"></script>
+  <script src="js/setup.js" charset="utf-8"></script>
+
+  <script src="js/drawHelperFunctions.js" charset="utf-8"></script>
+  <script src="js/MainController.js" charset="utf-8"></script>
+  <script src="js/pdfRender.js" charset="utf-8"></script>
+  <script type="text/javascript">
+
+
+  </script>
+  <!-- <script src="js/svgBoard.js" charset="utf-8"></script> -->
+  <!-- { command: "italic", type: "button", innerHTML: "italic" }, -->
+
+</html>

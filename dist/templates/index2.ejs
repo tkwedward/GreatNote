@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name= "viewport" content="width=device-width, initial-scaler=1" charset="utf-8">
+    <title> Chatter </title>
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+
+        <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+
+    <style media="screen">
+      form {
+        padding: 20px;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        padding-right: 50px;
+      }
+
+      #messages {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+      }
+
+      #messages li {
+        padding: 5px 10px;
+      }
+
+      #messages li:nth-child(odd) {
+          background: #eee;
+      }
+    </style>
+
+  </head>
+  <body>
+    <div class="container-fluid">
+
+      title: <br>
+      <input class="title" name="name" rows="10" cols="100"></input><br><br>
+      longVersion: <br>
+      <textarea class="longVersion" name="name" rows="10" cols="100">1232</textarea><br>
+      shortVersion: <br><br>
+      <textarea class="shortVersion"  name="name" rows="10" cols="100">12312</textarea>
+    </div>
+    <button type="submit" class="submitButton">save</button>
+
+  </body>
+  <script src="/socket.io/socket.io.js" charset="utf-8">
+  </script>
+
+  <script>
+    document.querySelector(".submitButton").addEventListener("click", e=>{
+      let date = new Date()
+      let title = document.querySelector(".title")
+      let longVersion = document.querySelector(".longVersion")
+      let shortVersion = document.querySelector(".shortVersion")
+      let url = document.URL
+      url = "http://" + url.split("://")[1].split("/")[0] + "/talkNotes/saveTalkNotes"
+      console.log(url);
+
+      let xhr = new XMLHttpRequest()
+      xhr.open("POST", url, true);
+      xhr.onload = p=>{
+        console.log(p);
+      }
+      let sendData = {
+        "date": date,
+        "title": title.value,
+        "longVersion": longVersion.value,
+        "shortVersion": shortVersion.value
+      }
+
+      // xhr.send(JSON.stringify(sendData));
+
+      console.log(date, shortVersion.value);
+    })
+  </script>
+</html>
