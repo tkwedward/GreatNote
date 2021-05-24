@@ -212,7 +212,7 @@ export class MainController implements MainControllerInterface{
     processChangeData(changeData: any){
           let {htmlObjectData, metaData} = changeData
 
-          // console.log(changeData)
+          console.log(215215, changeData)
           if (changeData.metaData.action=="modifyTemporaryPointer"){
               let temporaryPointer = metaData["temporaryPointer"]
               let targetObject = <any> document.querySelector(`*[accessPointer=${temporaryPointer}]`)
@@ -233,7 +233,7 @@ export class MainController implements MainControllerInterface{
 
               let _object = <any> document.querySelector(`*[accessPointer='${htmlObjectData._identity.accessPointer}']`)
               console.log(_object, _object._identity, htmlObjectData._identity)
-              // 
+              //
               // if (changeData.htmlObject.GNType == "GNImageContainer"){
               //     let img = _object.querySelector("img")
               //     img.src =
@@ -248,7 +248,8 @@ export class MainController implements MainControllerInterface{
                       let linkedObject =  <any> this.getHtmlObjectByID(p)
                       // console.log(207207, changeData.metaData.socketId, socket.id, _object._identity.accessPointer, p, linkedObject)
                       // console.log(linkedObject, linkedObject.loadFromData)
-                      linkedObject.loadFromData(htmlObjectData, true)
+                      // linkedObject.loadFromData(htmlObjectData, true)
+                      linkedObject.loadFromData(htmlObjectData, false)
                   }
 
               })

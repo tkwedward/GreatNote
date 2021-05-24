@@ -14,4 +14,4 @@ setInterval(function () {
         socket.emit("clientSendChangesToServer", mainController.changeList);
         mainController.changeList = [];
     }
-}, 2000);
+}, 1000);

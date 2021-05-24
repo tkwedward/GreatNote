@@ -54,6 +54,10 @@ interface ToolBoxItemStatusInterface {
         status: boolean;
         attributeController: string;
     };
+    textToolItemButton: {
+        status: boolean;
+        attributeController: string;
+    };
 }
 export declare class ToolBoxClass implements ToolBoxInterface {
     itemArray: any[];
@@ -75,6 +79,7 @@ export declare class ToolBoxClass implements ToolBoxInterface {
     createAddCommentButton(toolBoxHtmlObject: any): ToolBoxItemInterface;
     createAddBookmarkButton(toolBoxHtmlObject: any): ToolBoxItemInterface;
     createMoveObjectInDivButton(toolBoxHtmlObject: any): ToolBoxItemInterface;
+    createTextToolItemButton(toolBoxHtmlObject: any): ToolBoxItemInterface;
     activateButtonFunction(toolBoxItem: any, itemName: string): void;
     registerSvg(svgLayer: any): void;
 }

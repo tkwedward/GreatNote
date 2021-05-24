@@ -1,3 +1,29 @@
+class PageObject {
+    constructor() {
+        this.pageNumber = -1;
+        this.previous = null;
+        this.next = null;
+        this.fullPageHTMLObject = null;
+        this.smallViewHTMLObject = null;
+        this.pageRelatedData = {
+            sectionArray: [],
+            annotationArray: []
+        };
+    }
+    createAnnotationDummyObject() {
+        return {
+            comment: [], group: [], question: [], solution: [], section: [], equation: []
+        };
+    }
+    getCategorizedAnnotationArray() {
+        let annotationDummyObject = this.createAnnotationDummyObject();
+        this.pageRelatedData.annotationArray.forEach((p) => {
+            var _a;
+            (_a = annotationDummyObject[p.annotationType]) === null || _a === void 0 ? void 0 : _a.push(p);
+        });
+        return annotationDummyObject;
+    }
+}
 export function initializePageController(mainController) {
     let startPage = {
         previous: null,
@@ -8,14 +34,14 @@ export function initializePageController(mainController) {
     let endPage = { previous: startPage, next: null, pageNumber: 1, name: "endPage" };
     startPage.next = endPage;
     let pageController = {
-        "startPage": startPage,
-        "endPage": endPage,
-        "currentPage": startPage,
-        "EventReceiver": document.createElement("span"),
-        "totalPageNumber": 0,
-        "fullPageSize": [1187, 720],
-        "overviewPageSize": [237.4, 144],
-        "selectedObject": null
+        startPage: startPage,
+        endPage: endPage,
+        currentPage: startPage,
+        EventReceiver: document.createElement("span"),
+        totalPageNumber: 0,
+        fullPageSize: [1187, 720],
+        overviewPageSize: [237.4, 144],
+        selectedObject: null
     };
     pageController.updatePageNumber = function (initialPage = pageController.startPage) {
         let _currentPageNumber = initialPage.pageNumber;
@@ -26,8 +52,18 @@ export function initializePageController(mainController) {
             _currentPage = _currentPage.next;
         }
     };
+    pageController.updateCurrentPage = function (previousCurrentPageHTMLObject, newCurrentPageHTMLObject) {
+        previousCurrentPageHTMLObject === null || previousCurrentPageHTMLObject === void 0 ? void 0 : previousCurrentPageHTMLObject.classList.remove("currentPage");
+        newCurrentPageHTMLObject.classList.add("currentPage");
+    };
+    pageController.getAnnotationFromAccessPointer = function (pageAccessPointer, annotationAccessPointer) {
+        let pageObject = pageController.getPageObjectFromAccessPointer(pageAccessPointer);
+        let annotationObject = pageObject.annotationArray.filter(p => p.accessPointer == annotationAccessPointer);
+        return annotationObject;
+    };
     pageController.addPage = function (fullPageHTMLObject) {
-        let newPage = { pageNumber: -1, previous: null, next: null, fullPageHTMLObject: null, smallViewHTMLObject: null };
+        let newPage = new PageObject();
+        fullPageHTMLObject.soul = newPage;
         let alpha = pageController.currentPage;
         let beta = pageController.currentPage.next;
         newPage.previous = alpha;
@@ -38,11 +74,21 @@ export function initializePageController(mainController) {
         newPage.fullPageHTMLObject = fullPageHTMLObject;
         // newPage.smallViewHTMLObject = smallViewHTMLObject
         newPage.fullPageHTMLObject.style.display = "block";
+        pageController.updateCurrentPage(alpha.fullPageHTMLObject, newPage.fullPageHTMLObject);
         if (alpha.fullPageHTMLObject) {
             alpha.fullPageHTMLObject.style.display = "none";
         }
         pageController.updatePageNumber(alpha);
         pageController.totalPageNumber += 1;
+    };
+    pageController.getPageObjectFromAccessPointer = function (accessPointer) {
+        let _currentPage = pageController.startPage.next;
+        while (_currentPage) {
+            if (_currentPage.fullPageHTMLObject.getAttribute("accessPointer") == accessPointer)
+                break;
+            _currentPage = _currentPage.next;
+        }
+        return _currentPage;
     };
     pageController.getPage = function (pageNumber) {
         if (pageNumber == -999) {
@@ -66,6 +112,8 @@ export function initializePageController(mainController) {
         beta.previous = alpha;
     };
     pageController.goToPage = function (pageNumber, pageNumberInput) {
+        if (pageNumber == pageController.currentPage.pageNumber)
+            return;
         let _targetPage = pageController.getPage(pageNumber);
         _targetPage.fullPageHTMLObject.style.display = "block";
         // set the position of the page according to the position relative to the targetPage
@@ -95,12 +143,27 @@ export function initializePageController(mainController) {
     pageController.EventReceiver.addEventListener("goToPageEvent", (e) => {
         pageController.goToPage(e["detail"].pageNumber);
     });
+    pageController.getPageNumberFromPageID = function (accessPoiniter) {
+        var _a;
+        let pageNumber = 0;
+        let _currentPage = pageController.startPage;
+        while (_currentPage) {
+            if (((_a = _currentPage.fullPageHTMLObject) === null || _a === void 0 ? void 0 : _a.getAccessPointer()) == accessPoiniter) {
+                pageNumber = _currentPage.pageNumber;
+                break;
+            }
+            _currentPage = _currentPage.next;
+        }
+        return pageNumber;
+    };
+    window.pageController = pageController;
     return pageController;
 }
 //@auto-fold here
 export function pageControllerHTMLObject(pageController, subPanelContainer) {
     let pageNavigator = document.createElement("div");
-    pageNavigator.classList.add("pageNavigator");
+    pageNavigator.classList.add("pageController");
+    pageNavigator.soul = pageController;
     let pageNumberInput = document.createElement("input");
     pageNumberInput.classList.add("pageNumberInput");
     pageController.pagNumberInput = pageNumberInput;

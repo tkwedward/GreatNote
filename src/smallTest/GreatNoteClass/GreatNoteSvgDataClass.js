@@ -11,7 +11,7 @@ function createDummyData() {
 }
 //@auto-fold here
 export function GNSvg(createData) {
-    let { name, arrayID, insertPosition, dataPointer, saveToDatabase, specialCreationMessage, injectedData } = createData;
+    let { name, arrayID, insertPosition, dataPointer, saveToDatabase, specialCreationMessage, injectedData, _classNameList } = createData;
     let svgDivContainer = document.createElement("div");
     svgDivContainer.id = "testSvgDiv";
     let svgController = SVG(svgDivContainer);
@@ -21,6 +21,10 @@ export function GNSvg(createData) {
     svgBoard._name = name;
     svgBoard._dataStructure = [];
     svgBoard._styleStructure = ["width", "height", "background", "position", "left", "top"];
+    svgBoard._classNameList = _classNameList || [];
+    _classNameList === null || _classNameList === void 0 ? void 0 : _classNameList.forEach(p => {
+        svgBoard.classList.add(p);
+    });
     // // functions
     // svgObject.loadFromData = (data)=>{ svgObject.value = data }
     svgBoard.appendToContainer = function (parent) {
@@ -38,6 +42,7 @@ export function GNSvg(createData) {
         dataObject["GNType"] = svgBoard.GNType;
         if (svgBoard._identity)
             dataObject["_identity"] = svgBoard._identity;
+        dataObject["_classNameList"] = Array.from(svgBoard.classList);
         (_a = svgBoard === null || svgBoard === void 0 ? void 0 : svgBoard._dataStructure) === null || _a === void 0 ? void 0 : _a.forEach((p) => {
             dataObject["data"][p] = svgBoard[p];
         });
@@ -50,8 +55,8 @@ export function GNSvg(createData) {
     svgBoard.loadFromData = function (data) {
         svgBoard.GNSpecialCreationMessage = data.GNSpecialCreationMessage;
         svgBoard.specialGNType = data.specialGNType;
-        if (data.classList)
-            data.classList.forEach((p) => svgBoard.classList.add(p));
+        if (data._classNameList)
+            data._classNameList.forEach((p) => svgBoard.classList.add(p));
         svgBoard._identity = data._identity;
         svgBoard.setAttribute("accessPointer", data._identity.accessPointer);
         svgBoard.applyStyle(data.stylesheet);
@@ -59,7 +64,15 @@ export function GNSvg(createData) {
     //
     svgBoard.extract = () => svgBoard.createDataObject();
     // add extra funcitons to the object
-    superGNObject(svgBoard, saveToDatabase, arrayID, insertPosition, dataPointer);
+    superGNObject(svgBoard, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage, injectedData);
+    if (injectedData) {
+        svgBoard.identity = injectedData._identity;
+        svgBoard.setAttribute("accessPointer", svgBoard.identity.accessPointer);
+        svgBoard.objectData = injectedData;
+        if (injectedData._classNameList && injectedData._classNameList.length > 0) {
+            injectedData._classNameList.forEach((p) => svgBoard.classList.add(p));
+        }
+    }
     return svgBoard;
 }
 //@auto-fold here
@@ -161,7 +174,6 @@ export function GNSvgPolyLine(createData) {
     // functions
     svgObject.loadFromData = (injectedData) => {
         svgObject.soul.plot(injectedData["data"]["points"]);
-        console.log(218218, injectedData);
         svgObject.applyStyle(injectedData["stylesheet"]);
     };
     svgObject.createDataObject = function () {
@@ -192,6 +204,16 @@ export function GNSvgPolyLine(createData) {
     superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage, injectedData);
     SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
     // add extra funcitons to the object
+    if (injectedData) {
+        svgObject.loadFromData(injectedData);
+        svgObject.applyStyle(injectedData.stylesheet, false); //
+        if (svgObject._classNameList && svgObject._classNameList.length > 0) {
+            svgObject._classNameList.forEach((p) => svgObject.classList.add(p));
+        }
+        svgObject.identity = injectedData._identity;
+        svgObject.setAttribute("accessPointer", svgObject.identity.accessPointer);
+        svgObject.objectData = injectedData;
+    }
     return svgObject;
 } //GNSvgPolyLine
 //@auto-fold here

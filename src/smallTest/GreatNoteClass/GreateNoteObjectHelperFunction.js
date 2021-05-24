@@ -18,11 +18,6 @@ export function superGNObject(_object, saveToDatabase, arrayID, insertPosition, 
     _object._identity = {
         accessPointer: "", dataPointer: "", linkArray: []
     };
-    console.log(4545423, injectedData);
-    if (injectedData) {
-        _object.identity = injectedData._identity;
-        _object.setAttribute("accessPointer", _object.identity.accessPointer);
-    }
     /** important function to extract data from individual elements*/
     // when the data is first created, add it to the database
     _object.addToDatabase = function (arrayID, insertPosition, dataPointer, specialCreationMessage) {
@@ -52,31 +47,44 @@ export function superGNObject(_object, saveToDatabase, arrayID, insertPosition, 
         });
     };
     _object.initializeHTMLObjectFromData = function (data) {
-        console.log(data);
         _object.setAttribute("accessPointer", data._identity.accessPointer);
         _object._identity = data._identity;
         _object.GNType = data.GNType;
         _object.GNSpecialCreationMessage = data.GNSpecialCreationMessage;
     };
-    _object.processUpdateData = function () {
-        let objectData = _object.reloadDataFromDatabase();
-        _object.updateLinkObject();
-    };
-    _object.reloadDataFromDatabase = function () {
-        let dataPointer = _object.getDataPointer();
-        let accessPointer = _object.getAccessPointer();
-        let dataPointerObject = mainController.getObjectById(dataPointer);
-        _object.loadFromData(dataPointerObject);
-        //
-        if (dataPointer != accessPointer) {
-            let accessPointerObject = mainController.getObjectById(accessPointer);
-            _object.applyStyle(accessPointerObject.stylesheet);
+    _object.getLocatedPageNumber = function () {
+        if (_object.classList.contains("divPage")) {
+            let targetID = _object.getAccessPointer();
+            let pageNumber = mainController.pageController.getPageNumberFromPageID(targetID);
+            mainController.pageController.goToPage(pageNumber);
+            _object.scrollIntoView();
+            // return [pageNumber, mainController]
         }
         else {
-            _object.applyStyle(dataPointerObject.stylesheet);
+            let parent = _object.parentElement;
+            return parent.getLocatedPageNumber();
         }
-        return dataPointerObject;
     };
+    _object.processUpdateData = function () {
+        // let objectData = _object.reloadDataFromDatabase()
+        // _object.updateLinkObject()
+    };
+    // _object.reloadDataFromDatabase = function(){
+    //     let dataPointer = _object.getDataPointer()
+    //     let accessPointer = _object.getAccessPointer()
+    //
+    //     let dataPointerObject = mainController.getObjectById(dataPointer)
+    //
+    //     _object.loadFromData(dataPointerObject)
+    //     //
+    //     if (dataPointer!= accessPointer){
+    //         let accessPointerObject= mainController.getObjectById(accessPointer)
+    //         _object.applyStyle(accessPointerObject.stylesheet)
+    //     } else {
+    //         _object.applyStyle(dataPointerObject.stylesheet)
+    //     }
+    //     return dataPointerObject
+    // }
     _object.appendTo = function (_parent) {
         _object._parent = _parent;
         _parent.appendChild(_object);
@@ -128,4 +136,51 @@ function attachEventListenerToLayer(mainController, arrayID, _object, injectedDa
     if (injectedData === null || injectedData === void 0 ? void 0 : injectedData.GNSpecialCreationMessage) {
         ToolBoxEvents.attachEventListenerToDivLayer(mainController, _object);
     }
+}
+export function setObjectMovable(_object) {
+    let eventName = "mousedown";
+    let moveEventName = "mousemove";
+    let attributeX = "left";
+    let attributeY = "top";
+    _object.style.position = "absolute";
+    _object.addEventListener("mousedown", (e) => {
+        console.log(e);
+        e.stopPropagation();
+        let [startX, startY] = [e["screenX"], e["screenY"]];
+        let objectInitialX = 0;
+        let objectInitialY = 0;
+        let initialLeftValue = parseInt(_object.style[attributeX].replace("px", "")) || 0;
+        let initialTopValue = parseInt(_object.style[attributeY].replace("px", "")) || 0;
+        let [currentX, currentY, deltaX, deltaY] = [0, 0, 0, 0];
+        let mousemoveFunction = (e) => {
+            e.stopPropagation();
+            currentY = e.screenY;
+            currentX = e.screenX;
+            deltaX = currentX - startX;
+            deltaY = currentY - startY;
+            let newX = _object.style[attributeX] = `${initialLeftValue + deltaX}px`;
+            _object.style[attributeY] = `${initialTopValue + deltaY}px`;
+        };
+        function endDragEvent(e) {
+            var _a;
+            Array.from((_a = _object === null || _object === void 0 ? void 0 : _object.parentNode) === null || _a === void 0 ? void 0 : _a.childNodes).forEach((p) => {
+                p["style"]["pointerEvents"] = "inherit";
+            });
+            let endX = e["screenX"];
+            let endY = e["screenY"];
+            _object.removeEventListener("mousemove", mousemoveFunction);
+        }
+        let mouseUpEvent = (e) => {
+            e.stopPropagation();
+            endDragEvent(e);
+            if (e.type == "mouseup") {
+                _object.saveHTMLObjectToDatabase();
+            }
+            _object.removeEventListener("mouseup", mouseUpEvent);
+            _object.removeEventListener("mouseout", mouseUpEvent);
+        };
+        _object.addEventListener("mousemove", mousemoveFunction, false);
+        _object.addEventListener("mouseup", mouseUpEvent, false);
+        _object.addEventListener("mouseout", mouseUpEvent, false);
+    });
 }

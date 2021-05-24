@@ -54,7 +54,6 @@ export function selectionToolPhaseTwoMouseDownEvent(e, mainController, svgBoard,
     let mouseUpFunction = (e) => {
         e.preventDefault();
         selectionStatusObject.triggerFlag = false;
-        console.log(selectionStatusObject);
         selectionStatusObject.selectedObjectArray.forEach((p) => p.saveHTMLObjectToDatabase());
         svgBoard.removeEventListener(moveEventName, mouseMoveFunction);
         svgBoard.removeEventListener(upEventName, mouseMoveFunction);

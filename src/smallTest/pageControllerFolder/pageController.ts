@@ -10,6 +10,10 @@ export interface pageControllerInterface {
     overviewPageSize:[number, number]
     selectedObject:any
     pagNumberInput: HTMLInputElement
+    pageRelatedData: {
+        sectionArray: any,
+        annotationArray: any
+    }
     addPage(fullPageHTMLObject: HTMLDivElement, smallViewHTMLObject?: HTMLDivElement):void
     deletePage(targetPage:any):void
     getPage(pageNumber:number):any
@@ -20,7 +24,55 @@ export interface pageControllerInterface {
     updateCurrentPage(previousCurrentPageHTMLObject: HTMLDivElement, newCurrentPageHTMLObject:HTMLDivElement):void
     transvereList(actionFunction:any):void
     getPageNumberFromPageID(accessPointer: string):number
+    getPageObjectFromAccessPointer(accessPointer: string):any
 }
+
+export interface PageObjectInterface {
+      pageNumber: number,
+      previous: null | PageObjectInterface,
+      next: null | PageObjectInterface,
+      fullPageHTMLObject: any,
+      smallViewHTMLObject: any,
+      pageRelatedData: {
+          sectionArray: any,
+          annotationArray: {
+            accessPointer: string, annotationType: string
+          }[]
+      }
+      getCategorizedAnnotationArray(): any
+}
+
+class PageObject implements PageObjectInterface {
+    pageNumber = -1
+    previous = null
+    next = null
+    fullPageHTMLObject =  null
+    smallViewHTMLObject =  null
+    pageRelatedData =  {
+        sectionArray: [],
+        annotationArray: []
+    }
+
+    createAnnotationDummyObject(): any{
+        return {
+            comment: [], group: [], question: [], solution: [], section: [], equation: []
+        }
+    }
+
+    getCategorizedAnnotationArray(){
+        let annotationDummyObject = this.createAnnotationDummyObject();
+
+
+        this.pageRelatedData.annotationArray.forEach((p:{
+          accessPointer:string, annotationType: string
+        })=>{
+            annotationDummyObject[p.annotationType]?.push(p)
+        });
+
+        return annotationDummyObject
+    }
+}
+
 
 export function initializePageController(mainController:MainControllerInterface){
     let startPage = {
@@ -35,14 +87,14 @@ export function initializePageController(mainController:MainControllerInterface)
 
 
     let pageController = <pageControllerInterface> {
-      "startPage": startPage,
-      "endPage": endPage,
-      "currentPage": startPage,
-      "EventReceiver": document.createElement("span"),
-      "totalPageNumber": 0,
-      "fullPageSize": [1187, 720],
-      "overviewPageSize": [237.4, 144],
-      "selectedObject": null
+      startPage: startPage,
+      endPage: endPage,
+      currentPage: startPage,
+      EventReceiver: document.createElement("span"),
+      totalPageNumber: 0,
+      fullPageSize: [1187, 720],
+      overviewPageSize: [237.4, 144],
+      selectedObject: null
     }
 
     pageController.updatePageNumber = function(initialPage = pageController.startPage){
@@ -60,8 +112,18 @@ export function initializePageController(mainController:MainControllerInterface)
       newCurrentPageHTMLObject.classList.add("currentPage")
     }
 
+    pageController.getAnnotationFromAccessPointer = function(pageAccessPointer: string, annotationAccessPointer: string){
+        let pageObject = pageController.getPageObjectFromAccessPointer(pageAccessPointer)
+        let annotationObject = pageObject.annotationArray.filter(p=>p.accessPointer == annotationAccessPointer)
+        return annotationObject
+    }
+
     pageController.addPage = function(fullPageHTMLObject:any){
-        let newPage = {pageNumber:-1, previous: null, next: null, fullPageHTMLObject: <any> null, smallViewHTMLObject: <any> null}
+        let newPage = new PageObject()
+
+        fullPageHTMLObject.soul = newPage
+
+
         let alpha = pageController.currentPage
 
         let beta = pageController.currentPage.next
@@ -85,6 +147,16 @@ export function initializePageController(mainController:MainControllerInterface)
 
         pageController.updatePageNumber(alpha)
         pageController.totalPageNumber += 1
+    }
+
+    pageController.getPageObjectFromAccessPointer = function(accessPointer: string){
+      let _currentPage = pageController.startPage.next
+      while (_currentPage){
+          if (_currentPage.fullPageHTMLObject.getAttribute("accessPointer") == accessPointer) break
+          _currentPage = _currentPage.next
+      }
+
+      return _currentPage
     }
 
     pageController.getPage = function(pageNumber){
@@ -179,7 +251,8 @@ export function initializePageController(mainController:MainControllerInterface)
 //@auto-fold here
 export function pageControllerHTMLObject(pageController: any, subPanelContainer: HTMLDivElement){
     let pageNavigator = document.createElement("div")
-    pageNavigator.classList.add("pageNavigator")
+    pageNavigator.classList.add("pageController")
+    pageNavigator.soul = pageController
 
     let pageNumberInput = document.createElement("input")
     pageNumberInput.classList.add("pageNumberInput")

@@ -1,6 +1,6 @@
 import * as GreatNoteDataClass from "../GreatNoteClass/GreatNoteDataClass";
 import * as GreatNoteSvgDataClass from "../GreatNoteClass/GreatNoteSvgDataClass";
-let layerRowTemplate = document.querySelector("#layerRowTemplate");
+import * as ToolBoxEvents from "../EventFolder/attachToolBoxEventsToLayers";
 export function switchStatus(item) {
     let currentStatus = item.getAttribute("status");
     let newStatus = currentStatus == "on" ? "off" : "on";
@@ -33,10 +33,10 @@ export function createLayerController(mainController) {
     };
     layerControllerHTMLObject.addDivLayer = function (e) {
         let currentPage = mainController.pageController.currentPage.fullPageHTMLObject;
-        console.log(5151515, currentPage, currentPage.getAccessPointer());
         let divLayer = GreatNoteDataClass.GNContainerDiv({ name: "", arrayID: currentPage.getAccessPointer(), saveToDatabase: true, specialCreationMessage: "divLayer", _classNameList: ["divLayer"] });
         divLayer.applyStyle({ width: "100%", height: "100%", "position": "absolute", "left": "0px", "top": "0px" });
         mainController.saveHTMLObjectToDatabase(divLayer);
+        ToolBoxEvents.attachEventListenerToDivLayer(mainController, divLayer);
         // divLayer.classList.add("divLayer")
         divLayer.appendTo(currentPage);
         layerControllerHTMLObject.renderCurrentPageLayer();
@@ -48,6 +48,7 @@ export function createLayerController(mainController) {
         svgLayer.applyStyle({ width: "100%", height: "100%", "background": "transparent", position: "absolute", left: "0px", top: "0px" });
         mainController.saveHTMLObjectToDatabase(svgLayer);
         svgLayer.classList.add("svgLayer");
+        ToolBoxEvents.attachEventListenerToSvgBoard(mainController, svgLayer);
         svgLayer.appendTo(currentPage);
         layerControllerHTMLObject.renderCurrentPageLayer();
     };
@@ -57,7 +58,6 @@ export function createLayerController(mainController) {
 export function showCurrentPageButtonFunction(mainController, layerView) {
     var _a;
     layerView.innerHTML = "";
-    console.log(mainController.pageController.currentPage.fullPageHTMLObject);
     let currentPageData = (_a = mainController.pageController.currentPage.fullPageHTMLObject) === null || _a === void 0 ? void 0 : _a.extract();
     let layerObject = buildLayerContentFunction(mainController, currentPageData, layerView);
     layerView.appendChild(layerObject);
@@ -66,6 +66,7 @@ export function showCurrentPageButtonFunction(mainController, layerView) {
 export function buildLayerContentFunction(mainController, currentPageData, layerView, layerLevel = 0) {
     // first create an item object that conatin the information of the layerLeevel and pageAccessPointer
     // pageAccessPointer is used for finding the related HTML obejct show that you can manipulate them
+    let layerRowTemplate = document.querySelector("#layerRowTemplate");
     let item = document.createElement("div");
     item.classList.add("layerLevel");
     let itemRow = layerRowTemplate.content.cloneNode(true)

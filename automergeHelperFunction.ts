@@ -94,7 +94,7 @@ export class AutomergeMainDoc {
 
 
     addItemToChangeList(item: {temporaryPointer:string, arrayID: string}){
-        if (this.changeList.length > 10000) this.changeList.pop()
+        if (this.changeList.length > 50000) this.changeList.pop()
         this.changeList.push(item)
     }
 
@@ -252,6 +252,7 @@ export class AutomergeMainDoc {
 
 
     processUpdateDataHelper(updateData: any){
+
         let oldAccessPointer = <string> updateData.htmlObjectData._identity.accessPointer
         let newAccessPointer = ""
 
@@ -263,6 +264,9 @@ export class AutomergeMainDoc {
         }
         let accessPointerDataObject = this.getObjectById(newAccessPointer)
 
+        if (!accessPointerDataObject._identity){
+          console.log(accessPointerDataObject, newAccessPointer)
+        }
         // update the identity
         updateData.htmlObjectData._identity = accessPointerDataObject._identity
 

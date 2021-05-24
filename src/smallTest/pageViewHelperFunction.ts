@@ -67,9 +67,6 @@ export function subPanelTab(panelClassName: string){
 
       tabBar.insertBefore(_tab,tabBar.firstChild)
       tabContent.append(_tabContent)
-
-      console.log(_tabContent)
-
     }
 
     return [tabWrapper, tabBar, tabContent]

@@ -27,7 +27,13 @@ export function GNContainerDiv(createData) {
     _object.extract = () => _object.createDataObject();
     _object.createDataObject = function () {
         var _a;
-        let dataObject = createDummyData();
+        let dataObject;
+        if (_object.objectData) {
+            dataObject = _object.objectData;
+        }
+        else {
+            dataObject = createDummyData();
+        }
         dataObject["GNType"] = _object.GNType;
         dataObject["GNSpecialCreationMessage"] = _object.GNSpecialCreationMessage;
         dataObject["specialGNType"] = _object.specialGNType || "";
@@ -56,22 +62,25 @@ export function GNContainerDiv(createData) {
     if (injectedData) {
         _object.loadFromData(injectedData);
         _object.applyStyle(injectedData.stylesheet, false); //
-    }
-    // add events
-    let eventStatus = { t0: 0, t1: 0, run: true };
-    _object.addEventListener("input", (e) => {
-        e.stopPropagation();
-        eventStatus.t0 = eventStatus.t1;
-        eventStatus.t1 = e.timeStamp;
-        if (eventStatus.t1 - eventStatus.t0 > 100) {
-            console.log(9595959, _object.textContent);
-            // let target = e["target"]
-            if (_object._identity.accessPointer != "")
-                _object.saveHTMLObjectToDatabase();
-            console.log(_object.extract());
-            if (_object.processUpdateData)
-                _object.processUpdateData();
+        if (injectedData._classNameList && injectedData._classNameList.length > 0) {
+            injectedData._classNameList.forEach((p) => _object.classList.add(p));
         }
-    }, false); //addEventListener
+        _object._identity = injectedData._identity;
+        _object.setAttribute("accessPointer", _object._identity.accessPointer);
+        _object.objectData = injectedData;
+    }
+    // // add events
+    // let eventStatus = {t0: 0, t1: 0, run: true}
+    // _object.addEventListener("input", (e:any)=>{
+    //     e.stopPropagation()
+    //     eventStatus.t0 = eventStatus.t1
+    //     eventStatus.t1 = e.timeStamp
+    //
+    //     if ( eventStatus.t1 - eventStatus.t0 > 100){
+    //         // let target = e["target"]
+    //         if (_object._identity.accessPointer!="") _object.saveHTMLObjectToDatabase()
+    //         if (_object.processUpdateData) _object.processUpdateData()
+    //     }
+    // }, false)//addEventListener
     return _object;
 }

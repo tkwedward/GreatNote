@@ -6,11 +6,14 @@ import * as EventModel from "./EventModel"
 import {GNContainerDiv} from "./GreatNoteClass/GreatNoteDataClass"
 import {GNImageContainer} from "./GreatNoteClass/GNImageContainer"
 import {GNInputField} from "./GreatNoteClass/GNInputField"
+import {GNTextContainer} from "./GreatNoteClass/GNTextContainer"
 import { GNBookmark } from "./bookmarkFolder/GNBookmark"
 import { GNPage } from "./GreatNoteClass/GNPage"
 import { GNBookmarkLinkedObject} from "./bookmarkFolder/GNBookmarkLinkedObject"
 import * as GreatNoteSvgDataClass from "./GreatNoteClass/GreatNoteSvgDataClass"
 import * as GroupController from "./groupControllerFolder/groupController"
+import {getAllPageAnnotation, buildAnnotationPage } from "./pageControllerFolder/annotationHelperFunctions"
+
 
 import {socket} from "./socketFunction"
 import * as GNCommentController from "./commentFolder/commentController"
@@ -19,7 +22,7 @@ import * as CommentSidebarController from "./commentFolder/commentSidebarControl
 
 import * as LayerConroller from "./layerControllerFolder/layerController"
 import {MainControllerInterface} from "./mainControllerFolder/mainControllerInterface"
-import * as pageController from "./pageControllerFolder/pageController"
+import * as PageController from "./pageControllerFolder/pageController"
 import * as pageViewHelperFunction from "./pageViewHelperFunction"
 import * as InitializeAttributeControllerFunction from "./attributeControllerFolder/initializeAttributeControllers"
 import * as CollectionController from "./collectionControllerFolder/collectionController"
@@ -38,6 +41,7 @@ export function createGNDataStructureMapping(mainController:MainControllerInterf
       GNImageContainer: GNImageContainer,
       GNBookmark: GNBookmark,
       GNPage: GNPage,
+      GNTextContainer: GNTextContainer,
 
       // svg
       GNSvg: GreatNoteSvgDataClass.GNSvg,
@@ -140,11 +144,40 @@ export function buildPageControllerButtonArray(mainController:MainControllerInte
       console.log(153, mainController.mainDoc["array"][0]["array"], mainController)
   })
 
-  let resetButton = document.createElement("button")
-  resetButton.innerText = "resetButton"
-  resetButton.addEventListener("click", function(){
-      mainController.initalizeMainDoc()
+
+
+  let showAnnotationButton = document.createElement("button")
+  showAnnotationButton.innerText = "showAnnotation"
+  showAnnotationButton.addEventListener("click", function(){
+      let annotationPage = <HTMLDivElement> document.querySelector(".annotationPage")
+      console.log(annotationPage.style.display)
+
+      if (annotationPage.style.display=="block"){
+          annotationPage.style.display = "none"
+          return
+      }
+      // if the display is none or other
+      annotationPage.style.display = "block"
+
+      let annotationPageContentWrapper = <HTMLDivElement> annotationPage.querySelector(".annotationPageContentWrapper")
+      let currentPage = <any>  mainController.pageController.startPage.next
+
+      let allPageAnnotationArray = []
+      while (currentPage){
+          if (!currentPage.getCategorizedAnnotationArray) break
+
+          let currentPageAnnotationData = getAllPageAnnotation(currentPage)
+
+          if (currentPageAnnotationData){
+              allPageAnnotationArray.push(currentPageAnnotationData)
+          }
+
+          currentPage = currentPage.next
+      }
+      console.log(177177, allPageAnnotationArray)
   })
+
+
 
   let objectIDGetter = document.createElement("input")
   let objectIDGetterSubmit = document.createElement("input")
@@ -158,14 +191,16 @@ export function buildPageControllerButtonArray(mainController:MainControllerInte
       window.selectedItem = document.querySelector(`*[accessPointer='${objectIDGetter.value}']`)
   })
 
-  editorController.append(objectIDGetter, objectIDGetterSubmit, testFieldButton, showMainDocButton, resetButton)
+  editorController.append(objectIDGetter, objectIDGetterSubmit, testFieldButton, showMainDocButton, showAnnotationButton)
 
   // toolBoxObject
   let toolBoxHtmlObject = buildToolBoxHtmlObject(mainController)
 
   pageControllerSubPanelContent.append(toolBoxHtmlObject, editorController)
 
-  return {pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, copyButton, linkButton, deleteButton,  showMainDocButton, resetButton}
+  let annotationPage = document.querySelector(".annotationPage")
+
+  return {pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, copyButton, linkButton, deleteButton,  showMainDocButton, showAnnotationButton, annotationPage}
 }
 
 
@@ -181,9 +216,10 @@ export function buildToolBoxHtmlObject(mainController){
   let addCommentItemButton = mainController.toolBox.createAddCommentButton(toolBoxHtmlObject)
   let moveObjectInDivButton = mainController.toolBox.createMoveObjectInDivButton(toolBoxHtmlObject)
   let addBookmarkButton = mainController.toolBox.createAddBookmarkButton(toolBoxHtmlObject)
+  let textToolButton = mainController.toolBox.createTextToolItemButton(toolBoxHtmlObject)
 
 
-  toolBoxHtmlObject.append(eraserItemButton, polylineItemButton, selectionToolItemButton, mouseRectangleSelectionToolItemButton, addCommentItemButton, moveObjectInDivButton, addBookmarkButton)
+  toolBoxHtmlObject.append(eraserItemButton, polylineItemButton, selectionToolItemButton, mouseRectangleSelectionToolItemButton, addCommentItemButton, moveObjectInDivButton, addBookmarkButton, textToolButton)
 
   return toolBoxHtmlObject
 }
@@ -192,7 +228,7 @@ export function buildPageController(mainController, bookmarkSubPanelContent, ful
 
   // page controller
   // To create a page Controller to navigate previous and nex page
-  pageController.pageControllerHTMLObject(mainController.pageController, bookmarkSubPanelContent)
+  PageController.pageControllerHTMLObject(mainController.pageController, bookmarkSubPanelContent)
 
   let createNewDivButton = pageViewHelperFunction.functionButtonCreater(
     "new Div", pageViewHelperFunction.createNewPageEvent(mainController.pageController, fullPageModeDiv, overviewModeDiv, pageContentContainer)
@@ -226,12 +262,18 @@ export function buildPageController(mainController, bookmarkSubPanelContent, ful
 }
 
 
+
 export function buildInitialHTMLSkeleton(mainController: MainControllerInterface){
 
       let currentStatus = mainController.pageCurrentStatus
 
+      let annotationPage = buildAnnotationPage(mainController)
+
+
       let [topSubPanel, topSubPanelTabBar, topSubPanelTabContent] = pageViewHelperFunction.subPanelTab("topSubPanel")
-      let {pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, copyButton, linkButton, deleteButton, showMainDocButton, resetButton} =  buildPageControllerButtonArray(mainController)
+      let {pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, copyButton, linkButton, deleteButton, showMainDocButton, showAnnotationButton} =  buildPageControllerButtonArray(mainController)
+
+
       topSubPanel.addTabAndTabContent(pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent)
 
 
@@ -240,9 +282,9 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
 
       let [groupControllerNavbarTitle, groupControllerContent] = GroupController.GroupController(mainController)
       let [collectionControllerNavbarTitle, collectionControllerContent] = CollectionController.CollectionController(mainController)
-      middleSubPanel.addTabAndTabContent(collectionControllerNavbarTitle, collectionControllerContent)
+      middleSubPanel.addTabAndTabContent(collectionControllerNavbarTitle, collectionControllerContent, false)
       middleSubPanel.addTabAndTabContent(groupControllerNavbarTitle, groupControllerContent, false)
-      middleSubPanel.addTabAndTabContent(bookmarkSubPanelNavbarTitle, bookmarkSubPanelContent, false)
+      middleSubPanel.addTabAndTabContent(bookmarkSubPanelNavbarTitle, bookmarkSubPanelContent)
 
 
 
@@ -304,9 +346,11 @@ export function buildInitialPage(mainController:MainControllerInterface, saveToD
     for (let i = 0; i< pageFullArray.length; i++){
         let [newPage, smallView] = pageViewHelperFunction.createNewPage(pageController, fullPageModeDiv, overviewModeDiv, pageFullArray[i], pageOverviewArray[i], saveToDatabase)
 
+        pageViewHelperFunction.insertNewPage(pageController, newPage, smallView, fullPageModeDiv, overviewModeDiv)
+
         mainController.renderDataToHTML(pageFullArray[i], newPage)
 
-        pageViewHelperFunction.insertNewPage(pageController, newPage, smallView, fullPageModeDiv, overviewModeDiv)
+
 
         if (i == pageFullArray.length-1){
           newPage.classList.add("currentPage")

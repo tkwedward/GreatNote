@@ -17,7 +17,6 @@ export function polylineMouseDownFunction(e, mainController, svgBoard, moveEvent
     if (e.type == "mousedown") {
         offsetX = mousePositionRatioAdjustment(e.offsetX, ratio);
         offsetY = mousePositionRatioAdjustment(e.offsetY, ratio);
-        // testInfo.innerHTML = `dist
     }
     // touchIsPen = true
     if (e.type == "mousedown" || touchIsPen) {

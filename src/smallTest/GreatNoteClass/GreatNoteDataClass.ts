@@ -89,8 +89,8 @@ export function GNContainerDiv(createData: CreateGreatNoteObjectInterface) : GNC
         injectedData._classNameList.forEach((p:any)=>_object.classList.add(p))
       }
 
-      _object.identity = injectedData._identity
-      _object.setAttribute("accessPointer", _object.identity.accessPointer)
+      _object._identity = injectedData._identity
+      _object.setAttribute("accessPointer", _object._identity.accessPointer)
       _object.objectData = injectedData
 
     }

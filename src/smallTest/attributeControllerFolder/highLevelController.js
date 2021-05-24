@@ -87,3 +87,48 @@ export function createSvgCircleControllerContainer() {
     superController(svgCircleContainer);
     return svgCircleContainer;
 } // createSvgCircleControllerContainer
+export function createSelectionToolController(mainController) {
+    let selectionToolControllerContainer = document.createElement("div");
+    selectionToolControllerContainer.classList.add("penSelectionToolController");
+    selectionToolControllerContainer.copyDataArray = [];
+    let copyButton = document.createElement("button");
+    copyButton.innerText = "copy";
+    copyButton.addEventListener("click", function () {
+        selectionToolControllerContainer.copyDataArray = [];
+        let selectionPolyline = document.querySelector(".selectionPolyline");
+        selectionToolControllerContainer.copyDataArray = selectionPolyline.selectedObjectArray.map((p) => p.extract());
+    });
+    let cutButton = document.createElement("button");
+    cutButton.innerText = "cut";
+    cutButton.addEventListener("click", function () {
+        duplicateSvgData(mainController, selectionToolControllerContainer, true);
+    });
+    let pasteButton = document.createElement("button");
+    pasteButton.innerText = "paste";
+    pasteButton.addEventListener("click", function () {
+        duplicateSvgData(mainController, selectionToolControllerContainer);
+    });
+    let deleteButton = document.createElement("button");
+    deleteButton.innerText = "delete";
+    deleteButton.addEventListener("click", function () {
+        let selectionPolyline = document.querySelector(".selectionPolyline");
+        selectionPolyline.selectedObjectArray.forEach((p) => p.remove());
+        selectionPolyline.remove();
+    });
+    selectionToolControllerContainer.append(copyButton, cutButton, pasteButton, deleteButton);
+    return selectionToolControllerContainer;
+}
+function duplicateSvgData(mainController, selectionToolControllerContainer, removeOriginalData = false) {
+    let currentPageSvgLayer = document.querySelector(".currentPage svg");
+    selectionToolControllerContainer.copyDataArray.forEach((p) => {
+        let newHTMLObject;
+        if (p.GNType == "GNSvgPolyLine") {
+            newHTMLObject = mainController.createGNObjectThroughName("GNSvgPolyLine", { name: "", saveToDatabase: true, injectedData: p });
+            console.log(159159, currentPageSvgLayer, newHTMLObject);
+            currentPageSvgLayer.append(newHTMLObject);
+        }
+    });
+    selectionToolControllerContainer.copyDataArray = [];
+    let selectionPolyline = document.querySelector(".selectionPolyline");
+    selectionPolyline.remove();
+}

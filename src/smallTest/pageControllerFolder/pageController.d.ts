@@ -9,6 +9,10 @@ export interface pageControllerInterface {
     overviewPageSize: [number, number];
     selectedObject: any;
     pagNumberInput: HTMLInputElement;
+    pageRelatedData: {
+        sectionArray: any;
+        annotationArray: any;
+    };
     addPage(fullPageHTMLObject: HTMLDivElement, smallViewHTMLObject?: HTMLDivElement): void;
     deletePage(targetPage: any): void;
     getPage(pageNumber: number): any;
@@ -19,6 +23,22 @@ export interface pageControllerInterface {
     updateCurrentPage(previousCurrentPageHTMLObject: HTMLDivElement, newCurrentPageHTMLObject: HTMLDivElement): void;
     transvereList(actionFunction: any): void;
     getPageNumberFromPageID(accessPointer: string): number;
+    getPageObjectFromAccessPointer(accessPointer: string): any;
+}
+export interface PageObjectInterface {
+    pageNumber: number;
+    previous: null | PageObjectInterface;
+    next: null | PageObjectInterface;
+    fullPageHTMLObject: any;
+    smallViewHTMLObject: any;
+    pageRelatedData: {
+        sectionArray: any;
+        annotationArray: {
+            accessPointer: string;
+            annotationType: string;
+        }[];
+    };
+    getCategorizedAnnotationArray(): any;
 }
 export declare function initializePageController(mainController: MainControllerInterface): pageControllerInterface;
 export declare function pageControllerHTMLObject(pageController: any, subPanelContainer: HTMLDivElement): void;

@@ -85,7 +85,6 @@ export function GNBookmark(createData: CreateGreatNoteObjectInterface):GNBookmar
         // data conent
         bookmarkTitle.innerHTML = injectedData.data.bookmarkTitle
         bookmarkType.value = injectedData.data.bookmarkType
-        console.log(888888, injectedData.data.bookmarkType)
 
         // style
         _object.applyStyle(injectedData.stylesheet)

@@ -3,17 +3,41 @@ import * as ClipboardEvent from "./clipboardEvents";
 import { GNContainerDiv } from "./GreatNoteClass/GreatNoteDataClass";
 import { GNImageContainer } from "./GreatNoteClass/GNImageContainer";
 import { GNInputField } from "./GreatNoteClass/GNInputField";
+import { GNTextContainer } from "./GreatNoteClass/GNTextContainer";
+import { GNBookmark } from "./bookmarkFolder/GNBookmark";
+import { GNPage } from "./GreatNoteClass/GNPage";
+import { GNBookmarkLinkedObject } from "./bookmarkFolder/GNBookmarkLinkedObject";
 import * as GreatNoteSvgDataClass from "./GreatNoteClass/GreatNoteSvgDataClass";
+import * as GroupController from "./groupControllerFolder/groupController";
+import { getAllPageAnnotation, buildAnnotationPage } from "./pageControllerFolder/annotationHelperFunctions";
 import { socket } from "./socketFunction";
 import * as GNCommentController from "./commentFolder/commentController";
 import * as LayerConroller from "./layerControllerFolder/layerController";
-import * as pageController from "./pageControllerFolder/pageController";
+import * as PageController from "./pageControllerFolder/pageController";
 import * as pageViewHelperFunction from "./pageViewHelperFunction";
 import * as InitializeAttributeControllerFunction from "./attributeControllerFolder/initializeAttributeControllers";
+import * as CollectionController from "./collectionControllerFolder/collectionController";
+import * as ColllectionControllerHelperFunctions from "./collectionControllerFolder/colllectionControllerHelperFunctions";
 import * as SwipeEventController from "./EventFolder/swipeEvent";
-import * as TestHelper from "./testFolder/testHelperFunction";
-import * as WindowController from "./EventFolder/specialWindowObject";
-export function getDivFromHTML(mainController) {
+// import * as WindowController from "./EventFolder/specialWindowObject"
+let openStatus = true;
+export function createGNDataStructureMapping(mainController) {
+    mainController.GNDataStructureMapping = {
+        GNInputField: GNInputField,
+        GNContainerDiv: GNContainerDiv,
+        GNImageContainer: GNImageContainer,
+        GNBookmark: GNBookmark,
+        GNPage: GNPage,
+        GNTextContainer: GNTextContainer,
+        // svg
+        GNSvg: GreatNoteSvgDataClass.GNSvg,
+        GNSvgCircle: GreatNoteSvgDataClass.GNSvgCircle,
+        GNSvgPolyLine: GreatNoteSvgDataClass.GNSvgPolyLine,
+        GNSvgRect: GreatNoteSvgDataClass.GNSvgRect,
+        GNComment: GNCommentController.GNComment
+    };
+}
+export function getImportantDivFromHTML(mainController) {
     let pageArrayID = mainController.mainDocArray["mainArray_page"];
     // global htmlObjects
     let panelContainer = document.querySelector(".panelContainer");
@@ -24,14 +48,12 @@ export function getDivFromHTML(mainController) {
     let overviewModeDiv = document.querySelector(".overviewModeDiv");
     overviewModeDiv.setAttribute("accessPointer", mainController.mainDocArray["mainArray_pageOverview"]);
     overviewModeDiv.setAttribute("status", "off");
-    let bookmarkSubPanel = pageViewHelperFunction.createSubPanel("bookmark", true);
-    let bookmarkSubPanelContent = bookmarkSubPanel.querySelector(".subPanelContent");
-    return { pageArrayID, panelContainer, pageContentContainer, fullPageModeDiv, overviewModeDiv, bookmarkSubPanel, bookmarkSubPanelContent };
+    let [bookmarkSubPanelNavbarTitle, bookmarkSubPanelContent] = pageViewHelperFunction.createSubPanel("bookmark");
+    return { pageArrayID, panelContainer, pageContentContainer, fullPageModeDiv, overviewModeDiv, bookmarkSubPanelNavbarTitle, bookmarkSubPanelContent };
 }
 export function buildPageControllerButtonArray(mainController) {
     // create subPanel
-    let pageControllerSubPanel = pageViewHelperFunction.createSubPanel("pageController", true);
-    let pageControllerSubPanelContent = pageControllerSubPanel.querySelector(".subPanelContent");
+    let [pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent] = pageViewHelperFunction.createSubPanel("pageController");
     let testValuePanel = document.createElement("div");
     testValuePanel.classList.add("testValuePanel");
     pageControllerSubPanelContent.appendChild(testValuePanel);
@@ -60,7 +82,6 @@ export function buildPageControllerButtonArray(mainController) {
         let nameOfGNtype = selectedObject._type;
         let selectedObjectData = selectedObject.extract();
         selectedObjectData["data"]["cx"] += 100;
-        //_name:string, arrayID: string, insertPosition?: number|boolean, dataPointer?: string|boolean, saveToDatabase?: boolean=true
         let parentContainerObjectID = selectedObject.parentNode.getAccessPointer();
         let linkedObject = mainController.createGNObjectThroughName(nameOfGNtype, { name: "", arrayID: parentContainerObjectID, insertPosition: false, dataPointer: selectedObject.getAccessPointer(), saveToDatabase: true });
         linkedObject.loadFromData(selectedObjectData);
@@ -87,10 +108,30 @@ export function buildPageControllerButtonArray(mainController) {
     showMainDocButton.addEventListener("click", function () {
         console.log(153, mainController.mainDoc["array"][0]["array"], mainController);
     });
-    let resetButton = document.createElement("button");
-    resetButton.innerText = "resetButton";
-    resetButton.addEventListener("click", function () {
-        mainController.initalizeMainDoc();
+    let showAnnotationButton = document.createElement("button");
+    showAnnotationButton.innerText = "showAnnotation";
+    showAnnotationButton.addEventListener("click", function () {
+        let annotationPage = document.querySelector(".annotationPage");
+        console.log(annotationPage.style.display);
+        if (annotationPage.style.display == "block") {
+            annotationPage.style.display = "none";
+            return;
+        }
+        // if the display is none or other
+        annotationPage.style.display = "block";
+        let annotationPageContentWrapper = annotationPage.querySelector(".annotationPageContentWrapper");
+        let currentPage = mainController.pageController.startPage.next;
+        let allPageAnnotationArray = [];
+        while (currentPage) {
+            if (!currentPage.getCategorizedAnnotationArray)
+                break;
+            let currentPageAnnotationData = getAllPageAnnotation(currentPage);
+            if (currentPageAnnotationData) {
+                allPageAnnotationArray.push(currentPageAnnotationData);
+            }
+            currentPage = currentPage.next;
+        }
+        console.log(177177, allPageAnnotationArray);
     });
     let objectIDGetter = document.createElement("input");
     let objectIDGetterSubmit = document.createElement("input");
@@ -101,26 +142,30 @@ export function buildPageControllerButtonArray(mainController) {
         console.log(mainController.getObjectById(objectIDGetter.value), document.querySelector(`*[accessPointer='${objectIDGetter.value}']`));
         window.selectedItem = document.querySelector(`*[accessPointer='${objectIDGetter.value}']`);
     });
-    editorController.append(objectIDGetter, objectIDGetterSubmit, testFieldButton, showMainDocButton, resetButton);
+    editorController.append(objectIDGetter, objectIDGetterSubmit, testFieldButton, showMainDocButton, showAnnotationButton);
     // toolBoxObject
     let toolBoxHtmlObject = buildToolBoxHtmlObject(mainController);
     pageControllerSubPanelContent.append(toolBoxHtmlObject, editorController);
-    return { pageControllerSubPanel, pageControllerSubPanelContent, testFieldButton, copyButton, linkButton, deleteButton, showMainDocButton, resetButton };
+    let annotationPage = document.querySelector(".annotationPage");
+    return { pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, copyButton, linkButton, deleteButton, showMainDocButton, showAnnotationButton, annotationPage };
 }
 export function buildToolBoxHtmlObject(mainController) {
     let toolBoxHtmlObject = mainController.toolBox.createToolboxHtmlObject();
     let eraserItemButton = mainController.toolBox.createEraserItemButton(toolBoxHtmlObject);
     let polylineItemButton = mainController.toolBox.createNewPolyLineItemButton(toolBoxHtmlObject);
     let selectionToolItemButton = mainController.toolBox.createSelectionToolItemButton(toolBoxHtmlObject);
+    let mouseRectangleSelectionToolItemButton = mainController.toolBox.createMouseRectangleSelectionToolItemButton(toolBoxHtmlObject);
     let addCommentItemButton = mainController.toolBox.createAddCommentButton(toolBoxHtmlObject);
     let moveObjectInDivButton = mainController.toolBox.createMoveObjectInDivButton(toolBoxHtmlObject);
-    toolBoxHtmlObject.append(eraserItemButton, polylineItemButton, selectionToolItemButton, addCommentItemButton, moveObjectInDivButton);
+    let addBookmarkButton = mainController.toolBox.createAddBookmarkButton(toolBoxHtmlObject);
+    let textToolButton = mainController.toolBox.createTextToolItemButton(toolBoxHtmlObject);
+    toolBoxHtmlObject.append(eraserItemButton, polylineItemButton, selectionToolItemButton, mouseRectangleSelectionToolItemButton, addCommentItemButton, moveObjectInDivButton, addBookmarkButton, textToolButton);
     return toolBoxHtmlObject;
 }
 export function buildPageController(mainController, bookmarkSubPanelContent, fullPageModeDiv, overviewModeDiv, pageContentContainer) {
     // page controller
     // To create a page Controller to navigate previous and nex page
-    pageController.pageControllerHTMLObject(mainController.pageController, bookmarkSubPanelContent);
+    PageController.pageControllerHTMLObject(mainController.pageController, bookmarkSubPanelContent);
     let createNewDivButton = pageViewHelperFunction.functionButtonCreater("new Div", pageViewHelperFunction.createNewPageEvent(mainController.pageController, fullPageModeDiv, overviewModeDiv, pageContentContainer));
     createNewDivButton.classList.add("addNewPage");
     let deletePageButton = document.createElement("button");
@@ -144,66 +189,95 @@ export function buildPageController(mainController, bookmarkSubPanelContent, ful
 }
 export function buildInitialHTMLSkeleton(mainController) {
     let currentStatus = mainController.pageCurrentStatus;
-    let { pageArrayID, panelContainer, pageContentContainer, fullPageModeDiv, overviewModeDiv, bookmarkSubPanel, bookmarkSubPanelContent } = getDivFromHTML(mainController);
-    let { pageControllerSubPanel, pageControllerSubPanelContent, testFieldButton, copyButton, linkButton, deleteButton, showMainDocButton, resetButton } = buildPageControllerButtonArray(mainController);
+    let annotationPage = buildAnnotationPage(mainController);
+    let [topSubPanel, topSubPanelTabBar, topSubPanelTabContent] = pageViewHelperFunction.subPanelTab("topSubPanel");
+    let { pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, copyButton, linkButton, deleteButton, showMainDocButton, showAnnotationButton } = buildPageControllerButtonArray(mainController);
+    topSubPanel.addTabAndTabContent(pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent);
+    let [middleSubPanel, middleSubPanelTabBar, middleSubPanelTabContent] = pageViewHelperFunction.subPanelTab("middleSubPanel");
+    let { pageArrayID, panelContainer, pageContentContainer, fullPageModeDiv, overviewModeDiv, bookmarkSubPanelNavbarTitle, bookmarkSubPanelContent } = getImportantDivFromHTML(mainController);
+    let [groupControllerNavbarTitle, groupControllerContent] = GroupController.GroupController(mainController);
+    let [collectionControllerNavbarTitle, collectionControllerContent] = CollectionController.CollectionController(mainController);
+    middleSubPanel.addTabAndTabContent(collectionControllerNavbarTitle, collectionControllerContent, false);
+    middleSubPanel.addTabAndTabContent(groupControllerNavbarTitle, groupControllerContent, false);
+    middleSubPanel.addTabAndTabContent(bookmarkSubPanelNavbarTitle, bookmarkSubPanelContent);
     //===================== bookmarkSubPanel ==================//
     buildPageController(mainController, bookmarkSubPanelContent, fullPageModeDiv, overviewModeDiv, pageContentContainer);
+    let [bottomSubPanel, bottomSubPanelTabBar, bottomSubPanelTabContent] = pageViewHelperFunction.subPanelTab("bottomSubPanel");
     // commentSubPanel
-    let commentSubPanel = pageViewHelperFunction.createSubPanel("comment", false);
+    let [commentSubPanelNavbarTitle, commentSubPanelContent] = pageViewHelperFunction.createSubPanel("comment", true);
+    commentSubPanelContent.setAttribute("accessPointer", mainController.mainDocArray["mainArray_bookmark"]);
+    bottomSubPanel.addTabAndTabContent(commentSubPanelNavbarTitle, commentSubPanelContent);
+    //
+    // let commentSidebar = CommentSidebarController.GNCommentSidebar()
+    // commentSubPanelContent.append(commentSidebar)
     // add events: initalizeWindowObject, addPasteImageEvent, swipeDetection
     attachEvents(mainController, pageContentContainer);
+    panelContainer.append(topSubPanel, middleSubPanel, bottomSubPanel);
     pageViewHelperFunction.shortNotice("inital Value");
     socket.emit("clientAskServerForSocketData");
-    panelContainer.append(pageControllerSubPanel, bookmarkSubPanel, commentSubPanel);
     window.mainController = mainController;
 } // buildInitialHTMLSkeleton
 export function buildInitialPage(mainController, saveToDatabase = false) {
-    mainController.GNDataStructureMapping = {
-        GNInputField: GNInputField,
-        GNContainerDiv: GNContainerDiv,
-        GNImageContainer: GNImageContainer,
-        // svg
-        GNSvg: GreatNoteSvgDataClass.GNSvg,
-        GNSvgCircle: GreatNoteSvgDataClass.GNSvgCircle,
-        GNSvgPolyLine: GreatNoteSvgDataClass.GNSvgPolyLine,
-        GNSvgRect: GreatNoteSvgDataClass.GNSvgRect,
-        GNComment: GNCommentController.GNComment
-    };
+    createGNDataStructureMapping(mainController);
+    /*
+      0: pageFullArray
+      1: "mainArray_pageOverview"
+      2: "mainArray_bookmark"
+      3: "mainArray_panel"
+      4: "mainArray_pokemon"
+    */
+    // the array of the elements to be rendered to the document body
     let pageController = mainController.pageController;
     let pageFullArray = mainController.mainDoc["array"][0]["array"];
     let pageOverviewArray = mainController.mainDoc["array"][1]["array"];
+    let bookmarkArray = mainController.mainDoc["array"][2]["array"];
+    let collectionArray = mainController.mainDoc["array"][3]["array"];
     let fullPageModeDiv = document.querySelector(".fullPageModeDiv");
     let overviewModeDiv = document.querySelector(".overviewModeDiv");
+    let commentSubPanelContent = document.querySelector(".commentSubPanel");
+    let groupControllerWrapper = document.querySelector(".groupControllerWrapper");
+    let collectionControllerWrapper = document.querySelector(".collectionControllerWrapper");
     for (let i = 0; i < pageFullArray.length; i++) {
         let [newPage, smallView] = pageViewHelperFunction.createNewPage(pageController, fullPageModeDiv, overviewModeDiv, pageFullArray[i], pageOverviewArray[i], saveToDatabase);
-        mainController.renderDataToHTML(pageFullArray[i], newPage);
         pageViewHelperFunction.insertNewPage(pageController, newPage, smallView, fullPageModeDiv, overviewModeDiv);
+        mainController.renderDataToHTML(pageFullArray[i], newPage);
+        if (i == pageFullArray.length - 1) {
+            newPage.classList.add("currentPage");
+            let groupData = newPage.extract().data.groupData;
+            groupControllerWrapper.renderGroup(groupData);
+        }
     }
+    // collectionPage
+    let groupData = [
+        {
+            pageAccessPointer: "71ffffb4-e34a-41a6-9168-0d1991b655d7",
+            uniqueID: "1621568792409"
+        },
+        {
+            pageAccessPointer: "71ffffb4-e34a-41a6-9168-0d1991b655d7",
+            uniqueID: "1621568792409"
+        },
+        {
+            pageAccessPointer: "71ffffb4-e34a-41a6-9168-0d1991b655d7",
+            uniqueID: "1621568792409"
+        }
+    ];
+    let collectionPage = ColllectionControllerHelperFunctions.createCollectionPage();
+    collectionPage.injecetDataToCollectionPage(groupData);
     if (pageFullArray.length > 0)
         mainController.layerController.renderCurrentPageLayer();
-    TestHelper.testFunction(mainController);
+    bookmarkArray.forEach((p) => {
+        let bookmarkLinkedObject = GNBookmarkLinkedObject({ name: "bookmarkLinkedObject", injectedData: p });
+        commentSubPanelContent.append(bookmarkLinkedObject);
+    });
+    // TestHelper.testFunction(mainController)
     // let updateEvent = setInterval(() =>{
     //   console.log("send changes to server")
     //   mainController.sendChangeToServer()
     // }, 4000)
 } // buildInitialPage
-function jsonify(x) {
-    if (Array.isArray(x)) {
-        return x.map(p => jsonify(p));
-    }
-    else if (typeof x === 'object') {
-        let newX = {};
-        Object.entries(x).forEach(([key, value], _) => {
-            newX[key] = jsonify(value);
-        });
-        return newX;
-    }
-    else {
-        return x;
-    }
-}
 export function attachEvents(mainController, pageContentContainer) {
-    WindowController.initalizeWindowObject();
+    // WindowController.initalizeWindowObject()
     // clipboard event
     ClipboardEvent.addPasteImageEvent(mainController);
     // to add swipe, panning events to the pageContentContainer

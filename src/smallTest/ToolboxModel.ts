@@ -10,7 +10,8 @@ let iconName = {
     eraserTool: "/graphics/toolBox/eraserTool.png",
     commentTool: "/graphics/toolBox/commentTool.png",
     movableTool: "/graphics/toolBox/movableTool.png",
-    penTool: "/graphics/toolBox/penTool.png"
+    penTool: "/graphics/toolBox/penTool.png",
+    textTool: "/graphics/toolBox/textTool.png"
 }
 
 
@@ -60,6 +61,7 @@ interface ToolBoxItemStatusInterface {
     addCommentItemButton: {status: boolean, attributeController: string}
     moveObjectInDivButton: {status: boolean, attributeController: string}
     addBookmarkButton: {status: boolean, attributeController: string}
+    textToolItemButton: {status: boolean, attributeController: string}
 }
 
 
@@ -102,6 +104,10 @@ export class ToolBoxClass implements ToolBoxInterface {
         addBookmarkButton: {
             status: false,
             attributeController: "addBookmarkController"
+        },
+        textToolItemButton: {
+            status: false,
+            attributeController: "textToolController"
         }
     }
 
@@ -214,7 +220,7 @@ export class ToolBoxClass implements ToolBoxInterface {
         let toolBoxItem = this.createToolBoxItem("MouseRectangleSelectionTool", toolBoxHtmlObject, iconName["rectangleSelectionTool"])
 
         toolBoxItem.addEventListener("click", (e)=>{
-            console.log("Selection Tool item button is activated")
+            console.log("Mouse Rectangle Selection Tool item button is activated")
             this.activateButtonFunction(toolBoxItem, "rectangleSelectionToolItemButton")
         })
 
@@ -271,6 +277,27 @@ export class ToolBoxClass implements ToolBoxInterface {
 
       return toolBoxItem
     }
+
+    createTextToolItemButton(toolBoxHtmlObject:any){
+        let toolBoxItem = this.createToolBoxItem("textTool", toolBoxHtmlObject, iconName.textTool)
+
+        toolBoxItem.addEventListener("click", (e)=>{
+            console.log("Text Tool item button is activated")
+            this.activateButtonFunction(toolBoxItem, "textToolItemButton")
+        })
+
+
+        toolBoxItem.activate = function(){
+          changeSvgEventPointer("none")
+        }
+
+        toolBoxItem.deactivate = function(){
+          changeSvgEventPointer("auto")
+        }
+
+        return toolBoxItem
+    }
+
 
     activateButtonFunction(toolBoxItem:any, itemName:string){
       // to deactivate the previous button and activate the new button

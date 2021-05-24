@@ -13,7 +13,8 @@ export function selectionToolPhaseOneMouseDownFunction(e, mainController, svgBoa
     if (e.type == "mousedown" || touchIsPen) {
         selectionStatusObject.selectedObjectArray = [];
         selectionStatusObject.counter += 1;
-        let polyline = GreatNoteSvgDataClass.GNSvgPolyLine({ name: "", saveToDatabase: false });
+        let polyline = GreatNoteSvgDataClass.GNSvgPolyLine({ name: "", saveToDatabase: false, _classNameList: ["selectionPolyline"] });
+        polyline.classList.add("selectionPolyline");
         polyline.style.pointerEvents = "none";
         polyline.soul.plot([[offsetX, offsetY]]);
         polyline.appendTo(svgBoard);
@@ -74,5 +75,6 @@ export function markObjectInsideSelectionArea(svgBoard, selectionStatusObject) {
     }); // svgBoard.childNodes.forEach
     selectionStatusObject.selectedObjectArray = Array.from(selectionObjectSet);
     selectionStatusObject.selectedObjectArray = selectionStatusObject.selectedObjectArray.map(p => svgBoard.querySelector(`polyline[accessPointer='${p}']`));
+    polyline.selectedObjectArray = selectionStatusObject.selectedObjectArray;
     // selectionStatusObject.selectedObjectArray.push(polyline)
 }

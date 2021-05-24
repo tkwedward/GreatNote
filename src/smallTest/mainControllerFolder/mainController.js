@@ -48,7 +48,6 @@ export class MainController {
                 temporaryPointer: temporaryPointer
             }
         };
-        console.log();
         // socket.emit("databaseOperation", dataMessage)
         this.changeList.push(dataMessage);
         return dataMessage;
@@ -79,12 +78,23 @@ export class MainController {
                 action: "update"
             }
         };
-        console.log(112112, updateMessage);
         this.changeList.push(updateMessage);
     } // saveHTMLObjectToDatabase
     deleteFromDataBase(htmlObject) {
         let accessPointer = htmlObject.getAccessPointer();
+        let dataPointer = htmlObject.getDataPointer();
         let parentAccessPointer = htmlObject["parentNode"].getAttribute("accessPointer");
+        // console.log(114, htmlObject._identity.linkArray)
+        if (accessPointer == dataPointer) {
+            htmlObject._identity.linkArray.forEach((linkedObjectPointer, i) => {
+                if (i != 0) {
+                    // console.log(linkedObjectPointer)
+                    let linkedObject = document.querySelector(`*[accessPointer='${linkedObjectPointer}']`);
+                    // console.log(htmlObject, linkedObject)
+                    linkedObject === null || linkedObject === void 0 ? void 0 : linkedObject.deleteFromDatabase();
+                }
+            });
+        }
         let deleteMessage = {
             htmlObject: {},
             metaData: {
@@ -137,13 +147,13 @@ export class MainController {
     } // 3. renderDataToHTML
     createGNObjectThroughName(objectName, createData) {
         let { name, arrayID, insertPosition, dataPointer, saveToDatabase, injectedData } = createData;
+        // defined in buildInitialPage function
         return this.GNDataStructureMapping[objectName](createData);
     } // 4. createGNObjectThroughName
     //@auto-fold here
     loadMainDoc(data) {
         this.mainDoc = data;
         let rootArray = data["array"];
-        console.log(data);
         data["array"].map((p) => {
             let arrayName = p["data"]["name"];
             let accessPointer = p["_identity"]["accessPointer"];
@@ -151,11 +161,12 @@ export class MainController {
         });
     }
     processChangeData(changeData) {
-        console.log(268268, changeData);
         let { htmlObjectData, metaData } = changeData;
+        console.log(215215, changeData);
         if (changeData.metaData.action == "modifyTemporaryPointer") {
             let temporaryPointer = metaData["temporaryPointer"];
             let targetObject = document.querySelector(`*[accessPointer=${temporaryPointer}]`);
+            // console.log(217217 , temporaryPointer, targetObject, htmlObjectData, htmlObjectData, metaData)
             // set the accessPointer and updaate the identity
             targetObject === null || targetObject === void 0 ? void 0 : targetObject.setAttribute("accessPointer", htmlObjectData._identity.accessPointer);
             targetObject._identity = htmlObjectData._identity;
@@ -164,11 +175,26 @@ export class MainController {
             processCreationDataHelper(this, changeData);
         } // create
         if (changeData.metaData.action == "update") {
+            console.log(213213, changeData);
             let _object = document.querySelector(`*[accessPointer='${htmlObjectData._identity.accessPointer}']`);
-            console.log(222, 222, _object, htmlObjectData._identity.accessPointer);
-            if (_object) {
-                _object.loadFromData(htmlObjectData);
-            }
+            console.log(_object, _object._identity, htmlObjectData._identity);
+            //
+            // if (changeData.htmlObject.GNType == "GNImageContainer"){
+            //     let img = _object.querySelector("img")
+            //     img.src =
+            //     return
+            // }
+            htmlObjectData._identity.linkArray.forEach((p) => {
+                // to chheck if the socket id are different and if the aaaccessPointer of the object is different from the looped aaccessPointer of the linkedObject
+                // console.log(changeData.metaData.socketId, socket.id, _object._identity.accessPointer, p)
+                if (changeData.metaData.socketId != socket.id || _object._identity.accessPointer != p) {
+                    let linkedObject = this.getHtmlObjectByID(p);
+                    // console.log(207207, changeData.metaData.socketId, socket.id, _object._identity.accessPointer, p, linkedObject)
+                    // console.log(linkedObject, linkedObject.loadFromData)
+                    // linkedObject.loadFromData(htmlObjectData, true)
+                    linkedObject.loadFromData(htmlObjectData, false);
+                }
+            });
         } // update
         if (changeData.metaData.action == "delete") {
             let _object = document.querySelector(`*[accessPointer='${changeData.metaData.accessPointer}']`);

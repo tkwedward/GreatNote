@@ -51,14 +51,12 @@ export function attachExtraFunctionToCollectionPage(collectionPage:CollectionPag
         collectionPage.pageStatus.height = 0
         collectionPage.divLayer.innerHTML = ""
         Array.from(collectionPage.svgLayer.children).forEach((p:any)=>p.remove())
-        console.log(545454, injectedData)
+        // console.log(545454, injectedData)
         injectedData.forEach((p:CollectionPageInjectedDataInterface)=>{
             let page = <any> document.querySelector(`div[accessPointer='${p.pageAccessPointer}'`)
             let groupData = page.groupData.filter((q:any)=>q.uniqueID==p.uniqueID.toString())[0]
-            console.log(page.groupData, groupData)
+            // console.log(page.groupData, groupData)
             collectionPage.renderGroupDataToCollectionPage(groupData)
-
-            console.log(page, groupData)
         })
     } // collectionPage
 } // attachExtraFunctionToCollectionPage
@@ -67,12 +65,12 @@ export function attachEventsToCollectionPage(collectionPage: CollectionPageInter
     // dragging events to the collectionPage
     collectionPage.addEventListener("dragenter", e=>{
         e.preventDefault();
-        console.log("dragenter", e)
+        // console.log("dragenter", e)
     })
 
     collectionPage.addEventListener("dragleave", function( e ) {
       e.preventDefault();
-      console.log("dragleave", e)
+      // console.log("dragleave", e)
     }, false);
 
     collectionPage.addEventListener("dragover", function( e ) {

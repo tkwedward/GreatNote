@@ -31,7 +31,7 @@ export function createBookmarkLinkedObjectHTMLObject(_object:any){
   let goToBookmarkPageButton = document.createElement("button")
   goToBookmarkPageButton.innerText = "goToPage"
   goToBookmarkPageButton.addEventListener("click", e => {
-      console.log("goToBookmarkPageButton")
+      // console.log("goToBookmarkPageButton")
       let masterObject = <any> document.querySelector(`div[accessPointer='${_object.getDataPointer()}']`)
       masterObject?.getLocatedPageNumber()
   })
@@ -93,7 +93,7 @@ export function GNBookmarkLinkedObject(createData: CreateGreatNoteObjectInterfac
     _object.loadFromData = (injectedData:any) => {
         // first update the content, if the data is from the master, then just use the master's data only, not its css and other meta daat
         let linkedObjectData = _object.extract()
-        console.log(7575757,"before", injectedData, linkedObjectData)
+        // console.log(7575757,"before", injectedData, linkedObjectData)
 
         if (injectedData._identity.accessPointer == injectedData._identity.dataPointer){
             linkedObjectData.data = injectedData.data
@@ -105,7 +105,7 @@ export function GNBookmarkLinkedObject(createData: CreateGreatNoteObjectInterfac
             _object.setAttribute("accessPointer",injectedData._identity.accessPointer)
 
             let dataPointerHTMLObject = <any> document.querySelector(`*[accessPointer='${injectedData._identity.dataPointer}']`)
-            console.log(injectedData._identity.dataPointer, dataPointerHTMLObject)
+            // console.log(injectedData._identity.dataPointer, dataPointerHTMLObject)
             let masterDataPointerObject = dataPointerHTMLObject.extract()
             linkedObjectData.data = masterDataPointerObject.data
         }

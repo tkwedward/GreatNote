@@ -1,5 +1,5 @@
 import { mainController } from "../index";
-import * as GreatNoteDataClass from "./GreatNoteClass/GreatNoteDataClass";
+import { GNPage } from "./GreatNoteClass/GNPage";
 import { highlightCurrentPageInOverviewMode } from "./pageControllerFolder/pageController";
 // import {pageController, updatePageController, updatePageNumberInNewOrder, highlightCurrentPageInOverviewMode} from "./pageControllerFolder/pageController"
 export function shortNotice(noticeText) {
@@ -17,27 +17,49 @@ export function shortNotice(noticeText) {
     }, 1500);
     document.body.appendChild(shortNoticeDiv);
 }
-//@auto-fold here
-export function createSubPanel(name, first) {
-    var _a, _b;
-    let subPanelTemplate = document.querySelector("#subPanelTemplate");
-    let subPanel = document.importNode(subPanelTemplate.content, true);
-    let subPanelNavbarTitle = subPanel.querySelector(`.subPanelTitle`);
-    subPanelNavbarTitle.innerHTML = `${name}`;
-    let subPanelContent = subPanel.querySelector(".subPanelContent");
-    (_b = (_a = subPanelContent === null || subPanelContent === void 0 ? void 0 : subPanelContent.parentElement) === null || _a === void 0 ? void 0 : _a.classList) === null || _b === void 0 ? void 0 : _b.add(`${name}SubPanel`);
-    if (first) {
-        subPanelContent.setAttribute("status", "open");
-    }
-    else {
-        subPanelContent.setAttribute("status", "close");
-    }
-    let subPanelSwitch = subPanel.querySelector(".subPanelSwitch");
+export function subPanelTab(panelClassName) {
+    let tabWrapper = document.createElement("div");
+    tabWrapper.classList.add("tabWrapper", panelClassName + "TabWrapper");
+    let tabBar = document.createElement("div");
+    tabBar.classList.add("tabBar", panelClassName + "TabBar");
+    let tabContent = document.createElement("div");
+    tabContent.classList.add("tabContent", panelClassName + "TabContent");
+    let subPanelSwitch = document.createElement("span");
+    subPanelSwitch.classList.add("tabSwitch", panelClassName + "TabSwitch");
+    subPanelSwitch.setAttribute("status", "open");
     subPanelSwitch.addEventListener("click", function (event) {
-        let newStatus = subPanelContent.getAttribute("status") == "open" ? "close" : "open";
-        subPanelContent.setAttribute("status", newStatus);
+        let newStatus = subPanelSwitch.getAttribute("status") == "open" ? "close" : "open";
+        subPanelSwitch.setAttribute("status", newStatus);
     });
-    return subPanel;
+    tabBar.append(subPanelSwitch);
+    tabWrapper.append(tabBar, tabContent);
+    tabWrapper.addTabAndTabContent = function (_tab, _tabContent, showTabContent = true) {
+        _tab.setAttribute("status", "on");
+        if (!showTabContent) {
+            _tab.setAttribute("status", "off");
+            _tabContent.style.display = "none";
+        }
+        _tab.addEventListener("click", (e) => {
+            Array.from(tabBar.children)
+                .forEach(p => p.setAttribute("status", "off"));
+            Array.from(tabContent.children)
+                .forEach((p) => p.style.display = "none");
+            _tab.setAttribute("status", "off");
+            _tabContent.style.display = "block";
+        });
+        tabBar.insertBefore(_tab, tabBar.firstChild);
+        tabContent.append(_tabContent);
+    };
+    return [tabWrapper, tabBar, tabContent];
+}
+//@auto-fold here
+export function createSubPanel(name) {
+    let subPanelNavbarTitle = document.createElement(`div`);
+    subPanelNavbarTitle.classList.add(`subPanelTitle`);
+    subPanelNavbarTitle.innerHTML = `${name}`;
+    let subPanelContent = document.createElement(`div`);
+    subPanelContent.classList.add("subPanelContent", `${name}SubPanel`);
+    return [subPanelNavbarTitle, subPanelContent];
 }
 //@auto-fold here
 export function createSubPanelItem(name) {
@@ -85,13 +107,13 @@ export function createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv) {
     return switchViewModeButton;
 }
 export function createNewPage(pageController, fullPageModeDiv, overviewModeDiv, fullPageData, overviewPageData, saveToDatabase = true) {
-    let newPage = GreatNoteDataClass.GNContainerDiv({
+    let newPage = GNPage({
         name: "fullPage", arrayID: mainController.mainDocArray["mainArray_pageFull"], insertPosition: false,
         dataPointer: false,
         saveToDatabase: saveToDatabase,
         specialCreationMessage: "createNewFullPageObject",
         contentEditable: false,
-        _classNameList: ["fullPage"]
+        _classNameList: ["fullPage"], injectedData: fullPageData
     });
     newPage.classList.add("divPage", "fullPage");
     newPage._dataStructure = [];
@@ -99,7 +121,7 @@ export function createNewPage(pageController, fullPageModeDiv, overviewModeDiv, 
     // newPage.style.width = `${pageController.fullPageSize[0]}px`
     // newPage.style.height = `${pageController.fullPageSize[1]}px`
     let newPageAccesssPointer = saveToDatabase ? newPage.getAccessPointer() : false; // to avoid error when saveToDatabase is false and you cannot get the accessPointer of the new pagge
-    let smallView = GreatNoteDataClass.GNContainerDiv({
+    let smallView = GNPage({
         name: "overviewPage",
         arrayID: mainController.mainDocArray["mainArray_pageOverview"],
         insertPosition: false,
@@ -122,7 +144,7 @@ export function createNewPage(pageController, fullPageModeDiv, overviewModeDiv, 
     // ==========================
     // add events to smallView
     // ==========================
-    addEventToNewPage(pageController, newPage);
+    // addEventToNewPage(pageController, newPage)
     clickEventOfSmallPage(pageController, smallView);
     // if saveToDatabase is false, then you do not need to save it
     if (saveToDatabase) {
@@ -137,21 +159,21 @@ export function createNewPage(pageController, fullPageModeDiv, overviewModeDiv, 
 }
 export function fillInNewPageDataContent(newPage, fullPageData) {
     newPage.initializeHTMLObjectFromData(fullPageData);
+    newPage.objectData = fullPageData;
 }
 export function fillInSmallViewDataContent(smallView, overviewPageData) {
     smallView.initializeHTMLObjectFromData(overviewPageData);
     // smallViewDescription.innerText = overviewPageData.data.innerText
 }
-export function addEventToNewPage(pageController, newPage) {
-    newPage.addEventListener("click", function (e) {
-        if (newPage.contains(e.target)) {
-            if (pageController.selectedObject)
-                pageController.selectedObject.classList.remove("selectedObject");
-            pageController.selectedObject = e.target;
-            e.target.classList.add("selectedObject");
-        }
-    });
-}
+// export function addEventToNewPage(pageController:any, newPage:any){
+//     newPage.addEventListener("click", function(e:any){
+//       if (newPage.contains(e.target)){
+//           if (pageController.selectedObject) pageController.selectedObject.classList.remove("selectedObject")
+//           pageController.selectedObject = e.target
+//           e.target.classList.add("selectedObject")
+//       }
+//     })
+// }
 export function insertNewPage(pageController, newFullPage, newSmallView, fullPageModeDiv, overviewModeDiv) {
     pageController.addPage(newFullPage, newSmallView);
     // ==========================

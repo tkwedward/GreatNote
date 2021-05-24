@@ -1,5 +1,19 @@
 import {communicationDataStructure, MainControllerInterface} from "../mainControllerFolder/mainControllerInterface"
 
+export function getParentPage(htmlObject: HTMLElement):any{
+    if (htmlObject.classList.contains("fullPage")) {
+      return htmlObject
+    } else {
+        if (htmlObject.parentElement){
+            return getParentPage(htmlObject.parentElement)
+        } else {
+            return null
+        }
+    }
+
+
+}
+
 export function renderDataToHTML(mainController: MainControllerInterface, data:communicationDataStructure, arrayHTMLObject?:any){
     let newHTMLObject:any
     // cannot save any obeject to the data base here
@@ -59,6 +73,24 @@ export function renderDataToHTML(mainController: MainControllerInterface, data:c
         if (p.GNType=="GNBookmark"){
             newHTMLObject =  mainController.GNDataStructureMapping["GNBookmark"]({name: "name", arrayID: arrayHTMLObject.getAccessPointer(),  saveToDatabase:false, injectedData: p})
             newHTMLObject._identity = p._identity
+
+            newHTMLObject.loadFromData(p)
+            newHTMLObject.setMovable()
+        }
+
+        if (p.GNType=="GNTextContainer" || p.GNType=="GNTextDiv"){
+            newHTMLObject =  mainController.GNDataStructureMapping["GNTextContainer"]({name: "name", arrayID: arrayHTMLObject.getAccessPointer(),  saveToDatabase:false, injectedData: p})
+            newHTMLObject._identity = p._identity
+
+            let annotationObject = {
+                accessPointer: newHTMLObject.getAccessPointer(),
+                annotationType: newHTMLObject.getAnnotationType()
+            }
+
+            let currentPageObject = mainController.pageController.currentPage
+
+            // console.log(9696969696, currentPageObject)
+            currentPageObject.pageRelatedData.annotationArray.push(annotationObject)
 
             newHTMLObject.loadFromData(p)
             newHTMLObject.setMovable()

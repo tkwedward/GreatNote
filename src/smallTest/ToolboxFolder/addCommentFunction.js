@@ -4,9 +4,7 @@ export function addCommentMouseDownFunction(e, mainController, divLayer, moveEve
         return;
     }
     let divLayerAccessID = divLayer.getAccessPointer();
-    console.log(divLayer, mainController.getObjectById(divLayerAccessID));
     let commentBox = CommentController.GNComment({ name: "commentDiv", arrayID: divLayerAccessID, saveToDatabase: true });
-    console.log(divLayer, mainController.getObjectById(divLayerAccessID));
     //
     //
     divLayer.append(commentBox);

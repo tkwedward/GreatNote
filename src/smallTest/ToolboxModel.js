@@ -1,3 +1,13 @@
+import { mainController } from "../index";
+let iconName = {
+    rectangleSelectionTool: "/graphics/toolBox/rectangleSelection.png",
+    penSelectionTool: "/graphics/toolBox/penSelection.png",
+    eraserTool: "/graphics/toolBox/eraserTool.png",
+    commentTool: "/graphics/toolBox/commentTool.png",
+    movableTool: "/graphics/toolBox/movableTool.png",
+    penTool: "/graphics/toolBox/penTool.png",
+    textTool: "/graphics/toolBox/textTool.png"
+};
 export class ToolBoxClass {
     constructor() {
         this.itemArray = []; // to mark the status of the button
@@ -16,7 +26,11 @@ export class ToolBoxClass {
             },
             selectionToolItemButton: {
                 status: false,
-                attributeController: "selectionTool"
+                attributeController: "penSelectionToolController"
+            },
+            rectangleSelectionToolItemButton: {
+                status: false,
+                attributeController: "rectangleSelectionTool"
             },
             addCommentItemButton: {
                 status: false,
@@ -25,6 +39,14 @@ export class ToolBoxClass {
             moveObjectInDivButton: {
                 status: false,
                 attributeController: "moveObjectInDivController"
+            },
+            addBookmarkButton: {
+                status: false,
+                attributeController: "addBookmarkController"
+            },
+            textToolItemButton: {
+                status: false,
+                attributeController: "textToolController"
             }
         };
     }
@@ -35,20 +57,21 @@ export class ToolBoxClass {
         // turn off the attributeController and status of the buttom thaat is active
         let currentActiveButton = this.toolBoxItemStatus.currentActiveButton;
         if (currentActiveButton) {
+            // switch off the current status
             this.toolBoxItemStatus[currentActiveButton]["status"] = !this.toolBoxItemStatus[currentActiveButton]["status"];
+            // console.log(949494, currentActiveButton)
             // turn off attributeControllerWant
             let attributeControllerWantToTurnedOff = getAttributeController(this.toolBoxItemStatus, currentActiveButton);
             if (attributeControllerWantToTurnedOff)
                 attributeControllerWantToTurnedOff["style"].display = "none";
-            console.log(858585858, attributeControllerWantToTurnedOff);
         }
         this.toolBoxItemStatus.currentActiveButton = itemName;
         this.toolBoxItemStatus[itemName]["status"] = !this.toolBoxItemStatus[itemName]["status"];
         // turn on attributeControllerWantToturn on
         let attributeControllerWantToTurnedOn = getAttributeController(this.toolBoxItemStatus, itemName);
+        console.log(attributeControllerWantToTurnedOn);
         if (attributeControllerWantToTurnedOn)
             attributeControllerWantToTurnedOn["style"].display = "block";
-        console.log(858585858, attributeControllerWantToTurnedOn);
     }
     createToolboxHtmlObject() {
         let self = this;
@@ -64,11 +87,19 @@ export class ToolBoxClass {
         toolBoxContainer.appendChild(toolBoxSelectionHtmlObject);
         return toolBoxContainer;
     }
-    createToolBoxItem(name, toolBoxContainer) {
+    createToolBoxItem(name, toolBoxContainer, imagePath) {
         let toolBoxItem = document.createElement("div");
         // the html style part
         toolBoxItem.classList.add("toolBoxItem", name);
-        toolBoxItem.innerText = name[0];
+        if (imagePath) {
+            let icon = document.createElement("img");
+            icon.classList.add("toolBoxIcon");
+            icon.src = imagePath;
+            toolBoxItem.append(icon);
+        }
+        else {
+            toolBoxItem.innerText = name[0];
+        }
         let squreLength = "40px";
         toolBoxItem.style.width = squreLength;
         toolBoxItem.style.height = squreLength;
@@ -83,7 +114,7 @@ export class ToolBoxClass {
         return toolBoxItem;
     }
     createNewPolyLineItemButton(toolBoxHtmlObject) {
-        let toolBoxItem = this.createToolBoxItem("PolyLine", toolBoxHtmlObject);
+        let toolBoxItem = this.createToolBoxItem("PolyLine", toolBoxHtmlObject, iconName.penTool);
         toolBoxItem.addEventListener("click", (e) => {
             console.log("polyline item button is activated");
             this.activateButtonFunction(toolBoxItem, "polylineItemButton");
@@ -91,16 +122,24 @@ export class ToolBoxClass {
         return toolBoxItem;
     }
     createSelectionToolItemButton(toolBoxHtmlObject) {
-        let toolBoxItem = this.createToolBoxItem("SelectionTool", toolBoxHtmlObject);
+        let toolBoxItem = this.createToolBoxItem("SelectionTool", toolBoxHtmlObject, iconName.penSelectionTool);
         toolBoxItem.addEventListener("click", (e) => {
             console.log("Selection Tool item button is activated");
             this.activateButtonFunction(toolBoxItem, "selectionToolItemButton");
         });
         return toolBoxItem;
     }
+    createMouseRectangleSelectionToolItemButton(toolBoxHtmlObject) {
+        let toolBoxItem = this.createToolBoxItem("MouseRectangleSelectionTool", toolBoxHtmlObject, iconName["rectangleSelectionTool"]);
+        toolBoxItem.addEventListener("click", (e) => {
+            console.log("Mouse Rectangle Selection Tool item button is activated");
+            this.activateButtonFunction(toolBoxItem, "rectangleSelectionToolItemButton");
+        });
+        return toolBoxItem;
+    }
     createEraserItemButton(toolBoxHtmlObject) {
         // let self = this
-        let toolBoxItem = this.createToolBoxItem("Eraser", toolBoxHtmlObject);
+        let toolBoxItem = this.createToolBoxItem("Eraser", toolBoxHtmlObject, iconName.eraserTool);
         toolBoxItem.addEventListener("click", e => {
             this.activateButtonFunction(toolBoxItem, "eraserItemButton");
         });
@@ -113,25 +152,55 @@ export class ToolBoxClass {
         });
         return toolBoxItem;
     }
-    createMoveObjectInDivButton(toolBoxHtmlObject) {
-        let toolBoxItem = this.createToolBoxItem("MoveObjectInDiv", toolBoxHtmlObject);
+    createAddBookmarkButton(toolBoxHtmlObject) {
+        let toolBoxItem = this.createToolBoxItem("Bookmark", toolBoxHtmlObject, iconName.commentTool);
         toolBoxItem.addEventListener("click", e => {
-            this.activateButtonFunction(toolBoxItem, "moveObjectInDivButton");
-            console.log(this.toolBoxItemStatus);
+            this.activateButtonFunction(toolBoxItem, "addBookmarkButton");
         });
         return toolBoxItem;
     }
-    activateButtonFunction(toolBoxItem, itemName) {
-        this.itemArray.forEach(p => {
-            p.style.background = "gold";
+    createMoveObjectInDivButton(toolBoxHtmlObject) {
+        let toolBoxItem = this.createToolBoxItem("MoveObjectInDiv", toolBoxHtmlObject, iconName.movableTool);
+        toolBoxItem.addEventListener("click", e => {
+            this.activateButtonFunction(toolBoxItem, "moveObjectInDivButton");
         });
+        toolBoxItem.activate = function () {
+            changeSvgEventPointer("none");
+        };
+        toolBoxItem.deactivate = function () {
+            changeSvgEventPointer("auto");
+        };
+        return toolBoxItem;
+    }
+    createTextToolItemButton(toolBoxHtmlObject) {
+        let toolBoxItem = this.createToolBoxItem("textTool", toolBoxHtmlObject, iconName.textTool);
+        toolBoxItem.addEventListener("click", (e) => {
+            console.log("Text Tool item button is activated");
+            this.activateButtonFunction(toolBoxItem, "textToolItemButton");
+        });
+        toolBoxItem.activate = function () {
+            changeSvgEventPointer("none");
+        };
+        toolBoxItem.deactivate = function () {
+            changeSvgEventPointer("auto");
+        };
+        return toolBoxItem;
+    }
+    activateButtonFunction(toolBoxItem, itemName) {
+        // to deactivate the previous button and activate the new button
+        if (this.currentActiveButton) {
+            this.currentActiveButton.style.background = "gold";
+            if (this.currentActiveButton.deactivate)
+                this.currentActiveButton.deactivate();
+        }
         this.switchToolBoxItemStatus(itemName);
         toolBoxItem.style.background = "red";
         this.currentActiveButton = toolBoxItem;
+        if (this.currentActiveButton.activate)
+            this.currentActiveButton.activate();
     }
     registerSvg(svgLayer) {
         let self = this;
-        console.log(226, "registerSvg, yoyoyo");
         svgLayer.addEventListener("click", function () {
             console.log("The svg is register to the toolbox");
             console.log("======================");
@@ -142,4 +211,10 @@ export class ToolBoxClass {
 export function getAttributeController(toolBoxItemStatus, itemName) {
     let attributeControllerClassName = toolBoxItemStatus[itemName]["attributeController"];
     return document.querySelector(`.${attributeControllerClassName}`);
+}
+export function changeSvgEventPointer(pointerEventOption) {
+    let currentSvgLayerArray = mainController.pageController.currentPage.fullPageHTMLObject.querySelectorAll(".svgLayer");
+    Array.from(currentSvgLayerArray).forEach((svgLayer) => {
+        svgLayer.style.pointerEvents = pointerEventOption;
+    });
 }

@@ -1,8 +1,11 @@
 import { polylineMouseDownFunction } from "../ToolboxFolder/ToolboxEventFunction";
 import * as EraserFunction from "../ToolboxFolder/eraserFunction";
 import * as SelectionToolFunction from "../ToolboxFolder/selectionToolFunction";
+import * as RectangleSelectionToolFunction from "../ToolboxFolder/rectangleSelectionFunction";
 import * as AddCommentFunction from "../ToolboxFolder/addCommentFunction";
 import * as MoveObjectInDivFunction from "../ToolboxFolder/moveObjectInDivFunction";
+import * as TextToolFunction from "../ToolboxFolder/textToolHelperFunction";
+import * as AddBookmarkFunction from "../ToolboxFolder/addBookmarkFunction";
 export function attachEventListenerToSvgBoard(mainController, svgBoard) {
     let polylineMouseDown = {
         eventNameList: ["touchstart"],
@@ -27,7 +30,18 @@ export function attachEventListenerToSvgBoard(mainController, svgBoard) {
             SelectionToolFunction.overallMouseDownFunction(e, mainController, svgBoard, "touchmove", "touchend", selectionStatusObject);
         }
     };
-    let eventArray = [polylineMouseDown, eraserMouseDownFunction, selectionToolMouseDownFunction];
+    let rectangleSelectionStatusObject = {
+        mode: "phaseOne",
+        polyline: null,
+        counter: 0
+    };
+    let rectangleSelectionToolMouseDownFunction = {
+        eventNameList: ["mousedown"],
+        eventFunction: (e) => {
+            RectangleSelectionToolFunction.overallMouseDownFunction(e, mainController, svgBoard, "mousemove", "mouseup", rectangleSelectionStatusObject);
+        }
+    };
+    let eventArray = [polylineMouseDown, eraserMouseDownFunction, selectionToolMouseDownFunction, rectangleSelectionToolMouseDownFunction];
     eventArray.forEach(toolboxEvent => {
         toolboxEvent.eventNameList.forEach(eventName => {
             svgBoard.addEventListener(eventName, toolboxEvent.eventFunction);
@@ -41,6 +55,12 @@ export function attachEventListenerToDivLayer(mainController, divLayer) {
             AddCommentFunction.addCommentMouseDownFunction(e, mainController, divLayer, "mousemove", "mouseup");
         }
     }; // addCommentMouseDownFunction
+    let addBookmarkMouseDownFunction = {
+        eventNameList: ["mousedown"],
+        eventFunction: (e) => {
+            AddBookmarkFunction.addBookmarkMouseDownFunction(e, mainController, divLayer, "mousemove", "mouseup");
+        }
+    }; // addCommentMouseDownFunction
     let divSelctionObjectStatus = {
         "selectedObject": null
     };
@@ -48,14 +68,18 @@ export function attachEventListenerToDivLayer(mainController, divLayer) {
         eventNameList: ["mousedown"],
         eventFunction: (e) => {
             MoveObjectInDivFunction.moveObejectInDivMouseDownFunction(e, mainController, divLayer, "mousemove", "mouseup", divSelctionObjectStatus);
-            // AddCommentFunction.addCommentMouseDownFunction(e, mainController, divLayer, "mousemove", "mouseup")
         }
     };
-    let eventArray = [addCommentMouseDownFunction, moveObjectInDivMouseDownFunction];
-    // let eventArray = [addCommentMouseDownFunction]
+    let textToolMouseDownFunction = {
+        eventNameList: ["mousedown"],
+        eventFunction: (e) => {
+            TextToolFunction.textToolMouseDownFunction(e, mainController, divLayer, "mousemove", "mouseup");
+        }
+    };
+    // let eventArray = [addCommentMouseDownFunction, moveObjectInDivMouseDownFunction]
+    let eventArray = [addCommentMouseDownFunction, addBookmarkMouseDownFunction, textToolMouseDownFunction];
     eventArray.forEach(toolboxEvent => {
         toolboxEvent.eventNameList.forEach(eventName => {
-            divLayer.style.background = "maroon";
             divLayer.addEventListener(eventName, toolboxEvent.eventFunction);
         });
     });

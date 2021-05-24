@@ -1,7 +1,7 @@
-import { superGNObject, createDummyData } from "./GreateNoteObjectHelperFunction";
+import { superGNObject, createDummyData, setObjectMovable } from "./GreateNoteObjectHelperFunction";
 //@auto-fold here
 export function GNImageContainer(createData) {
-    let { name, arrayID, insertPosition, dataPointer, saveToDatabase, specialCreationMessage, imgsrc, _classNameList } = createData;
+    let { name, arrayID, insertPosition, dataPointer, saveToDatabase, specialCreationMessage, imgsrc, _classNameList, injectedData } = createData;
     let _object = document.createElement("div");
     _object.draggable = false;
     _object._name = name;
@@ -20,54 +20,14 @@ export function GNImageContainer(createData) {
         _object.imageWidthToHeightRatio = image.width / image.height;
     };
     _object.appendChild(image);
-    _object.loadFromData = (data) => {
-        Object.entries(data.stylesheet).forEach(([key, value], _) => {
+    _object.loadFromData = (injectedData) => {
+        Object.entries(injectedData.stylesheet).forEach(([key, value], _) => {
             _object.style[key] = value;
         });
+        image.src = injectedData.data.src;
     };
     _object.setMovable = function () {
-        let eventName = "mousedown";
-        let moveEventName = "mousemove";
-        let attributeX = "left";
-        let attributeY = "top";
-        _object.style.position = "absolute";
-        _object.addEventListener("mousedown", (e) => {
-            let startX = e["screenX"];
-            let startY = e["screenY"];
-            let objectInitialX = 0;
-            let objectInitialY = 0;
-            let initialLeftValue = parseInt(_object.style[attributeX].replace("px", "")) || 0;
-            let initialTopValue = parseInt(_object.style[attributeY].replace("px", "")) || 0;
-            let currentX;
-            let currentY;
-            let deltaX = 0;
-            let deltaY = 0;
-            let mousemoveFunction = (e) => {
-                currentY = e.screenY;
-                currentX = e.screenX;
-                deltaX = currentX - startX;
-                deltaY = currentY - startY;
-                let newX = _object.style[attributeX] = `${initialLeftValue + deltaX}px`;
-                _object.style[attributeY] = `${initialTopValue + deltaY}px`;
-            };
-            _object.addEventListener("mousemove", mousemoveFunction, false);
-            function endDragEvent(e) {
-                var _a;
-                Array.from((_a = _object === null || _object === void 0 ? void 0 : _object.parentNode) === null || _a === void 0 ? void 0 : _a.childNodes).forEach((p) => {
-                    p["style"]["pointerEvents"] = "inherit";
-                });
-                let endX = e["screenX"];
-                let endY = e["screenY"];
-                _object.removeEventListener("mousemove", mousemoveFunction);
-            }
-            _object.addEventListener("mouseup", (e) => {
-                endDragEvent(e);
-                _object.saveHTMLObjectToDatabase();
-            }, false);
-            _object.addEventListener("mouseout", (e) => {
-                endDragEvent(e);
-            }, false);
-        });
+        setObjectMovable(_object);
     };
     _object.createDataObject = function () {
         var _a;
@@ -99,6 +59,14 @@ export function GNImageContainer(createData) {
         _object.style.height = height + "px";
     };
     superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage);
+    if (injectedData) {
+        _object.identity = injectedData._identity;
+        _object.setAttribute("accessPointer", _object.identity.accessPointer);
+        _object.objectData = injectedData;
+        if (injectedData._classNameList && injectedData._classNameList.length > 0) {
+            _object.objectData._classNameList.forEach((p) => _object.classList.add(p));
+        }
+    }
     _object.addEventListener("eventName", (e) => {
         // do something
     });

@@ -21,7 +21,8 @@ app.get("/board", (req, res)=>{
   res.sendFile(__dirname + "/public/board.html")
 })
 
-let turnOnServerMode = false
+let turnOnServerMode = true
+// turnOnServerMode = false
 
 // socketArray = []
 let jsonFileLocation = path.join(__dirname, "./dist/data/automergeData.txt")
@@ -65,11 +66,13 @@ io.on("connection", socket=>{
       let jsonifiedMainDoc
       if (turnOnServerMode){
           jsonifiedMainDoc = jsonify(automergeMainDoc.mainDoc)
+
+          fs.writeFileSync(jsonFileLocation2, JSON.stringify(jsonifiedMainDoc));
       } else {
           jsonifiedMainDoc = JSON.parse(fs.readFileSync(jsonFileLocation2))
       }
       //
-      // fs.writeFileSync(jsonFileLocation2, JSON.stringify(jsonifiedMainDoc));
+
       socket.emit("processInitialData", jsonifiedMainDoc)
   })
 

@@ -1,7 +1,6 @@
 let io = require('socket.io-client');
 import { mainController } from "../index";
 export var socket;
-//
 socket = io.io();
 socket.on("connect", () => {
     // emit to everybody
@@ -42,7 +41,6 @@ socket.on("serverSendChangeFileToClient", (changeDataArray) => {
     console.log(59, changeDataArray);
     // changeData: meta, htmlObjectData
     changeDataArray.forEach((changeData) => {
-        console.log(changeData);
         if (changeData.metaData.socketId == socket.id && changeData.metaData.action == "create") {
             changeData.metaData.action = "modifyTemporaryPointer";
         }

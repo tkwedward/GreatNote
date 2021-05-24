@@ -3,5 +3,5 @@ export interface GNBookmarkInterface extends GNObjectInterface, HTMLElement {
     setMovable(): void;
     getPageNumber(): number;
 }
-export declare function createBookmarkHTMLObject(_object: any): (HTMLDivElement | HTMLButtonElement | HTMLInputElement | HTMLSelectElement)[];
+export declare function createBookmarkHTMLObject(_object: any): (HTMLSelectElement | HTMLButtonElement | HTMLDivElement)[];
 export declare function GNBookmark(createData: CreateGreatNoteObjectInterface): GNBookmarkInterface;

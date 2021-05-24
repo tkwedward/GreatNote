@@ -1,4 +1,5 @@
 import { GNContainerDiv } from "../GreatNoteClass/GreatNoteDataClass";
+import { setObjectMovable } from "../GreatNoteClass/GreateNoteObjectHelperFunction";
 import * as CommentControlerHelperFunction from "./commentControllerHelperFunction";
 //@auto-fold here
 export function GNComment(createData) {
@@ -36,5 +37,7 @@ export function GNComment(createData) {
     } // if not injectedData
     CommentControlerHelperFunction.addEventToCommentContainer(_commentContainer);
     CommentControlerHelperFunction.addCommentController(_commentContainer);
+    // set it movable
+    setObjectMovable(_commentContainer);
     return _commentContainer;
 }

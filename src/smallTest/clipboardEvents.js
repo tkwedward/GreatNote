@@ -2,7 +2,6 @@ import { GNImageContainer } from "./GreatNoteClass/GNImageContainer";
 export function addPasteImageEvent(mainController) {
     document.onpaste = function (event) {
         var items = (event.clipboardData || event.originalEvent.clipboardData).items;
-        console.log(JSON.stringify(items)); // might give you mime types
         let currentPage = mainController.pageController.currentPage.fullPageHTMLObject;
         let targetDiv = currentPage.querySelector(".divLayer");
         for (var index in items) {
@@ -15,8 +14,8 @@ export function addPasteImageEvent(mainController) {
                     xhr.open('POST', 'processImageBase64Format', true);
                     xhr.onload = function () {
                         console.log("finish processing image");
-                        console.log(this.responseText);
                         let responseImgSrc = JSON.parse(this.responseText).imgsrc.replace("talkNotes/", "");
+                        console.log(24242424, responseImgSrc);
                         let newImg = GNImageContainer({ "name": "", arrayID: targetDiv.getAccessPointer(), saveToDatabase: true, imgsrc: "../image/" + responseImgSrc + ".png" });
                         targetDiv.appendChild(newImg);
                         newImg.setImageSize({ width: 500 });
@@ -31,7 +30,6 @@ export function addPasteImageEvent(mainController) {
         }
     };
 }
-console.log("clipboard event");
 export function mouseResizeFunction(item) {
     let eventName = "mousedown";
     let moveEventName = "mousemove";
@@ -74,7 +72,7 @@ export function mouseResizeFunction(item) {
     };
 }
 export function createMouseTrackingController(mouseInfoDiv, testFieldDiv) {
-    console.log(mouseInfoDiv, testFieldDiv);
+    // testFieldDiv to reflect the data
     let clientXYDiv = document.createElement("div");
     clientXYDiv.style.display = "grid";
     clientXYDiv.style.gridTemplateColumns = "1fr 2fr";
@@ -126,9 +124,10 @@ export function createMouseTrackingController(mouseInfoDiv, testFieldDiv) {
     mouseInfoDiv.append(clientXYDiv, screenXYDiv, offsetXYDiv, pageXYDiv, deltaXYDiv, targetObjectXYDiv);
     return [clientXYDivData, screenXYDivData, offsetXYDivData, pageXYDivData, deltaXYDivData, targetObjectXYDivData];
 }
-export function setTargetObject(parentDiv, targetObjectArray) {
-    parentDiv.targetObjectArray = targetObjectArray;
-}
+//
+// export function setTargetObject(parentDiv: any, targetObjectArray:any){
+//     parentDiv.targetObjectArray = targetObjectArray
+// }
 export function getObjectOrigianlDataArray(p) {
     // to get data about the object's position and parent's dimension so that you can change the position and size of the object
     return {
@@ -149,55 +148,3 @@ export function triggerTargetObjectMovingFunction(p, i, deltaX, deltaY, targetOb
         p.specialMovingEvent(deltaX, deltaY, targetObjectOriginalDataArray[i]["parentOriginalWidth"], targetObjectOriginalDataArray[i]["parentOriginalHeight"]);
     }
 } // triggerTargetObjectMovingFunction
-export function mousePositionTrackFunction(mouseInfoDiv, parentDiv) {
-    let [clientXYDivData, screenXYDivData, offsetXYDivData, pageXYDivData, deltaXYDivData, targetObjectXYDivData] = createMouseTrackingController(mouseInfoDiv, parentDiv);
-    let originalX, originalY;
-    let currentX, currentY;
-    let deltaX, deltaY;
-    let targetObjectOriginalDataArray = [];
-    parentDiv.addEventListener("mousedown", function (e) {
-        parentDiv.childNodes.forEach((p) => {
-            // p.style.pointerEvents = "none"
-            if (p.classList.contains("selectedObject")) {
-                // p.style.pointerEvents = "all"
-            }
-        });
-        originalX = e.pageX;
-        originalY = e.pageY;
-        currentX = e.pageX;
-        currentY = e.pageY;
-        clientXYDivData.innerText = `(${e.clientX}, ${e.clientY})`;
-        screenXYDivData.innerText = `(${e.screenX}, ${e.screenY})`;
-        offsetXYDivData.innerText = `(${e.offsetX}, ${e.offsetY})`;
-        pageXYDivData.innerText = `(${e.pageX}, ${e.pageY})`;
-        deltaX = currentX - originalX;
-        deltaY = currentY - originalY;
-        deltaXYDivData.innerText = `(${deltaX}, ${deltaY})`;
-        // original position
-        targetObjectOriginalDataArray = Array.from(parentDiv.childNodes).map(p => getObjectOrigianlDataArray(p));
-        let mousemoveFunction = function (e) {
-            currentX = e.pageX;
-            currentY = e.pageY;
-            clientXYDivData.innerText = `(${e.clientX}, ${e.clientY})`;
-            screenXYDivData.innerText = `(${e.screenX}, ${e.screenY})`;
-            offsetXYDivData.innerText = `(${e.offsetX}, ${e.offsetY})`;
-            pageXYDivData.innerText = `(${e.pageX}, ${e.pageY})`;
-            deltaX = currentX - originalX;
-            deltaY = currentY - originalY;
-            parentDiv.childNodes.forEach((p, i) => {
-                if (p.classList.contains("selectedObject")) {
-                    triggerTargetObjectMovingFunction(p, i, deltaX, deltaY, targetObjectOriginalDataArray);
-                }
-            });
-            deltaXYDivData.innerText = `(${deltaX}, ${deltaY})`;
-        }; // mousemoveFunction
-        parentDiv.addEventListener("mousemove", mousemoveFunction);
-        let mouseupFunction = function (e) {
-            parentDiv.removeEventListener("mousemove", mousemoveFunction);
-            parentDiv.removeEventListener("mouseup", mouseupFunction);
-            parentDiv.childNodes.forEach((p) => p.style.pointerEvents = "all");
-        };
-        parentDiv.addEventListener("mouseup", mouseupFunction);
-        parentDiv.addEventListener("mouseup2", mouseupFunction);
-    });
-}

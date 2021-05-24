@@ -47,13 +47,11 @@ export function addMovingEvent(htmlObject) {
         function endDragEvent(e) {
             let htmlObjectParentNode = htmlObject.parentNode;
             Array.from(htmlObjectParentNode["children"]).forEach((p) => {
-                console.log(p);
                 p["style"]["pointerEvents"] = "inherit";
             });
             let endX = e["screenX"];
             let endY = e["screenY"];
             htmlObject.removeEventListener("mousemove", mousemoveFunction);
-            console.log(`end at = (${endX}, ${endY})`);
         }
         htmlObject.addEventListener("mouseup", (e) => {
             endDragEvent(e);

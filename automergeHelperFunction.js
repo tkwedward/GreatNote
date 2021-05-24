@@ -118,7 +118,7 @@ var AutomergeMainDoc = /** @class */ (function () {
         // this.addData(this.mainDocArray["mainArray_pageFull"], createDummyData())
     }
     AutomergeMainDoc.prototype.addItemToChangeList = function (item) {
-        if (this.changeList.length > 10000)
+        if (this.changeList.length > 50000)
             this.changeList.pop();
         this.changeList.push(item);
     };
@@ -280,6 +280,9 @@ var AutomergeMainDoc = /** @class */ (function () {
             newAccessPointer = oldAccessPointer;
         }
         var accessPointerDataObject = this.getObjectById(newAccessPointer);
+        if (!accessPointerDataObject._identity) {
+            console.log(accessPointerDataObject, newAccessPointer);
+        }
         // update the identity
         updateData.htmlObjectData._identity = accessPointerDataObject._identity;
         // update the database

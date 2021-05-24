@@ -21,7 +21,6 @@ export function eraserMouseDownFunction(e, mainController, svgBoard, moveEventNa
         return;
     }
     let [offsetX, offsetY, touchIsPen] = ToolBoxHelperFunction.getOffSetXY(e);
-    console.log(44, 44, 44, touchIsPen);
     if (!touchIsPen)
         return;
     e.preventDefault();
@@ -33,7 +32,6 @@ export function eraserMouseDownFunction(e, mainController, svgBoard, moveEventNa
         eraser.style["cx"] = cx;
         eraser.style["cy"] = cy;
         eraser.style["r"] = r;
-        // console.log(545454, e, eraser, moveEventName)
         let mouseMoveFunction = (e) => {
             // t1 = t2
             // t2 = e.timeStamp

@@ -21,9 +21,6 @@ export function polylineMouseDownFunction(e:any, mainController: MainControllerI
     if (e.type=="mousedown"){
        offsetX = mousePositionRatioAdjustment(e.offsetX, ratio)
        offsetY = mousePositionRatioAdjustment(e.offsetY, ratio)
-
-
-       // testInfo.innerHTML = `dist
    }
 
    // touchIsPen = true

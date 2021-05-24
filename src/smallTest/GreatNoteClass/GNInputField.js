@@ -1,7 +1,7 @@
 import { superGNObject, createDummyData } from "./GreateNoteObjectHelperFunction";
 //@auto-fold here
 export function GNInputField(createData) {
-    let { name, arrayID, insertPosition, dataPointer, saveToDatabase, specialCreationMessage } = createData;
+    let { name, arrayID, insertPosition, dataPointer, saveToDatabase, specialCreationMessage, injectedData } = createData;
     let _object = document.createElement("input");
     _object.GNType = "GNInputField";
     _object._name = name;
@@ -32,5 +32,13 @@ export function GNInputField(createData) {
     superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage);
     // if the object is assigned to the database, then this  addEventListener is to monitor the change
     // define what is the update action
+    if (injectedData) {
+        _object.identity = injectedData._identity;
+        _object.setAttribute("accessPointer", _object.identity.accessPointer);
+        _object.objectData = injectedData;
+        if (injectedData._classNameList && injectedData._classNameList.length > 0) {
+            _object.objectData._classNameList.forEach((p) => _object.classList.add(p));
+        }
+    }
     return _object;
 } // GNInputField

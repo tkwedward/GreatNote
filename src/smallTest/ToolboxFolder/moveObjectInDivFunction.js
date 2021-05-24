@@ -2,36 +2,43 @@ import { ClassNameCollection } from "../settings";
 import * as ToolBoxHelperFunction from "./toolBoxHelperFunction";
 let allowedSelectionObject = [ClassNameCollection.commentContainer];
 export function moveObejectInDivMouseDownFunction(e, mainController, divLayer, moveEventName, upEventName, divSelctionObjectStatus) {
-    let originalObjectPosition, _;
-    let clickedPosition = { x: 0, y: 0 };
-    if (!mainController.toolBox.checkToolBoxItemStatus("moveObjectInDivButton")) {
-        return;
-    }
-    if (divSelctionObjectStatus.selectedObject) {
-        divSelctionObjectStatus.selectedObject.classList.remove("selectedObjectInDiv");
-    }
-    if (allowedSelectionObject.indexOf(e.target.className) == -1)
-        return;
-    // if the objeect is in the allowedSelectionObject list, then
-    divSelctionObjectStatus.selectedObject = e.target;
-    e.target.classList.add("selectedObjectInDiv");
-    // get the object's original position
-    [clickedPosition.x, clickedPosition.y, _] = ToolBoxHelperFunction.getPageXY(e);
-    originalObjectPosition = { x: divSelctionObjectStatus.selectedObject.offsetLeft, y: divSelctionObjectStatus.selectedObject.offsetTop };
-    // mousemove event listener
-    let _moveEventFunction = (e) => {
-        console.log(34, "moveEventFUnction");
-        moveEventFunction(e, divSelctionObjectStatus, originalObjectPosition, clickedPosition);
-    };
-    // mouseup event listener
-    let _upEventFunction = (e) => {
-        console.log(349, "_upEventFunction");
-        divLayer.removeEventListener(moveEventName, _moveEventFunction);
-        divLayer.removeEventListener(upEventName, _upEventFunction);
-        divSelctionObjectStatus.selectedObject.saveHTMLObjectToDatabase();
-    };
-    divLayer.addEventListener(moveEventName, _moveEventFunction);
-    divLayer.addEventListener(upEventName, _upEventFunction);
+    // let originalObjectPosition: any, _
+    // let clickedPosition = {x: 0, y:0}
+    //
+    // if (!mainController.toolBox.checkToolBoxItemStatus("moveObjectInDivButton")){
+    //     return
+    // }
+    //
+    // if (divSelctionObjectStatus.selectedObject){
+    //     divSelctionObjectStatus.selectedObject.classList.remove("selectedObjectInDiv")
+    // }
+    //
+    // // if the objeect is in the allowedSelectionObject list, then
+    // divSelctionObjectStatus.selectedObject = e.target
+    // e.target.classList.add("selectedObjectInDiv");
+    //
+    // // get the object's original position
+    //
+    // [clickedPosition.x, clickedPosition.y, _] = ToolBoxHelperFunction.getPageXY(e);
+    //
+    //
+    // originalObjectPosition = {x: divSelctionObjectStatus.selectedObject.offsetLeft, y: divSelctionObjectStatus.selectedObject.offsetTop}
+    // console.log("the target Object is", e.target)
+    // // mousemove event listener
+    // let _moveEventFunction = (e:any)=>{
+    //   console.log(34, "moveEventFUnction")
+    //     moveEventFunction(e, divSelctionObjectStatus, originalObjectPosition, clickedPosition)
+    // }
+    // // mouseup event listener
+    // let _upEventFunction = (e:any)=>{
+    //   console.log(349, "_upEventFunction")
+    //     divLayer.removeEventListener(moveEventName, _moveEventFunction)
+    //     divLayer.removeEventListener(upEventName, _upEventFunction)
+    //     divSelctionObjectStatus.selectedObject.saveHTMLObjectToDatabase()
+    // }
+    //
+    // divLayer.addEventListener(moveEventName, _moveEventFunction)
+    // divLayer.addEventListener(upEventName, _upEventFunction)
 }
 function moveEventFunction(e, divSelctionObjectStatus, originalObjectPosition, clickedPosition) {
     let newPosition;

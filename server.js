@@ -55,7 +55,8 @@ var io = require("socket.io")(server);
 app.get("/board", function (req, res) {
     res.sendFile(__dirname + "/public/board.html");
 });
-var turnOnServerMode = false;
+var turnOnServerMode = true;
+// turnOnServerMode = false
 // socketArray = []
 var jsonFileLocation = path.join(__dirname, "./dist/data/automergeData.txt");
 var jsonFileLocation2 = path.join(__dirname, "./dist/data/automergeDataJSON.txt");
@@ -98,12 +99,12 @@ io.on("connection", function (socket) {
         var jsonifiedMainDoc;
         if (turnOnServerMode) {
             jsonifiedMainDoc = automergeHelperFunction_1.jsonify(automergeMainDoc.mainDoc);
+            fs.writeFileSync(jsonFileLocation2, JSON.stringify(jsonifiedMainDoc));
         }
         else {
             jsonifiedMainDoc = JSON.parse(fs.readFileSync(jsonFileLocation2));
         }
         //
-        // fs.writeFileSync(jsonFileLocation2, JSON.stringify(jsonifiedMainDoc));
         socket.emit("processInitialData", jsonifiedMainDoc);
     });
     socket.on("disconnect", function () {

@@ -16,6 +16,13 @@ body {
   background: CornflowerBlue;
 }
 
+select, option {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 .pageWrapper {
   display: grid;
   grid-template-columns: 1fr 5fr;
@@ -108,6 +115,14 @@ body {
   left: 0;
   right: 0;
 }
+.pageWrapper .pageContentContainer .fullPage .divLayer .GNTextContainer {
+  width: 800px;
+  min-height: 100px;
+  background: lightblue;
+}
+.pageWrapper .pageContentContainer .fullPage .divLayer .GNTextContainer[section_annotation=true] {
+  background: maroon;
+}
 .pageWrapper .pageContentContainer .fullPage .selectedObjectInDiv {
   border: 1px solid blue;
 }
@@ -185,20 +200,22 @@ body {
   background: coral;
 }
 
-.bookmarkSubPanel .pageNavigator {
+.bookmarkSubPanel .pageController {
+  display: flex;
+}
+.bookmarkSubPanel .pageController * {
   text-align: center;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
 }
 .bookmarkSubPanel .pageNumberInput {
   width: 50%;
-  margin: 0 auto;
+  margin: 0 10px;
 }
 .bookmarkSubPanel .functionButton {
   width: 90%;
   height: 30px;
   margin: 10px auto;
   background: grey;
+  text-align: center;
 }
 
 .layerController {
@@ -392,7 +409,7 @@ body {
   display: flex;
 }
 
-.collectionPage {
+.collectionPage, .annotationPage {
   width: 80%;
   height: 100vh;
   background: pink;

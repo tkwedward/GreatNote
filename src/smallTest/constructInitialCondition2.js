@@ -4,7 +4,6 @@ import { socket } from "./socketFunction";
 import { processCreationDataHelper } from "./databaseHelperFunction";
 import * as PageController from "./pageControllerFolder/pageController";
 import * as Setting from "./settings";
-import { MainDocArrayEnum } from "./mainControllerFolder/mainControllerInterface";
 import * as MainControllerHelperFunction from "./mainControllerFolder/mainControllerHelperFunction";
 export class MainController {
     // *****************************
