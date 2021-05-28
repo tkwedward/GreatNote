@@ -9,7 +9,7 @@ export function selectionToolPhaseOneMouseDownFunction(e, mainController, svgBoa
     }
     let [originalPositionX, originalPositionY, touchIsPen] = getOffSetXY(e);
     let [offsetX, offsetY] = [originalPositionX, originalPositionY];
-    touchIsPen = true;
+    // touchIsPen = true
     if (e.type == "mousedown" || touchIsPen) {
         selectionStatusObject.selectedObjectArray = [];
         selectionStatusObject.counter += 1;

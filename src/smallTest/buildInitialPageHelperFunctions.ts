@@ -12,7 +12,7 @@ import { GNPage } from "./GreatNoteClass/GNPage"
 import { GNBookmarkLinkedObject} from "./bookmarkFolder/GNBookmarkLinkedObject"
 import * as GreatNoteSvgDataClass from "./GreatNoteClass/GreatNoteSvgDataClass"
 import * as GroupController from "./groupControllerFolder/groupController"
-import {getAllPageAnnotation, buildAnnotationPage } from "./pageControllerFolder/annotationHelperFunctions"
+import {getAllPageAnnotation, renderAnnotationPage,  buildAnnotationPage } from "./pageControllerFolder/annotationHelperFunctions"
 
 
 import {socket} from "./socketFunction"
@@ -174,11 +174,50 @@ export function buildPageControllerButtonArray(mainController:MainControllerInte
 
           currentPage = currentPage.next
       }
-      console.log(177177, allPageAnnotationArray)
+      console.log(177177, allPageAnnotationArray, annotationPageContentWrapper)
+
+      if (annotationPageContentWrapper.innerHTML==""){
+          renderAnnotationPage(allPageAnnotationArray, annotationPageContentWrapper)
+      }
   })
 
 
+  // ============ scale Controller ===========//
+  function scaleChange(scale:number){
+    let currentPage = mainController.pageController.startPage.next
+    while (currentPage){
+        if (!currentPage.fullPageHTMLObject) break
+        currentPage.fullPageHTMLObject.style.transform = `scale(${scale})`
+        currentPage = currentPage.next
+    }
+  }
 
+  let scaleController = document.createElement("div")
+  let scaleInput = document.createElement("input")
+  scaleInput.value = "1"
+  scaleInput.style.width = "50px";
+
+  let scaleIncreaseButton = document.createElement("button")
+  scaleIncreaseButton.innerText = "+"
+  scaleIncreaseButton.classList.add("scaleIncreaseButton")
+  scaleIncreaseButton.addEventListener("click", function(e){
+    let newScale = +scaleInput.value + 0.1
+    scaleInput.value = newScale.toFixed(2)
+    scaleChange(newScale)
+  })
+
+  let scaleDecreaseButton = document.createElement("button")
+  scaleDecreaseButton.innerText = "-"
+  scaleDecreaseButton.classList.add("scaleDecreaseButton")
+  scaleDecreaseButton.addEventListener("click", function(e){
+    let newScale = +scaleInput.value - 0.1
+    scaleInput.value = newScale.toFixed(2)
+    scaleChange(newScale)
+  })
+  scaleController.append(scaleIncreaseButton, scaleInput, scaleDecreaseButton)
+
+
+  // ===================  ==================//
   let objectIDGetter = document.createElement("input")
   let objectIDGetterSubmit = document.createElement("input")
   objectIDGetterSubmit.type = "submit"
@@ -186,7 +225,7 @@ export function buildPageControllerButtonArray(mainController:MainControllerInte
   objectIDGetterSubmit.style.background = "gold"
 
   objectIDGetterSubmit.addEventListener("click", (e)=>{
-      console.log(mainController.getObjectById(objectIDGetter.value), document.querySelector(`*[accessPointer='${objectIDGetter.value}']`));
+      // console.log(mainController.getObjectById(objectIDGetter.value), document.querySelector(`*[accessPointer='${objectIDGetter.value}']`));
 
       window.selectedItem = document.querySelector(`*[accessPointer='${objectIDGetter.value}']`)
   })
@@ -196,11 +235,11 @@ export function buildPageControllerButtonArray(mainController:MainControllerInte
   // toolBoxObject
   let toolBoxHtmlObject = buildToolBoxHtmlObject(mainController)
 
-  pageControllerSubPanelContent.append(toolBoxHtmlObject, editorController)
+  pageControllerSubPanelContent.append(toolBoxHtmlObject, scaleController, editorController)
 
   let annotationPage = document.querySelector(".annotationPage")
 
-  return {pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, copyButton, linkButton, deleteButton,  showMainDocButton, showAnnotationButton, annotationPage}
+  return {pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, copyButton, linkButton, deleteButton,  showMainDocButton, showAnnotationButton, annotationPage, scaleController}
 }
 
 
@@ -342,7 +381,7 @@ export function buildInitialPage(mainController:MainControllerInterface, saveToD
     let groupControllerWrapper = <any> document.querySelector(".groupControllerWrapper")
     let collectionControllerWrapper = <any> document.querySelector(".collectionControllerWrapper")
 
-
+    console.log(345345, pageFullArray, mainController.mainDoc)
     for (let i = 0; i< pageFullArray.length; i++){
         let [newPage, smallView] = pageViewHelperFunction.createNewPage(pageController, fullPageModeDiv, overviewModeDiv, pageFullArray[i], pageOverviewArray[i], saveToDatabase)
 

@@ -47,7 +47,7 @@ export function createLayerController(mainController:MainControllerInterface){
 
   layerControllerHTMLObject.addDivLayer = function (e:any){
       let currentPage = mainController.pageController.currentPage.fullPageHTMLObject
-      let divLayer = GreatNoteDataClass.GNContainerDiv({name:"",arrayID: currentPage.getAccessPointer(), saveToDatabase: true, specialCreationMessage: "divLayer", _classNameList: ["divLayer"]})
+      let divLayer = GreatNoteDataClass.GNContainerDiv({name:"",arrayID: currentPage.getAccessPointer(), saveToDatabase: true,  _classNameList: ["divLayer"]})
       divLayer.applyStyle({width: "100%", height: "100%", "position": "absolute", "left": "0px", "top": "0px"})
       mainController.saveHTMLObjectToDatabase(divLayer)
 

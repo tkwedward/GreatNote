@@ -15,10 +15,14 @@ socket.on("serverSendSocketIdArray", (data) => {
 socket.on("message", (msg) => {
     console.log(msg);
 });
+socket.on("broadcastMessage", (msg) => {
+    console.log(msg);
+});
 socket.on("saveDataToServer", (data) => {
     mainController.saveMainDoc(true);
 });
 socket.on("serverResponseToLoadMainDocRequest", (data) => {
+    // console.log(323232)
     mainController.loadMainDoc(data);
     mainController.buildInitialHTMLSkeleton();
     mainController.buildPageFromMainDoc();
@@ -29,6 +33,7 @@ function Decodeuint8arr(uint8array) {
 socket.on("processInitialData", (data) => {
     // let convertedData = Decodeuint8arr(data)
     // console.log(data)
+    // console.log(444444, data)
     mainController.loadMainDoc(data);
     mainController.buildInitialHTMLSkeleton();
     mainController.buildPageFromMainDoc();
@@ -38,12 +43,8 @@ socket.on("socketConnectionUpdate", (data) => {
     // mainController.communitcationController.update(data)
 });
 socket.on("serverSendChangeFileToClient", (changeDataArray) => {
-    console.log(59, changeDataArray);
     // changeData: meta, htmlObjectData
     changeDataArray.forEach((changeData) => {
-        if (changeData.metaData.socketId == socket.id && changeData.metaData.action == "create") {
-            changeData.metaData.action = "modifyTemporaryPointer";
-        }
         mainController.processChangeData(changeData);
     });
 });

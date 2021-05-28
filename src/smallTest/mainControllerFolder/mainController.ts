@@ -3,7 +3,7 @@ import * as buildInitialPageHelperFunctions from "../buildInitialPageHelperFunct
 import {GNObjectInterface, CreateGreatNoteObjectInterface}  from "../GreatNoteClass/GreatNoteObjectInterface"
 import {socket} from "../socketFunction"
 import {ToolBoxInterface} from "../ToolboxModel"
-import {changeEventGenerator, processCreationDataHelper,processNewChangeData} from "../databaseHelperFunction"
+import { processCreationDataHelper } from "../databaseHelperFunction"
 import {LayerControllerInterface} from "../layerControllerFolder/layerController"
 import * as PageController from "../pageControllerFolder/pageController"
 import * as Setting from "../settings"
@@ -50,19 +50,17 @@ export class MainController implements MainControllerInterface{
     the last paraameter is used only for the first tiee to initialize the object, no need to worry about it when used later
     */
     //@auto-fold here
-    addData(arrayID: string, htmlObject:GNObjectInterface|any, temporaryPointer:string, insertPosition?:number|boolean, dataPointer?:string, specialCreationMessage?: string, ):AddDatabaseFormatInterface{
+    addData(parentAccessPointer: string, htmlObject:GNObjectInterface|any, accessPointer:string, insertPosition?:number|boolean, dataPointer?:string, specialCreationMessage?: string, ):AddDatabaseFormatInterface{
       // Step 1: register an accessPointer in the database
         //@auto-fold here
-
         let dataMessage:AddDatabaseFormatInterface = {
             htmlObjectData: htmlObject.extract(),
             metaData: {
                 action: "create",
                 insertPosition: insertPosition,
+                parentAccessPointer: parentAccessPointer,
+                accessPointer: accessPointer,
                 dataPointer: dataPointer,
-                specialCreationMessage: specialCreationMessage,
-                arrayID: arrayID,
-                temporaryPointer: temporaryPointer
             }
         }
         // socket.emit("databaseOperation", dataMessage)
@@ -94,6 +92,8 @@ export class MainController implements MainControllerInterface{
     /** when ever the htmlObject is updated, we fetch newData from thfe HTMLObjectt, and then go to the database and update the relevant data*/
     saveHTMLObjectToDatabase(htmlObject:any){
         let newData = htmlObject.extract()
+
+        // console.log(96969696, newData)
         let updateMessage: UpdateDataFormatInterface= {
             htmlObjectData: newData,
             metaData:{
@@ -138,7 +138,6 @@ export class MainController implements MainControllerInterface{
       let changes = ""
 
       if (changes.length > 0){
-
         socket.emit("clientSendChangesToServer", {"changeData": changes})
       }
 
@@ -201,45 +200,32 @@ export class MainController implements MainControllerInterface{
       let rootArray = data["array"]
 
       data["array"].map((p:any)=>{
-          let arrayName = p["data"]["name"]
+          let arrayName = p["GNType"]
           let accessPointer = p["_identity"]["accessPointer"]
           this.mainDocArray[arrayName] = accessPointer
       })
-    }
 
+      // console.log(201201, this.mainDocArray)
+    }
 
 
     processChangeData(changeData: any){
           let {htmlObjectData, metaData} = changeData
 
-          console.log(215215, changeData)
-          if (changeData.metaData.action=="modifyTemporaryPointer"){
-              let temporaryPointer = metaData["temporaryPointer"]
-              let targetObject = <any> document.querySelector(`*[accessPointer=${temporaryPointer}]`)
-              // console.log(217217 , temporaryPointer, targetObject, htmlObjectData, htmlObjectData, metaData)
-              // set the accessPointer and updaate the identity
-              targetObject?.setAttribute("accessPointer", htmlObjectData._identity.accessPointer)
-              targetObject._identity = htmlObjectData._identity
-          }// create
+          // console.log(215215, metaData.socketId , socket.id)
+
+          if (metaData.socketId == socket.id) return
+
+
 
           if (changeData.metaData.action=="create"){
               processCreationDataHelper(this, changeData)
           }// create
 
           if (changeData.metaData.action=="update"){
-              console.log(213213, changeData)
-
-
-
+              // console.log(213213, changeData)
               let _object = <any> document.querySelector(`*[accessPointer='${htmlObjectData._identity.accessPointer}']`)
-              console.log(_object, _object._identity, htmlObjectData._identity)
-              //
-              // if (changeData.htmlObject.GNType == "GNImageContainer"){
-              //     let img = _object.querySelector("img")
-              //     img.src =
-              //     return
-              // }
-
+              // console.log(_object, _object._identity, htmlObjectData._identity)
 
               htmlObjectData._identity.linkArray.forEach((p:string)=>{
                   // to chheck if the socket id are different and if the aaaccessPointer of the object is different from the looped aaccessPointer of the linkedObject

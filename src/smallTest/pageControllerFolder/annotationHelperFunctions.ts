@@ -73,7 +73,7 @@ export function buildAnnotationPage(mainController: MainControllerInterface){
 
           // pageNumber: , currentPageAnnotationData
           let currentPageAnnotationData = getAllPageAnnotation(currentPage, checkedArray)
-
+          // console.log(7676767, currentPageAnnotationData)
 
           if (currentPageAnnotationData){
               allPageAnnotationArray.push(currentPageAnnotationData)
@@ -125,12 +125,7 @@ export function renderAnnotationPage(currentPageAnnotationData: any, annotationP
                 pageWrapper.append(annotationSummary, annotationContent, separationLine)
 
             })
-
-
-
-
-
-        })
+        })// p.currentPageAnnotationData).forEach
 
         annotationPageContentWrapper.append(pageWrapper)
     })

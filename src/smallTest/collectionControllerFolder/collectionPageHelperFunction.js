@@ -26,9 +26,10 @@ export function attachExtraFunctionToCollectionPage(collectionPage, divLayer, sv
         // console.log(545454, injectedData)
         injectedData.forEach((p) => {
             let page = document.querySelector(`div[accessPointer='${p.pageAccessPointer}'`);
-            let groupData = page.groupData.filter((q) => q.uniqueID == p.uniqueID.toString())[0];
+            let groupData = page === null || page === void 0 ? void 0 : page.groupData.filter((q) => q.uniqueID == p.uniqueID.toString())[0];
             // console.log(page.groupData, groupData)
-            collectionPage.renderGroupDataToCollectionPage(groupData);
+            if (groupData)
+                collectionPage.renderGroupDataToCollectionPage(groupData);
         });
     }; // collectionPage
 } // attachExtraFunctionToCollectionPage

@@ -102,10 +102,9 @@ export interface AddDatabaseFormatInterface {
     htmlObjectData: HtmlObjectDataInterface;
     metaData: {
         action: string;
-        arrayID: string;
         insertPosition?: number | boolean;
+        parentAccessPointer: string;
+        accessPointer: string;
         dataPointer?: string;
-        specialCreationMessage?: string;
-        temporaryPointer: string;
     };
 }

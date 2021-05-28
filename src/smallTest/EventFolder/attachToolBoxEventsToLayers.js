@@ -7,6 +7,10 @@ import * as MoveObjectInDivFunction from "../ToolboxFolder/moveObjectInDivFuncti
 import * as TextToolFunction from "../ToolboxFolder/textToolHelperFunction";
 import * as AddBookmarkFunction from "../ToolboxFolder/addBookmarkFunction";
 export function attachEventListenerToSvgBoard(mainController, svgBoard) {
+    console.log(1313131313, "attachItemtoSvgBoard", svgBoard, svgBoard.getAttribute("eventAttached"));
+    if (svgBoard.getAttribute("eventAttached") == "true")
+        return;
+    svgBoard.setAttribute("eventAttached", "true");
     let polylineMouseDown = {
         eventNameList: ["touchstart"],
         eventFunction: (e) => {
@@ -20,9 +24,7 @@ export function attachEventListenerToSvgBoard(mainController, svgBoard) {
         }
     };
     let selectionStatusObject = {
-        mode: "phaseOne",
-        polyline: null,
-        counter: 0
+        mode: "phaseOne", polyline: null, counter: 0
     };
     let selectionToolMouseDownFunction = {
         eventNameList: ["touchstart"],
@@ -31,9 +33,7 @@ export function attachEventListenerToSvgBoard(mainController, svgBoard) {
         }
     };
     let rectangleSelectionStatusObject = {
-        mode: "phaseOne",
-        polyline: null,
-        counter: 0
+        mode: "phaseOne", polyline: null, counter: 0
     };
     let rectangleSelectionToolMouseDownFunction = {
         eventNameList: ["mousedown"],

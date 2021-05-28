@@ -15,16 +15,19 @@ export function createDummyData() {
 //@auto-fold here
 export function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage, injectedData, attachEventListener = true) {
     _object = _object;
+    // to set the object _identity
+    let accessPointer = `${Date.now().toString(36) + Math.random().toString(36).substr(2)}`;
     _object._identity = {
-        accessPointer: "", dataPointer: "", linkArray: []
+        parentAccessPointer: arrayID,
+        accessPointer: accessPointer,
+        dataPointer: dataPointer || accessPointer,
+        linkArray: [accessPointer],
+        children: []
     };
-    /** important function to extract data from individual elements*/
+    _object.setAttribute("accessPointer", accessPointer);
     // when the data is first created, add it to the database
     _object.addToDatabase = function (arrayID, insertPosition, dataPointer, specialCreationMessage) {
-        let temporaryPointer = `temporaryPointer_${Date.now().toString(36) + Math.random().toString(36).substr(2)}`;
-        _object._identity.accessPointer = temporaryPointer;
-        _object.setAttribute("accessPointer", temporaryPointer);
-        mainController.addData(arrayID, _object, temporaryPointer, insertPosition, dataPointer, specialCreationMessage);
+        mainController.addData(arrayID, _object, accessPointer, insertPosition, dataPointer, specialCreationMessage);
     };
     _object.saveHTMLObjectToDatabase = function () {
         mainController.saveHTMLObjectToDatabase(_object);
@@ -42,7 +45,7 @@ export function superGNObject(_object, saveToDatabase, arrayID, insertPosition, 
                 targetHTML === null || targetHTML === void 0 ? void 0 : targetHTML.loadFromData(dataObject);
             }
             else {
-                // _object.saveHTMLObjectToDatabase()
+                // _object.saveHTMLObjectToDatabase
             }
         });
     };
@@ -65,26 +68,6 @@ export function superGNObject(_object, saveToDatabase, arrayID, insertPosition, 
             return parent.getLocatedPageNumber();
         }
     };
-    _object.processUpdateData = function () {
-        // let objectData = _object.reloadDataFromDatabase()
-        // _object.updateLinkObject()
-    };
-    // _object.reloadDataFromDatabase = function(){
-    //     let dataPointer = _object.getDataPointer()
-    //     let accessPointer = _object.getAccessPointer()
-    //
-    //     let dataPointerObject = mainController.getObjectById(dataPointer)
-    //
-    //     _object.loadFromData(dataPointerObject)
-    //     //
-    //     if (dataPointer!= accessPointer){
-    //         let accessPointerObject= mainController.getObjectById(accessPointer)
-    //         _object.applyStyle(accessPointerObject.stylesheet)
-    //     } else {
-    //         _object.applyStyle(dataPointerObject.stylesheet)
-    //     }
-    //     return dataPointerObject
-    // }
     _object.appendTo = function (_parent) {
         _object._parent = _parent;
         _parent.appendChild(_object);
@@ -121,9 +104,7 @@ export function superGNObject(_object, saveToDatabase, arrayID, insertPosition, 
     _object.getDataFromDataBase = function () {
         return mainController.getObjectById(_object.getDataPointer());
     };
-    if (attachEventListener) {
-        attachEventListenerToLayer(mainController, arrayID, _object, injectedData);
-    }
+    attachEventListenerToLayer(mainController, arrayID, _object, injectedData);
     if (saveToDatabase) {
         _object.addToDatabase(arrayID, insertPosition, dataPointer, specialCreationMessage);
         // _object.editEvent(editEvent)
@@ -133,7 +114,8 @@ function attachEventListenerToLayer(mainController, arrayID, _object, injectedDa
     if (_object.GNType == "GNSvg") {
         ToolBoxEvents.attachEventListenerToSvgBoard(mainController, _object);
     }
-    if (injectedData === null || injectedData === void 0 ? void 0 : injectedData.GNSpecialCreationMessage) {
+    // console.log(1671671767, _object, _object._classNameList)
+    if (_object.classList.contains("divLayer")) {
         ToolBoxEvents.attachEventListenerToDivLayer(mainController, _object);
     }
 }
@@ -144,7 +126,7 @@ export function setObjectMovable(_object) {
     let attributeY = "top";
     _object.style.position = "absolute";
     _object.addEventListener("mousedown", (e) => {
-        console.log(e);
+        // console.log(e)
         e.stopPropagation();
         let [startX, startY] = [e["screenX"], e["screenY"]];
         let objectInitialX = 0;

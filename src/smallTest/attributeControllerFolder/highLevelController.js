@@ -7,9 +7,9 @@ export function createPolylineController() {
     // color controller
     let colorTemplate = document.createElement("div");
     colorTemplate.style.display = "inline-block";
-    colorTemplate.style["width"] = "50px";
-    colorTemplate.style["height"] = "50px";
-    colorTemplate.style["margin"] = "10px";
+    colorTemplate.style["width"] = "30px";
+    colorTemplate.style["height"] = "30px";
+    colorTemplate.style["margin"] = "5px";
     let polylineStrokeColorController = choiceController("background", ["red", "blue", "green", "black", "yellow", "grey", "gold", "silver", "pink"], colorTemplate);
     polylineStrokeColorController.classList.add("polylineColorController");
     let polylineStrokeWidthController = universalControllerCreater("widthController", {

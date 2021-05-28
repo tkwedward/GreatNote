@@ -8,7 +8,7 @@ import * as PageController from "./smallTest/pageControllerFolder/pageController
 export var mainController:MainControllerInterface
 mainController = new MainController()
 
-console.log(PageController.highlightCurrentPageInOverviewMode)
+// console.log(PageController.highlightCurrentPageInOverviewMode)
 mainController.toolBox = new ToolBoxModel.ToolBoxClass()
 // to create the attributeControllers
 socket.emit("initialDataRequest") // processInitialDat

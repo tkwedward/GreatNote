@@ -21,6 +21,7 @@ export function eraserMouseDownFunction(e, mainController, svgBoard, moveEventNa
         return;
     }
     let [offsetX, offsetY, touchIsPen] = ToolBoxHelperFunction.getOffSetXY(e);
+    // touchIsPen = true
     if (!touchIsPen)
         return;
     e.preventDefault();

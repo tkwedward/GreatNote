@@ -15,6 +15,8 @@ export interface GNObjectInterface {
         "accessPointer": string;
         "dataPointer": string;
         "linkArray": string[];
+        parent: string;
+        children: string[];
     };
     loadFromData?(data: any): void;
     extract?(): any;
@@ -42,6 +44,18 @@ export interface GNObjectInterface {
     processUpdateData(): void;
     addToDatabase(arrayID: string, insertPosition?: number | boolean, dataPointer?: string): void;
     deleteFromDatabase(): void;
+}
+export interface GNExtractDataInterface {
+    GNType: string;
+    data: any;
+    stylesheet: any;
+    _identity: {
+        parent: string;
+        children: string[];
+        accessPointer: string;
+        dataPointer: string;
+        linkedArray: string[];
+    };
 }
 export interface GNInputFieldInterface extends GNObjectInterface, HTMLInputElement {
     _parent?: any;

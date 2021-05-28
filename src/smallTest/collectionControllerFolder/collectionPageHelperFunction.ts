@@ -54,9 +54,9 @@ export function attachExtraFunctionToCollectionPage(collectionPage:CollectionPag
         // console.log(545454, injectedData)
         injectedData.forEach((p:CollectionPageInjectedDataInterface)=>{
             let page = <any> document.querySelector(`div[accessPointer='${p.pageAccessPointer}'`)
-            let groupData = page.groupData.filter((q:any)=>q.uniqueID==p.uniqueID.toString())[0]
+            let groupData = page?.groupData.filter((q:any)=>q.uniqueID==p.uniqueID.toString())[0]
             // console.log(page.groupData, groupData)
-            collectionPage.renderGroupDataToCollectionPage(groupData)
+            if (groupData) collectionPage.renderGroupDataToCollectionPage(groupData)
         })
     } // collectionPage
 } // attachExtraFunctionToCollectionPage

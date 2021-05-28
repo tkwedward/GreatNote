@@ -1,12 +1,13 @@
 import { GNTextContainer } from "../GreatNoteClass/GNTextContainer";
 import * as ToolBoxHelperFunction from "./toolBoxHelperFunction";
 export function textToolMouseDownFunction(e, mainController, divLayer, moveEventName, upEventName) {
+    console.log(666, "yesyesyes");
     if (!mainController.toolBox.checkToolBoxItemStatus("textToolItemButton"))
         return;
     if (e.target.classList.contains("svgLayer"))
         return;
-    if (divLayer.classList.contains("fullPage"))
-        return;
+    // if (divLayer.classList.contains("fullPage")) return
+    console.log(1001010101, "yesyesyes");
     let offsetX, offstY, touchIsPen;
     [offsetX, offstY, touchIsPen] = ToolBoxHelperFunction.getOffSetXY(e);
     let textContainer = GNTextContainer({ name: "GNTextContainer", arrayID: divLayer.getAccessPointer(), _classNameList: ["GNTextContainer"], saveToDatabase: true });

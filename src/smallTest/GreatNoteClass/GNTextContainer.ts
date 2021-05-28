@@ -46,8 +46,8 @@ export function createTextContainerHTMLObject(): [GNTextContainerInterface, HTML
         return function itemInputFunction(e:InputEvent){
             setTimeout(function(){
               _object.saveHTMLObjectToDatabase()
-            item.addEventListener("input",  itemInputFunction)
-          }, 3000)
+              item.addEventListener("input",  itemInputFunction)
+            }, 3000)
             item.removeEventListener("input", itemInputFunction)
         }
     }

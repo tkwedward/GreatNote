@@ -18,7 +18,9 @@ export interface GNObjectInterface {
     _identity?: {
       "accessPointer": string,
       "dataPointer": string,
-      "linkArray": string[]
+      "linkArray": string[],
+      parent: string,
+      children: string[]
     } // the identity of the object
 
     loadFromData?(data:any):void
@@ -54,6 +56,19 @@ export interface GNObjectInterface {
     // relate to DB
     addToDatabase(arrayID:string, insertPosition?:number|boolean, dataPointer?:string):void
     deleteFromDatabase():void
+}
+
+export interface GNExtractDataInterface {
+    GNType: string,
+    data: any,
+    stylesheet: any,
+    _identity: {
+      parent: string,
+      children: string[],
+      accessPointer: string,
+      dataPointer: string,
+      linkedArray: string[]
+    }
 }
 
 // GNInputFieldInterface

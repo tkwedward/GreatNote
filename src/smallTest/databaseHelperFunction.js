@@ -5,7 +5,7 @@ export var specialCreationMessageEnum;
 })(specialCreationMessageEnum || (specialCreationMessageEnum = {}));
 export function processCreationDataHelper(mainController, creationData) {
     let { htmlObjectData, metaData } = creationData;
-    let parentElement = mainController.getHtmlObjectByID(metaData.arrayID);
+    let parentElement = mainController.getHtmlObjectByID(metaData.parentAccessPointer);
     let htmlObjectName = htmlObjectData.GNType;
     let htmlObject = mainController.createGNObjectThroughName(htmlObjectName, { name: "", injectedData: htmlObjectData });
     console.log(htmlObject);

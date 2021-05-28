@@ -1,5 +1,6 @@
 import { calculateDistance, getScale, getTouchOffset } from "../ToolboxFolder/toolBoxHelperFunction";
 import * as PageViewHelperFunction from "../pageViewHelperFunction";
+import { socket } from "../socketFunction";
 export function swipeDetection(mainController, pageContentContainer) {
     pageContentContainer.addEventListener("touchstart", function (e) {
         let [initialPointX, initialPointY, finalPointX, finalPointY] = [0, 0, 0, 0];
@@ -43,7 +44,9 @@ export function swipeDetection(mainController, pageContentContainer) {
             scaleDirection = newFinalPointsDistance - previousFinalPointsDistance > 0 ? +1 : -1;
             testInfo.innerHTML = `distance_1 = ${distance1} <br>` + `distance_2 = ${distance2} <br>` + `totalDistance = ${distance1 + distance2}, scale = ${scale}, scale = ${scale + scaleDirection * deltaScale}, direction = ${scaleDirection}, finalX = ${finalPointX}, finalY = ${finalPointY}, finalX2 = ${finalPointX2}, finalY2 = ${finalPointY2}, width ${e.target.getBoundingClientRect().width}`;
             let pageWidth = e.target.getBoundingClientRect().width;
-            // pageContentContainer["style"].transform = `scale(${scale + scaleDirection * deltaScale})`
+            pageContentContainer["style"].transform = `scale(${scale + scaleDirection * deltaScale})`;
+            let testMessage = `${JSON.stringify(scale)}`;
+            socket.emit("clientWantsToBroadcastMessage", testMessage);
             if (newFinalPointsDistance > 100) {
                 Array.from(fullPageArray).forEach((p) => {
                     if (pageWidth < 4000 && pageWidth > 600) {

@@ -3,11 +3,11 @@ import * as ToolBoxHelperFunction from "./toolBoxHelperFunction"
 import { MainControllerInterface } from "../mainControllerFolder/mainControllerInterface"
 
 export function textToolMouseDownFunction(e: any, mainController: MainControllerInterface, divLayer: any, moveEventName:string, upEventName:string){
-
+  console.log(666, "yesyesyes")
     if (!mainController.toolBox.checkToolBoxItemStatus("textToolItemButton")) return
     if (e.target.classList.contains("svgLayer")) return
-    if (divLayer.classList.contains("fullPage")) return
-
+    // if (divLayer.classList.contains("fullPage")) return
+console.log(1001010101, "yesyesyes")
     let offsetX, offstY, touchIsPen;
     [offsetX, offstY, touchIsPen] = ToolBoxHelperFunction.getOffSetXY(e);
 

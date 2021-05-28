@@ -34,7 +34,7 @@ export class MainController {
     the last paraameter is used only for the first tiee to initialize the object, no need to worry about it when used later
     */
     //@auto-fold here
-    addData(arrayID, htmlObject, temporaryPointer, insertPosition, dataPointer, specialCreationMessage) {
+    addData(parentAccessPointer, htmlObject, accessPointer, insertPosition, dataPointer, specialCreationMessage) {
         // Step 1: register an accessPointer in the database
         //@auto-fold here
         let dataMessage = {
@@ -42,10 +42,9 @@ export class MainController {
             metaData: {
                 action: "create",
                 insertPosition: insertPosition,
+                parentAccessPointer: parentAccessPointer,
+                accessPointer: accessPointer,
                 dataPointer: dataPointer,
-                specialCreationMessage: specialCreationMessage,
-                arrayID: arrayID,
-                temporaryPointer: temporaryPointer
             }
         };
         // socket.emit("databaseOperation", dataMessage)
@@ -72,6 +71,7 @@ export class MainController {
     /** when ever the htmlObject is updated, we fetch newData from thfe HTMLObjectt, and then go to the database and update the relevant data*/
     saveHTMLObjectToDatabase(htmlObject) {
         let newData = htmlObject.extract();
+        // console.log(96969696, newData)
         let updateMessage = {
             htmlObjectData: newData,
             metaData: {
@@ -155,35 +155,24 @@ export class MainController {
         this.mainDoc = data;
         let rootArray = data["array"];
         data["array"].map((p) => {
-            let arrayName = p["data"]["name"];
+            let arrayName = p["GNType"];
             let accessPointer = p["_identity"]["accessPointer"];
             this.mainDocArray[arrayName] = accessPointer;
         });
+        // console.log(201201, this.mainDocArray)
     }
     processChangeData(changeData) {
         let { htmlObjectData, metaData } = changeData;
-        console.log(215215, changeData);
-        if (changeData.metaData.action == "modifyTemporaryPointer") {
-            let temporaryPointer = metaData["temporaryPointer"];
-            let targetObject = document.querySelector(`*[accessPointer=${temporaryPointer}]`);
-            // console.log(217217 , temporaryPointer, targetObject, htmlObjectData, htmlObjectData, metaData)
-            // set the accessPointer and updaate the identity
-            targetObject === null || targetObject === void 0 ? void 0 : targetObject.setAttribute("accessPointer", htmlObjectData._identity.accessPointer);
-            targetObject._identity = htmlObjectData._identity;
-        } // create
+        // console.log(215215, metaData.socketId , socket.id)
+        if (metaData.socketId == socket.id)
+            return;
         if (changeData.metaData.action == "create") {
             processCreationDataHelper(this, changeData);
         } // create
         if (changeData.metaData.action == "update") {
-            console.log(213213, changeData);
+            // console.log(213213, changeData)
             let _object = document.querySelector(`*[accessPointer='${htmlObjectData._identity.accessPointer}']`);
-            console.log(_object, _object._identity, htmlObjectData._identity);
-            //
-            // if (changeData.htmlObject.GNType == "GNImageContainer"){
-            //     let img = _object.querySelector("img")
-            //     img.src =
-            //     return
-            // }
+            // console.log(_object, _object._identity, htmlObjectData._identity)
             htmlObjectData._identity.linkArray.forEach((p) => {
                 // to chheck if the socket id are different and if the aaaccessPointer of the object is different from the looped aaccessPointer of the linkedObject
                 // console.log(changeData.metaData.socketId, socket.id, _object._identity.accessPointer, p)

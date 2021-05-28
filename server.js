@@ -60,27 +60,7 @@ var turnOnServerMode = true;
 // socketArray = []
 var jsonFileLocation = path.join(__dirname, "./dist/data/automergeData.txt");
 var jsonFileLocation2 = path.join(__dirname, "./dist/data/automergeDataJSON.txt");
-var automergeMainDoc;
-if (turnOnServerMode) {
-    automergeMainDoc = new automergeHelperFunction_1.AutomergeMainDoc(jsonFileLocation);
-    var data = fs.readFileSync(jsonFileLocation);
-    automergeMainDoc.mainDoc = Automerge.load(data);
-    setInterval(function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var saveData;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        saveData = Automerge.save(automergeMainDoc.mainDoc);
-                        return [4 /*yield*/, fs.writeFileSync(jsonFileLocation, saveData)];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        });
-    }, 10000);
-}
+var automergeMainDoc = new automergeHelperFunction_1.AutomergeMainDoc(jsonFileLocation);
 io.on("connection", function (socket) {
     socket.broadcast.emit('socketConnectionUpdate', {
         action: "connect", targetSocketId: socket.id
@@ -88,6 +68,7 @@ io.on("connection", function (socket) {
     socket.on("message", function (data) {
         console.log(new Date());
     });
+    socket.on("clientWantsToBroadcastMessage", function (data) { return socket.broadcast.emit("broadcastMessage", data); });
     socket.on("clientAskServerForSocketData", function (data) {
         var socketData = {
             "yourSocketId": socket.id,
@@ -95,18 +76,18 @@ io.on("connection", function (socket) {
         };
         socket.emit("serverSendSocketIdArray", socketData);
     });
-    socket.on("initialDataRequest", function () {
-        var jsonifiedMainDoc;
-        if (turnOnServerMode) {
-            jsonifiedMainDoc = automergeHelperFunction_1.jsonify(automergeMainDoc.mainDoc);
-            fs.writeFileSync(jsonFileLocation2, JSON.stringify(jsonifiedMainDoc));
-        }
-        else {
-            jsonifiedMainDoc = JSON.parse(fs.readFileSync(jsonFileLocation2));
-        }
-        //
-        socket.emit("processInitialData", jsonifiedMainDoc);
-    });
+    socket.on("initialDataRequest", function () { return __awaiter(void 0, void 0, void 0, function () {
+        var result;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, automergeMainDoc.initializeRootArray()];
+                case 1:
+                    result = _a.sent();
+                    socket.emit("processInitialData", result);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
     socket.on("disconnect", function () {
         console.log("user disconnected");
         io.emit("message", "user disconnected");
@@ -115,12 +96,24 @@ io.on("connection", function (socket) {
         });
     });
     socket.on("clientSendChangesToServer", function (changeList) { return __awaiter(void 0, void 0, void 0, function () {
-        var changeListToClients;
+        var mongoClient, database, allNotebookDB, changeListToClients;
         return __generator(this, function (_a) {
-            changeListToClients = changeList.map(function (changeData) { return automergeMainDoc.processDatabaseOperationData(changeData, socket.id); });
-            io.emit("message", "finish saving");
-            io.emit("serverSendChangeFileToClient", changeListToClients);
-            return [2 /*return*/];
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, automergeMainDoc.mongoDB.connect()];
+                case 1:
+                    mongoClient = _a.sent();
+                    database = mongoClient.db("GreatNote");
+                    allNotebookDB = database.collection("allNotebookDB");
+                    changeListToClients = changeList.map(function (changeData) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, automergeMainDoc.processChangeDataFromClients(allNotebookDB, changeData, socket.id)];
+                            case 1: return [2 /*return*/, _a.sent()];
+                        }
+                    }); }); });
+                    io.emit("message", "finish saving");
+                    io.emit("serverSendChangeFileToClient", changeList);
+                    return [2 /*return*/];
+            }
         });
     }); });
     socket.on("resetNoteBook", function (saveData) {

@@ -11,7 +11,7 @@ export function overallMouseDownFunction(e:any, mainController: MainControllerIn
     let offsetX, offstY, touchIsPen;
     [offsetX, offstY, touchIsPen] = getOffSetXY(e);
 
-    // if (!touchIsPen) return
+    if (!touchIsPen) return
 
     e.preventDefault()
 

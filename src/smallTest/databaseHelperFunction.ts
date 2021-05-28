@@ -10,7 +10,7 @@ export enum specialCreationMessageEnum{
 export function processCreationDataHelper(mainController:MainControllerInterface, creationData: AddDatabaseFormatInterface){
     let {htmlObjectData, metaData} =  creationData
 
-    let parentElement = <any> mainController.getHtmlObjectByID(metaData.arrayID)
+    let parentElement = <any> mainController.getHtmlObjectByID(metaData.parentAccessPointer)
 
     let htmlObjectName = htmlObjectData.GNType
     let htmlObject = <any> mainController.createGNObjectThroughName(htmlObjectName, {name:"", injectedData: htmlObjectData})

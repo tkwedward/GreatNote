@@ -36,8 +36,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.AutomergeMainDoc = exports.jsonify = exports.MainDocArrayEnum = void 0;
-var Automerge = require("automerge");
+exports.AutomergeMainDoc = exports.MainDocArrayEnum = void 0;
+var MongoDBClient_1 = require("./MongoDBClient");
 var fs = require("fs");
 var MainDocArrayEnum;
 (function (MainDocArrayEnum) {
@@ -47,75 +47,34 @@ var MainDocArrayEnum;
     MainDocArrayEnum["mainArray_panel"] = "mainArray_panel";
     MainDocArrayEnum["mainArray_pokemon"] = "mainArray_pokemon";
 })(MainDocArrayEnum = exports.MainDocArrayEnum || (exports.MainDocArrayEnum = {}));
-function jsonify(x) {
-    if (Array.isArray(x)) {
-        return x.map(function (p) { return jsonify(p); });
-    }
-    else if (typeof x === 'object') {
-        var newX_1 = {};
-        Object.entries(x).forEach(function (_a, _) {
-            var key = _a[0], value = _a[1];
-            newX_1[key] = jsonify(value);
-        });
-        return newX_1;
-    }
-    else {
-        return x;
-    }
-}
-exports.jsonify = jsonify;
 var initializeArray = { name: "root", array: [] };
 function createDummyData() {
     return {
         htmlObjectData: {
-            array: [],
+            data: {},
+            stylesheet: {},
             _classNameList: [],
             _identity: {
                 accessPointer: "",
                 dataPointer: "",
-                linkArray: []
+                linkArray: [],
+                children: [],
+                parentAccessPointer: ""
             }
         },
         metaData: {
             insertPosition: null,
-            dataPointer: "",
-            specialCreationMessage: "",
-            temporaryPointer: ""
+            parentAccessPointer: "",
+            accessPointer: "",
+            dataPointer: ""
         }
     };
 }
 var AutomergeMainDoc = /** @class */ (function () {
     function AutomergeMainDoc(jsonFileLocation) {
-        this.mainDoc = Automerge.from(initializeArray);
-        this.previousDoc = Automerge.from(initializeArray);
-        this.mainDocArray = {};
         this.changeList = [];
         this.jsonFileLocation = jsonFileLocation;
-        this.baseArrayID = Automerge.getObjectId(this.mainDoc);
-        // initialize the root array
-        this.initializeRootArray();
-        for (var arrayName in MainDocArrayEnum) {
-            var htmlObjectData = {
-                "data": { "name": arrayName },
-                "array": [],
-                "_identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
-                "_classList": [],
-                "styleSheet": {},
-                "GNType": "",
-                "specialGNType": ""
-            };
-            this.addData({
-                htmlObjectData: htmlObjectData,
-                metaData: {
-                    insertPosition: false,
-                    dataPointer: false,
-                    specialCreationMessage: "",
-                    temporaryPointer: "",
-                    arrayID: this.baseArrayID
-                }
-            });
-        }
-        // this.addData(this.mainDocArray["mainArray_pageFull"], createDummyData())
+        this.mongoDB = new MongoDBClient_1.MongoBackEnd();
     }
     AutomergeMainDoc.prototype.addItemToChangeList = function (item) {
         if (this.changeList.length > 50000)
@@ -130,12 +89,46 @@ var AutomergeMainDoc = /** @class */ (function () {
             }
         }
     };
+    AutomergeMainDoc.prototype.testMongoDBConnection = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, _b, _c;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
+                    case 0:
+                        console.log("====== test connection ======");
+                        _b = (_a = console).log;
+                        _c = ["0000: testConection"];
+                        return [4 /*yield*/, this.mongoDB.testConnection()];
+                    case 1:
+                        _b.apply(_a, _c.concat([_d.sent()]));
+                        console.log("====== test connection end ======");
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     AutomergeMainDoc.prototype.initializeRootArray = function () {
-        for (var arrayName in MainDocArrayEnum)
-            this.mainDocArray[arrayName] = "";
+        return __awaiter(this, void 0, void 0, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.mongoDB.initializeFirstNotebook()];
+                    case 1:
+                        result = _a.sent();
+                        console.log(result.then);
+                        return [4 /*yield*/, this.mongoDB.disconnect()];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/, result
+                            // result.then(p=>{
+                            //     return p
+                            // })
+                        ];
+                }
+            });
+        });
     };
     AutomergeMainDoc.prototype.addData = function (saveDataMessage) {
-        var _this = this;
         var initializeMessage = { "action": "create", "objectID": "" };
         var htmlObjectData = saveDataMessage.htmlObjectData, metaData = saveDataMessage.metaData;
         var addToChangeList = true;
@@ -150,58 +143,6 @@ var AutomergeMainDoc = /** @class */ (function () {
         // }
         // to convertt tthe data pointer
         // step 1, to regiestter a place
-        this.mainDoc = Automerge.change(this.mainDoc, JSON.stringify(initializeMessage), function (doc) {
-            // console.log("====================")
-            // console.log(222333, "metaData", metaData, "arrayID", arrayID)
-            // console.log(222333, this.changeList)
-            //
-            // console.log("====================")
-            var arrayToBeAttachedTo = Automerge.getObjectById(doc, arrayID)["array"];
-            if (!insertPosition)
-                insertPosition = arrayToBeAttachedTo.length;
-            arrayToBeAttachedTo.insertAt(insertPosition, {});
-        });
-        // // step 2 update the identityProperties of the object
-        var arrayToBeAttachedTo = Automerge.getObjectById(this.mainDoc, arrayID)["array"];
-        // console.log("======== step 2: get arrayToBeAttachedTo ============")
-        // console.log(arrayToBeAttachedTo)
-        var objectSymbolArray = Object.getOwnPropertySymbols(arrayToBeAttachedTo[insertPosition]);
-        var accessPointer = arrayToBeAttachedTo[insertPosition][objectSymbolArray[1]];
-        this.addItemToChangeList({
-            temporaryPointer: temporaryPointer,
-            arrayID: accessPointer
-        });
-        // // create new object data
-        // console.log("130130 , dataPointer before", dataPointer)
-        if (dataPointer) {
-            var validDataPointer = Automerge.getObjectById(this.mainDoc, dataPointer);
-            if (!validDataPointer) {
-                dataPointer = this.getArrayIdFromChangeList(dataPointer);
-            }
-            metaData["dataPointer"] = dataPointer;
-            htmlObjectData._identity.dataPointer = dataPointer;
-        }
-        else {
-            htmlObjectData._identity.dataPointer = accessPointer;
-        }
-        htmlObjectData._identity.linkArray.push(accessPointer);
-        // add data to changelist
-        htmlObjectData._identity.accessPointer = accessPointer;
-        // Step 3: put real data into the database
-        this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
-            // add the data to the object
-            var objectInDatabase = Automerge.getObjectById(doc, accessPointer);
-            Object.entries(htmlObjectData).forEach(function (_a, _) {
-                var key = _a[0], value = _a[1];
-                objectInDatabase[key] = value;
-            });
-            // update the masterobject if it is a link object
-            if (dataPointer) {
-                var masterObject = _this.getObjectById(dataPointer, doc);
-                masterObject._identity.linkArray.push(accessPointer);
-                // masterObjectHtmlElement?._identity.linkArray.push(accessPointer) // **** this line may be deleted because we do not need to access the linkArray of the master object
-            }
-        });
         return { htmlObjectData: htmlObjectData, metaData: metaData };
     };
     AutomergeMainDoc.prototype.deleteFromDatabase = function (deleteMessage) {
@@ -218,92 +159,56 @@ var AutomergeMainDoc = /** @class */ (function () {
     };
     AutomergeMainDoc.prototype.updateDataInDatabase = function (htmlObjectData) {
         var _a = htmlObjectData._identity, accessPointer = _a.accessPointer, dataPointer = _a.dataPointer;
-        this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
-            var dataPointerObejct = Automerge.getObjectById(doc, dataPointer);
-            var accessPointerObject = Automerge.getObjectById(doc, accessPointer);
-            // update the data
-            Object.entries(htmlObjectData.data).forEach(function (_a, _) {
-                var key = _a[0], value = _a[1];
-                return dataPointerObejct["data"][key] = value;
-            });
-            if (htmlObjectData._classNameList)
-                dataPointerObejct["_classNameList"] = htmlObjectData._classNameList;
-            // update the stylesheet
-            if (accessPointer != dataPointer) {
-                // if it is a link object
-                Object.entries(htmlObjectData.stylesheet).forEach(function (_a, _) {
-                    var key = _a[0], value = _a[1];
-                    accessPointerObject["stylesheet"][key] = value;
-                });
-            }
-            else {
-                // if it is the main object
-                Object.entries(htmlObjectData.stylesheet).forEach(function (_a, _) {
-                    var key = _a[0], value = _a[1];
-                    dataPointerObejct["stylesheet"][key] = value;
-                });
-            }
-        });
     };
     AutomergeMainDoc.prototype.loadMainDoc = function () {
         var data = fs.readFileSync(this.jsonFileLocation);
-        this.mainDoc = Automerge.load(data);
     };
     AutomergeMainDoc.prototype.saveMainDoc = function (sendRequest) {
         if (sendRequest === void 0) { sendRequest = false; }
         return __awaiter(this, void 0, void 0, function () {
-            var saveData;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        saveData = Automerge.save(this.mainDoc);
-                        return [4 /*yield*/, fs.writeFileSync(this.jsonFileLocation, saveData)];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
+                return [2 /*return*/];
             });
         });
     }; // saveMainDoc
-    AutomergeMainDoc.prototype.getObjectById = function (objectID, doc) {
-        if (doc === void 0) { doc = this.mainDoc; }
-        return Automerge.getObjectById(doc, objectID);
-    };
     AutomergeMainDoc.prototype.processUpdateDataHelper = function (updateData) {
         var oldAccessPointer = updateData.htmlObjectData._identity.accessPointer;
         var newAccessPointer = "";
-        // to update the temporaryPointer to accessPointer
-        if (oldAccessPointer.startsWith("temporaryPointer_")) {
-            newAccessPointer = this.getArrayIdFromChangeList(oldAccessPointer);
-        }
-        else {
-            newAccessPointer = oldAccessPointer;
-        }
-        var accessPointerDataObject = this.getObjectById(newAccessPointer);
-        if (!accessPointerDataObject._identity) {
-            console.log(accessPointerDataObject, newAccessPointer);
-        }
-        // update the identity
-        updateData.htmlObjectData._identity = accessPointerDataObject._identity;
-        // update the database
-        this.updateDataInDatabase(updateData.htmlObjectData);
+        // this.updateDataInDatabase(updateData.htmlObjectData)
+        // console.log(updateData)
         return updateData;
     };
-    AutomergeMainDoc.prototype.processDatabaseOperationData = function (data, socketID) {
-        data.metaData.socketId = socketID;
-        if (data.metaData.action == "create") {
-            var changeDataToClient = this.addData(data);
-            // console.log(changeDataToClient)
-            return changeDataToClient;
-        } // create
-        if (data.metaData.action == "update") {
-            var updateData = this.processUpdateDataHelper(data);
-            return data;
-        } // update
-        if (data.metaData.action == "delete") {
-            var deleteMessage = this.deleteFromDatabase(data);
-            return deleteMessage;
-        } // delete
+    AutomergeMainDoc.prototype.processChangeDataFromClients = function (collection, data, socketID) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        data.metaData.socketId = socketID;
+                        if (!(data.metaData.action == "create")) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.mongoDB.createItem(collection, data).then(this.mongoDB.disconnect())];
+                    case 1:
+                        _a.sent();
+                        _a.label = 2;
+                    case 2:
+                        if (!(data.metaData.action == "update")) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.mongoDB.updateItem(collection, data).then(this.mongoDB.disconnect())];
+                    case 3:
+                        _a.sent();
+                        _a.label = 4;
+                    case 4:
+                        if (!(data.metaData.action == "delete")) return [3 /*break*/, 6];
+                        // let deleteMessage = this.deleteFromDatabase(data)
+                        // return deleteMessage
+                        return [4 /*yield*/, this.mongoDB.deleteItem(collection, data).then(this.mongoDB.disconnect())];
+                    case 5:
+                        // let deleteMessage = this.deleteFromDatabase(data)
+                        // return deleteMessage
+                        _a.sent();
+                        _a.label = 6;
+                    case 6: return [2 /*return*/];
+                }
+            });
+        });
     };
     return AutomergeMainDoc;
 }());

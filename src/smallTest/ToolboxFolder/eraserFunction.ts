@@ -24,7 +24,7 @@ export function eraserMouseDownFunction(e: any, mainController: MainControllerIn
     }
 
     let [offsetX, offsetY, touchIsPen] = ToolBoxHelperFunction.getOffSetXY(e)
-
+    // touchIsPen = true
     if (!touchIsPen) return
     e.preventDefault()
 

@@ -41,7 +41,7 @@ export function renderDataToHTML(mainController: MainControllerInterface, data:c
         }
 
         if (p.GNType=="GNContainerDiv"){
-            newHTMLObject =  mainController.GNDataStructureMapping["GNContainerDiv"]({name: "name", arrayID: arrayHTMLObject.getAccessPointer(),  saveToDatabase:false, injectedData: p, contentEditable: false})
+            newHTMLObject =  mainController.GNDataStructureMapping["GNContainerDiv"]({name: "name", arrayID: arrayHTMLObject.getAccessPointer(),  saveToDatabase:false, injectedData: p, _classNameList: p._classNameList})
             newHTMLObject._identity = p._identity
 
             let objectData =  p

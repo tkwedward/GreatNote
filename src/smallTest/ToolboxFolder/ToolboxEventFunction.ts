@@ -6,6 +6,7 @@ export function polylineMouseDownFunction(e:any, mainController: MainControllerI
         return
     }
 
+    console.log(1010101010, "createNewPolypenItem")
     let polylineController = mainController.attributeControllerMapping.polylineController
 
     let [offsetX, offsetY, touchIsPen, ratio] = [0, 0, false, 0]
@@ -29,6 +30,8 @@ export function polylineMouseDownFunction(e:any, mainController: MainControllerI
        let [strokeColor, strokeWidth]:[string, string] = polylineController.extract()
        let polyline = GreatNoteSvgDataClass.GNSvgPolyLine({name:"", arrayID: svgBoard.getAccessPointer(), insertPosition:false, dataPointer:false, saveToDatabase:true, specialCreationMessage:"polylineCreated"})
        polyline.style.pointerEvents = "none"
+
+       // console.log(33333, polyline)
 
        let pointArray = [[offsetX, offsetY]]
        //

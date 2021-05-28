@@ -23,12 +23,16 @@ socket.on("message", (msg:any)=>{
     console.log(msg)
 })
 
+socket.on("broadcastMessage", (msg: any)=>{
+    console.log(msg)
+})
 
 socket.on("saveDataToServer", (data:any)=>{
     mainController.saveMainDoc(true)
 })
 
 socket.on("serverResponseToLoadMainDocRequest", (data:any)=>{
+  // console.log(323232)
     mainController.loadMainDoc(data)
     mainController.buildInitialHTMLSkeleton()
     mainController.buildPageFromMainDoc()
@@ -41,7 +45,7 @@ function Decodeuint8arr(uint8array:any){
 socket.on("processInitialData", (data:any)=>{
     // let convertedData = Decodeuint8arr(data)
     // console.log(data)
-
+    // console.log(444444, data)
     mainController.loadMainDoc(data)
     mainController.buildInitialHTMLSkeleton()
     mainController.buildPageFromMainDoc()
@@ -56,12 +60,9 @@ socket.on("socketConnectionUpdate", (data:any)=>{
 
 
 socket.on("serverSendChangeFileToClient", (changeDataArray: any)=>{
-    console.log(59, changeDataArray)
     // changeData: meta, htmlObjectData
     changeDataArray.forEach((changeData:any)=>{
-      if (changeData.metaData.socketId == socket.id && changeData.metaData.action == "create"){
-          changeData.metaData.action = "modifyTemporaryPointer"
-      }
       mainController.processChangeData(changeData)
     })
+
 })

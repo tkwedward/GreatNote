@@ -21,12 +21,13 @@ export function addPasteImageEvent(mainController: MainControllerInterface){
                       console.log("finish processing image")
                        let responseImgSrc = JSON.parse(this.responseText).imgsrc.replace("talkNotes/", "")
 
-                       console.log(24242424, responseImgSrc)
+                       // console.log(24242424, responseImgSrc)
                        let newImg = GNImageContainer({"name": "", arrayID: targetDiv.getAccessPointer(), saveToDatabase:true, imgsrc: "../image/" + responseImgSrc +".png"})
 
                        targetDiv.appendChild(newImg)
                        newImg.setImageSize({width:500})
                        newImg.setMovable()
+                       newImg.style["top"] = document.querySelector(".pageContentContainer")?.scrollTop + "px"
                        newImg.saveHTMLObjectToDatabase()
                        targetDiv.appendChild(newImg)
                     };

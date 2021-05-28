@@ -3,5 +3,5 @@ export declare function getAllPageAnnotation(currentPage: any, checkedArray?: an
     pageNumber: any;
     currentPageAnnotationData: {};
 } | undefined;
-export declare function buildAnnotationPage(mainController: MainControllerInterface): (HTMLButtonElement | HTMLDivElement)[];
+export declare function buildAnnotationPage(mainController: MainControllerInterface): (HTMLDivElement | HTMLButtonElement)[];
 export declare function renderAnnotationPage(currentPageAnnotationData: any, annotationPageContentWrapper: HTMLDivElement): void;

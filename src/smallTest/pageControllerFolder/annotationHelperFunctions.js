@@ -59,6 +59,7 @@ export function buildAnnotationPage(mainController) {
                 break;
             // pageNumber: , currentPageAnnotationData
             let currentPageAnnotationData = getAllPageAnnotation(currentPage, checkedArray);
+            // console.log(7676767, currentPageAnnotationData)
             if (currentPageAnnotationData) {
                 allPageAnnotationArray.push(currentPageAnnotationData);
             }
@@ -93,7 +94,7 @@ export function renderAnnotationPage(currentPageAnnotationData, annotationPageCo
                 console.log(key, item, masterObject);
                 pageWrapper.append(annotationSummary, annotationContent, separationLine);
             });
-        });
+        }); // p.currentPageAnnotationData).forEach
         annotationPageContentWrapper.append(pageWrapper);
     });
     console.log(currentPageAnnotationData);

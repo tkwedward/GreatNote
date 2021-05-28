@@ -19,6 +19,7 @@ export declare function buildPageControllerButtonArray(mainController: MainContr
     showMainDocButton: HTMLButtonElement;
     showAnnotationButton: HTMLButtonElement;
     annotationPage: Element | null;
+    scaleController: HTMLDivElement;
 };
 export declare function buildToolBoxHtmlObject(mainController: any): any;
 export declare function buildPageController(mainController: any, bookmarkSubPanelContent: any, fullPageModeDiv: any, overviewModeDiv: any, pageContentContainer: any): void;

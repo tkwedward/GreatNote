@@ -6,7 +6,8 @@ export function overallMouseDownFunction(e, mainController, svgBoard, moveEventN
         return;
     let offsetX, offstY, touchIsPen;
     [offsetX, offstY, touchIsPen] = getOffSetXY(e);
-    // if (!touchIsPen) return
+    if (!touchIsPen)
+        return;
     e.preventDefault();
     if (selectionStatusObject.mode == "phaseOne") {
         selectionToolPhaseOneMouseDownFunction(e, mainController, svgBoard, moveEventName, upEventName, selectionStatusObject);

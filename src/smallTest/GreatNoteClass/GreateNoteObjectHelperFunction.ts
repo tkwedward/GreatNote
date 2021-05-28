@@ -32,26 +32,26 @@ export function createDummyData(): DummnyDataInterface{
     }
 }
 
-
 //@auto-fold here
 export function superGNObject(_object:any, saveToDatabase?:boolean, arrayID?:string, insertPosition?:number|boolean, dataPointer?:string|boolean, specialCreationMessage?:string, injectedData?: any, attachEventListener=true){
     _object = <superGNObjectInterface>_object
-    _object._identity = {
-      accessPointer: "", dataPointer: "", linkArray: []
-    }
 
-    /** important function to extract data from individual elements*/
+    // to set the object _identity
+    let accessPointer =  `${Date.now().toString(36) + Math.random().toString(36).substr(2)}`
+    _object._identity = {
+      parentAccessPointer: arrayID,
+      accessPointer: accessPointer,
+      dataPointer: dataPointer || accessPointer,
+      linkArray: [accessPointer],
+      children: []
+    }
+    _object.setAttribute("accessPointer", accessPointer)
+
 
     // when the data is first created, add it to the database
     _object.addToDatabase = function(arrayID: string, insertPosition?:number|boolean, dataPointer?:string, specialCreationMessage?: string){
-
-        let temporaryPointer =  `temporaryPointer_${Date.now().toString(36) + Math.random().toString(36).substr(2)}`
-        _object._identity.accessPointer = temporaryPointer
-        _object.setAttribute("accessPointer", temporaryPointer)
-
-        mainController.addData(arrayID, _object, temporaryPointer, insertPosition, dataPointer, specialCreationMessage)
+        mainController.addData(arrayID, _object, accessPointer, insertPosition, dataPointer, specialCreationMessage)
     }
-
 
     _object.saveHTMLObjectToDatabase = function(){
         mainController.saveHTMLObjectToDatabase(_object)
@@ -71,7 +71,7 @@ export function superGNObject(_object:any, saveToDatabase?:boolean, arrayID?:str
             if (p!= accessPointer){
                 targetHTML?.loadFromData(dataObject)
             } else {
-                // _object.saveHTMLObjectToDatabase()
+                // _object.saveHTMLObjectToDatabase
             }
         })
     }
@@ -97,30 +97,6 @@ export function superGNObject(_object:any, saveToDatabase?:boolean, arrayID?:str
             return parent.getLocatedPageNumber()
         }
     }
-
-
-    _object.processUpdateData  = function(){
-        // let objectData = _object.reloadDataFromDatabase()
-        // _object.updateLinkObject()
-    }
-
-    // _object.reloadDataFromDatabase = function(){
-    //     let dataPointer = _object.getDataPointer()
-    //     let accessPointer = _object.getAccessPointer()
-    //
-    //     let dataPointerObject = mainController.getObjectById(dataPointer)
-    //
-    //     _object.loadFromData(dataPointerObject)
-    //     //
-    //     if (dataPointer!= accessPointer){
-    //         let accessPointerObject= mainController.getObjectById(accessPointer)
-    //         _object.applyStyle(accessPointerObject.stylesheet)
-    //     } else {
-    //         _object.applyStyle(dataPointerObject.stylesheet)
-    //     }
-    //     return dataPointerObject
-    // }
-
 
     _object.appendTo = function(_parent:HTMLDivElement){
         _object._parent = _parent
@@ -170,9 +146,8 @@ export function superGNObject(_object:any, saveToDatabase?:boolean, arrayID?:str
         return mainController.getObjectById(_object.getDataPointer())
     }
 
-    if (attachEventListener){
-        attachEventListenerToLayer(mainController, arrayID, _object, injectedData)
-    }
+
+    attachEventListenerToLayer(mainController, arrayID, _object, injectedData)
 
 
     if (saveToDatabase){
@@ -188,7 +163,9 @@ function attachEventListenerToLayer(mainController:MainControllerInterface, arra
         ToolBoxEvents.attachEventListenerToSvgBoard(mainController, _object)
     }
 
-    if (injectedData?.GNSpecialCreationMessage){
+    // console.log(1671671767, _object, _object._classNameList)
+    if (_object.classList.contains("divLayer")){
+
         ToolBoxEvents.attachEventListenerToDivLayer(mainController, _object)
     }
 }
@@ -202,7 +179,7 @@ export function setObjectMovable(_object:any){
     _object.style.position = "absolute"
 
     _object.addEventListener("mousedown", (e:any)=>{
-        console.log(e)
+        // console.log(e)
        e.stopPropagation()
        let [startX, startY] = [e["screenX"], e["screenY"]]
        let objectInitialX =  0

@@ -9,10 +9,14 @@ import * as TextToolFunction from "../ToolboxFolder/textToolHelperFunction"
 import * as AddBookmarkFunction from "../ToolboxFolder/addBookmarkFunction"
 
 export function attachEventListenerToSvgBoard(mainController: MainControllerInterface, svgBoard: SVGElement){
+
+    console.log(1313131313, "attachItemtoSvgBoard", svgBoard, svgBoard.getAttribute("eventAttached"))
+    if (svgBoard.getAttribute("eventAttached")=="true") return
+    svgBoard.setAttribute("eventAttached", "true")
+
     let polylineMouseDown ={
       eventNameList: ["touchstart"],
       eventFunction: (e:any)=>{
-
         polylineMouseDownFunction(e, mainController, svgBoard,  "touchmove", "touchend")
       }
     }
@@ -24,11 +28,8 @@ export function attachEventListenerToSvgBoard(mainController: MainControllerInte
       }
     }
 
-
     let selectionStatusObject = {
-      mode: "phaseOne",
-      polyline: null,
-      counter: 0
+      mode: "phaseOne", polyline: null, counter: 0
     }
 
     let selectionToolMouseDownFunction = {
@@ -39,9 +40,7 @@ export function attachEventListenerToSvgBoard(mainController: MainControllerInte
     }
 
     let rectangleSelectionStatusObject = {
-      mode: "phaseOne",
-      polyline: null,
-      counter: 0
+      mode: "phaseOne", polyline: null, counter: 0
     }
 
     let rectangleSelectionToolMouseDownFunction = {
@@ -53,10 +52,7 @@ export function attachEventListenerToSvgBoard(mainController: MainControllerInte
 
     let eventArray = [polylineMouseDown, eraserMouseDownFunction, selectionToolMouseDownFunction, rectangleSelectionToolMouseDownFunction]
 
-
-
     eventArray.forEach(toolboxEvent=>{
-
         toolboxEvent.eventNameList.forEach(eventName=>{
             svgBoard.addEventListener(eventName, toolboxEvent.eventFunction)
         })
@@ -90,13 +86,12 @@ export function attachEventListenerToDivLayer(mainController: MainControllerInte
     }
   }
 
-let textToolMouseDownFunction = {
-  eventNameList: ["mousedown"],
-  eventFunction: (e: any)=>{
-    TextToolFunction.textToolMouseDownFunction(e, mainController, divLayer, "mousemove", "mouseup")
+  let textToolMouseDownFunction = {
+    eventNameList: ["mousedown"],
+    eventFunction: (e: any)=>{
+      TextToolFunction.textToolMouseDownFunction(e, mainController, divLayer, "mousemove", "mouseup")
+    }
   }
-}
-
   // let eventArray = [addCommentMouseDownFunction, moveObjectInDivMouseDownFunction]
   let eventArray = [addCommentMouseDownFunction, addBookmarkMouseDownFunction, textToolMouseDownFunction]
 
