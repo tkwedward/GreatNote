@@ -9,10 +9,11 @@ export enum specialCreationMessageEnum{
 
 export function processCreationDataHelper(mainController:MainControllerInterface, creationData: AddDatabaseFormatInterface){
     let {htmlObjectData, metaData} =  creationData
-
+    console.log(creationData)
     let parentElement = <any> mainController.getHtmlObjectByID(metaData.parentAccessPointer)
 
     let htmlObjectName = htmlObjectData.GNType
+
     let htmlObject = <any> mainController.createGNObjectThroughName(htmlObjectName, {name:"", injectedData: htmlObjectData})
     console.log(htmlObject)
     if (htmlObject.classList.contains("fullPage")){
@@ -20,5 +21,11 @@ export function processCreationDataHelper(mainController:MainControllerInterface
         mainController.pageController.addPage(htmlObject)
     }
 
-    parentElement.appendChild(htmlObject)
+    let insertPosition = <number> metaData.insertPosition
+
+    if (insertPosition){
+      parentElement.insertBefore(htmlObject, parentElement.children[insertPosition]);
+    } else {
+      parentElement.appendChild(htmlObject)
+    }
 }

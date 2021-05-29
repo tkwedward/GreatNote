@@ -24,7 +24,7 @@ export function GNImageContainer(createData) {
         Object.entries(injectedData.stylesheet).forEach(([key, value], _) => {
             _object.style[key] = value;
         });
-        image.src = injectedData.data.src;
+        image.src = "/" + injectedData.data.src;
     };
     _object.setMovable = function () {
         setObjectMovable(_object);

@@ -1,8 +1,12 @@
 const express = require("express")
 const ejs = require("ejs")
+const path = require("path")
 let router = express.Router();
 const base64 = require('uuid-base64');
 
+
+router.use(express.static(path.join(__dirname, './dist')));
+router.use(express.static(path.join(__dirname, './build')));
 
 router.get("/", (req, res) => {
   res.render("automerge.ejs")
@@ -12,6 +16,17 @@ router.get("/board", (req, res) => {
   res.render("board.ejs")
 })
 
+
+router.get("/mainPage", (req, res) => {
+  res.render("mainPage.ejs")
+})
+
+
+router.get('/notebook/:tagId', function(req, res) {
+  // res.send("tagId is set to " + req.params.tagId);
+  res.render("board.ejs")
+
+});
 
 router.get("/get/", (req, res) => {
   res.render("thingsGet.ejs")

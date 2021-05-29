@@ -6,7 +6,6 @@ import { GNInputField } from "./GreatNoteClass/GNInputField";
 import { GNTextContainer } from "./GreatNoteClass/GNTextContainer";
 import { GNBookmark } from "./bookmarkFolder/GNBookmark";
 import { GNPage } from "./GreatNoteClass/GNPage";
-import { GNBookmarkLinkedObject } from "./bookmarkFolder/GNBookmarkLinkedObject";
 import * as GreatNoteSvgDataClass from "./GreatNoteClass/GreatNoteSvgDataClass";
 import * as GroupController from "./groupControllerFolder/groupController";
 import { getAllPageAnnotation, renderAnnotationPage, buildAnnotationPage } from "./pageControllerFolder/annotationHelperFunctions";
@@ -17,7 +16,6 @@ import * as PageController from "./pageControllerFolder/pageController";
 import * as pageViewHelperFunction from "./pageViewHelperFunction";
 import * as InitializeAttributeControllerFunction from "./attributeControllerFolder/initializeAttributeControllers";
 import * as CollectionController from "./collectionControllerFolder/collectionController";
-import * as ColllectionControllerHelperFunctions from "./collectionControllerFolder/colllectionControllerHelperFunctions";
 import * as SwipeEventController from "./EventFolder/swipeEvent";
 // import * as WindowController from "./EventFolder/specialWindowObject"
 let openStatus = true;
@@ -277,41 +275,44 @@ export function buildInitialPage(mainController, saveToDatabase = false) {
         let [newPage, smallView] = pageViewHelperFunction.createNewPage(pageController, fullPageModeDiv, overviewModeDiv, pageFullArray[i], pageOverviewArray[i], saveToDatabase);
         pageViewHelperFunction.insertNewPage(pageController, newPage, smallView, fullPageModeDiv, overviewModeDiv);
         mainController.renderDataToHTML(pageFullArray[i], newPage);
+        newPage.setAttribute("visited", "false");
         if (i == pageFullArray.length - 1) {
             newPage.classList.add("currentPage");
-            let groupData = newPage.extract().data.groupData;
-            groupControllerWrapper.renderGroup(groupData);
+            newPage.setAttribute("visited", "true");
+            let notebookID = mainController.notebookID;
+            let pageID = pageFullArray[i]._identity.accessPointer;
+            console.log(397397, notebookID, pageID);
+            getPageDataFromServer(mainController, notebookID, pageID);
+            // let groupData = newPage.extract().data.groupData
+            // groupControllerWrapper.renderGroup(groupData)
         }
     }
-    // collectionPage
-    let groupData = [
-        {
-            pageAccessPointer: "71ffffb4-e34a-41a6-9168-0d1991b655d7",
-            uniqueID: "1621568792409"
-        },
-        {
-            pageAccessPointer: "71ffffb4-e34a-41a6-9168-0d1991b655d7",
-            uniqueID: "1621568792409"
-        },
-        {
-            pageAccessPointer: "71ffffb4-e34a-41a6-9168-0d1991b655d7",
-            uniqueID: "1621568792409"
-        }
-    ];
-    let collectionPage = ColllectionControllerHelperFunctions.createCollectionPage();
-    collectionPage.injecetDataToCollectionPage(groupData);
-    if (pageFullArray.length > 0)
-        mainController.layerController.renderCurrentPageLayer();
-    bookmarkArray.forEach((p) => {
-        let bookmarkLinkedObject = GNBookmarkLinkedObject({ name: "bookmarkLinkedObject", injectedData: p });
-        commentSubPanelContent.append(bookmarkLinkedObject);
-    });
+    // let collectionPage = ColllectionControllerHelperFunctions.createCollectionPage()
+    // collectionPage.injecetDataToCollectionPage(groupData)
+    //
+    //  if (pageFullArray.length > 0) mainController.layerController.renderCurrentPageLayer()
+    //
+    //  bookmarkArray.forEach((p:any)=>{
+    //      let bookmarkLinkedObject = GNBookmarkLinkedObject({name: "bookmarkLinkedObject", injectedData: p})
+    //      commentSubPanelContent.append(bookmarkLinkedObject)
+    //  })
     // TestHelper.testFunction(mainController)
     // let updateEvent = setInterval(() =>{
     //   console.log("send changes to server")
     //   mainController.sendChangeToServer()
     // }, 4000)
 } // buildInitialPage
+export function getPageDataFromServer(mainController, notebookID, pageID) {
+    socket.emit("getPageData", { notebookID, pageID });
+    socket.on("receivePageDataFromServer", (data) => {
+        console.log(data["array"]);
+        data["array"].forEach((p) => {
+            let layerHTMLObject = document.querySelector(`*[accessPointer='${p._identity.accessPointer}']`);
+            mainController.renderDataToHTML(p, layerHTMLObject);
+        });
+        socket.off("receivePageDataFromServer");
+    });
+}
 export function attachEvents(mainController, pageContentContainer) {
     // WindowController.initalizeWindowObject()
     // clipboard event

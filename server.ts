@@ -6,7 +6,7 @@ const fs = require("fs")
 const Automerge = require("automerge")
 const app = express()
 const talkNotes = require("./routes/talkNotes")
-import {jsonify, AutomergeMainDoc, AutomergeMainDocInterface} from "./automergeHelperFunction"
+import {AutomergeMainDoc, AutomergeMainDocInterface} from "./automergeHelperFunction"
 // server.set("view engine", "ejs")
 app.use(express.static(path.join(__dirname, './dist')));
 app.use(express.static(path.join(__dirname, './build')));
@@ -29,34 +29,75 @@ let jsonFileLocation = path.join(__dirname, "./dist/data/automergeData.txt")
 let jsonFileLocation2 = path.join(__dirname, "./dist/data/automergeDataJSON.txt")
 
 
-let automergeMainDoc = new AutomergeMainDoc(jsonFileLocation)
+let automergeMainDoc: AutomergeMainDocInterface = new AutomergeMainDoc(jsonFileLocation)
 
-io.on("connection", socket=>{
-    socket.broadcast.emit('socketConnectionUpdate', {
-      action: "connect", targetSocketId: socket.id
-    });
-
+  io.on("connection", socket=>{
     socket.on("message", data => {
-        console.log(new Date());
-    })
+    console.log(new Date(), data);
+  })
 
-    socket.on("clientWantsToBroadcastMessage", data=> socket.broadcast.emit("broadcastMessage", data))
+  socket.on('joinRoom', function(room) {
+    socket.join(room);
+  });
 
-    socket.on("clientAskServerForSocketData", data => {
-      let socketData = {
-          "yourSocketId": socket.id,
-          "socketArray": Array.from( io.sockets.sockets.keys())
-      }
+  socket.on("clientsAskForOverallNoteBookInfo", async ()=>{
+    let overallNotebookInfo = await automergeMainDoc.mongoDB.getOverallNotebookData()
+    console.log(overallNotebookInfo)
 
-      socket.emit("serverSendSocketIdArray", socketData)
-    })
+    socket.emit("serverResponsesForOverallNoteBookInfo", overallNotebookInfo)
+  })
 
-  socket.on("initialDataRequest", async ()=>{
-      // automergeMainDoc.initializeRootArray().then(p=>{
-      //
-      // })
-      let result = await automergeMainDoc.initializeRootArray()
-      socket.emit("processInitialData", result)
+  socket.on("clientWantsToBroadcastMessage", data=> socket.broadcast.emit("broadcastMessage", data))
+
+  socket.on("clientAskServerForSocketData", data => {
+    let socketData = {
+      "yourSocketId": socket.id,
+      "socketArray": Array.from( io.sockets.sockets.keys())
+    }
+    socket.emit("serverSendSocketIdArray", socketData)
+  })
+
+  socket.on("initialDataRequest", async (notebookID: string)=>{
+    let result = await automergeMainDoc.initializeRootArray(notebookID)
+    socket.emit("processInitialData", result)
+  })
+
+  socket.on("clientSendChangesToServer",async  changeList=>{
+    let mongoClient = await automergeMainDoc.mongoDB.connect()
+    const database =  mongoClient.db("GreatNote")
+    let notebooID = changeList[0].metaData.notebookID
+    let allNotebookDB = database.collection(notebooID)
+
+    let changeListToClients = changeList.map(async changeData=> await automergeMainDoc.processChangeDataFromClients(allNotebookDB, changeData, socket.id))
+
+    io.to(notebooID).emit("message", "finish saving")
+    io.to(notebooID).emit("serverSendChangeFileToClient", changeList)
+  })
+
+  // operaation on notebook
+  socket.on("createNewNotebook", (notebookInfo: {notebookName: string, notebookID: string})=>{
+    console.log("=====================")
+    console.log(636363, notebookInfo)
+    console.log("=====================")
+
+    automergeMainDoc.mongoDB.createNewNoteBook(notebookInfo)
+    socket.emit("message", "create New Notebook")
+  }) // createNewNotebook
+
+  socket.on("deleteNotebook", (notebookID: string)=>{
+
+    automergeMainDoc.mongoDB.deleteNoteBook(notebookID)
+    socket.emit("message", "create New Notebook")
+  }) // createNewNotebook
+
+  socket.on("getPageData", async (requestData: { notebookID:string, pageID:string})=>{
+      let mongoClient = await automergeMainDoc.mongoDB.connect()
+      const database =  mongoClient.db("GreatNote")
+      let allNotebookDB = database.collection(requestData.notebookID)
+      let pageObject = await allNotebookDB.findOne({ "_identity.accessPointer": requestData.pageID })
+
+      let pageInfo = await automergeMainDoc.mongoDB.recursiveGetChildNodeData(allNotebookDB, pageObject)
+      socket.emit("receivePageDataFromServer", pageInfo)
   })
 
 
@@ -66,32 +107,8 @@ io.on("connection", socket=>{
     socket.broadcast.emit('socketConnectionUpdate', {
       action: "disconnect", targetSocketId: socket.id
     });
-  })
-
-  socket.on("clientSendChangesToServer",async  changeList=>{
-
-      let mongoClient = await automergeMainDoc.mongoDB.connect()
-      const database =  mongoClient.db("GreatNote")
-      let allNotebookDB = database.collection("allNotebookDB")
-
-      let changeListToClients = changeList.map(async changeData=> await automergeMainDoc.processChangeDataFromClients(allNotebookDB, changeData, socket.id))
-
-      io.emit("message", "finish saving")
-      io.emit("serverSendChangeFileToClient", changeList)
-  })
-
-
-  socket.on("resetNoteBook", saveData=>{
-    console.log("resetNotebook")
-     fs.writeFileSync(jsonFileLocation, saveData);
-  })
-
-  socket.on("saveNotebookUsingClientData",async data => {
-    // console.log(data)
-    Automerge.load(data)
-      await fs.writeFileSync(jsonFileLocation, data);
-  }) // saveMainDocToDisk
-})
+  })// disconnect
+}) // io.on(connection)
 
 server.listen(port, ()=>{
   console.log(`Server is running on port ${port}`);

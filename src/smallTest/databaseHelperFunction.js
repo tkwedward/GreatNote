@@ -5,6 +5,7 @@ export var specialCreationMessageEnum;
 })(specialCreationMessageEnum || (specialCreationMessageEnum = {}));
 export function processCreationDataHelper(mainController, creationData) {
     let { htmlObjectData, metaData } = creationData;
+    console.log(creationData);
     let parentElement = mainController.getHtmlObjectByID(metaData.parentAccessPointer);
     let htmlObjectName = htmlObjectData.GNType;
     let htmlObject = mainController.createGNObjectThroughName(htmlObjectName, { name: "", injectedData: htmlObjectData });
@@ -13,5 +14,11 @@ export function processCreationDataHelper(mainController, creationData) {
         console.log("create new page");
         mainController.pageController.addPage(htmlObject);
     }
-    parentElement.appendChild(htmlObject);
+    let insertPosition = metaData.insertPosition;
+    if (insertPosition) {
+        parentElement.insertBefore(htmlObject, parentElement.children[insertPosition]);
+    }
+    else {
+        parentElement.appendChild(htmlObject);
+    }
 }

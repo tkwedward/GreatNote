@@ -1,3 +1,4 @@
+import { getPageDataFromServer } from "../buildInitialPageHelperFunctions";
 class PageObject {
     constructor() {
         this.pageNumber = -1;
@@ -124,6 +125,12 @@ export function initializePageController(mainController) {
         pageController.currentPage.fullPageHTMLObject.classList.add("currentPage");
         pageController.pagNumberInput.value = "" + pageNumber;
         mainController.layerController.renderCurrentPageLayer();
+        if (pageController.currentPage.fullPageHTMLObject.getAttribute("visited") == "false") {
+            let notebookID = mainController.notebookID;
+            let pageID = pageController.currentPage.fullPageHTMLObject.getAccessPointer();
+            getPageDataFromServer(mainController, notebookID, pageID);
+            pageController.currentPage.fullPageHTMLObject.setAttribute("visited", "true");
+        }
     }; // go To Page
     pageController.printAllPage = function () {
         let array = [];

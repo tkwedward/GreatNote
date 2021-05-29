@@ -1,0 +1,53 @@
+.notebookContainerWrapper {
+  display: flex;
+  flex-wrap: wrap;
+}
+.notebookContainerWrapper .notebookDiv {
+  position: relative;
+  width: 200px;
+  height: 250px;
+  margin: 10px;
+  background: lightblue;
+}
+.notebookContainerWrapper .notebookDiv .notebookContainerOverlayWrapper {
+  display: none;
+}
+.notebookContainerWrapper .notebookDiv .notebookContainerOverlayWrapper .notebookContainerOverlay {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: black;
+  opacity: 0.2;
+}
+.notebookContainerWrapper .notebookDiv .notebookContainerOverlayWrapper .selectionDiv {
+  width: 30px;
+  height: 30px;
+  opacity: 1;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+.notebookContainerWrapper .notebookDiv .notebookContainerOverlayWrapper .selectionDiv[selected=true] {
+  background: lightgreen;
+}
+.notebookContainerWrapper .notebookDiv .notebookContainerOverlayWrapper .selectionDiv[selected=false] {
+  background: white;
+}
+
+.askUserInputDiv {
+  display: none;
+  position: fixed;
+  background: orange;
+  width: 70%;
+  height: 200px;
+  margin: 10px auto;
+  top: calc(100vh * 0.5 - 200px * 0.5);
+  left: calc(100vw * 0.5 - 70% * 0.5);
+}
+.askUserInputDiv input, .askUserInputDiv button {
+  display: block;
+}
+
+/*# sourceMappingURL=mainPage.css.map */

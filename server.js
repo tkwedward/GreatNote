@@ -62,12 +62,25 @@ var jsonFileLocation = path.join(__dirname, "./dist/data/automergeData.txt");
 var jsonFileLocation2 = path.join(__dirname, "./dist/data/automergeDataJSON.txt");
 var automergeMainDoc = new automergeHelperFunction_1.AutomergeMainDoc(jsonFileLocation);
 io.on("connection", function (socket) {
-    socket.broadcast.emit('socketConnectionUpdate', {
-        action: "connect", targetSocketId: socket.id
-    });
     socket.on("message", function (data) {
-        console.log(new Date());
+        console.log(new Date(), data);
     });
+    socket.on('joinRoom', function (room) {
+        socket.join(room);
+    });
+    socket.on("clientsAskForOverallNoteBookInfo", function () { return __awaiter(void 0, void 0, void 0, function () {
+        var overallNotebookInfo;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, automergeMainDoc.mongoDB.getOverallNotebookData()];
+                case 1:
+                    overallNotebookInfo = _a.sent();
+                    console.log(overallNotebookInfo);
+                    socket.emit("serverResponsesForOverallNoteBookInfo", overallNotebookInfo);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
     socket.on("clientWantsToBroadcastMessage", function (data) { return socket.broadcast.emit("broadcastMessage", data); });
     socket.on("clientAskServerForSocketData", function (data) {
         var socketData = {
@@ -76,14 +89,68 @@ io.on("connection", function (socket) {
         };
         socket.emit("serverSendSocketIdArray", socketData);
     });
-    socket.on("initialDataRequest", function () { return __awaiter(void 0, void 0, void 0, function () {
+    socket.on("initialDataRequest", function (notebookID) { return __awaiter(void 0, void 0, void 0, function () {
         var result;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, automergeMainDoc.initializeRootArray()];
+                case 0: return [4 /*yield*/, automergeMainDoc.initializeRootArray(notebookID)];
                 case 1:
                     result = _a.sent();
                     socket.emit("processInitialData", result);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    socket.on("clientSendChangesToServer", function (changeList) { return __awaiter(void 0, void 0, void 0, function () {
+        var mongoClient, database, notebooID, allNotebookDB, changeListToClients;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, automergeMainDoc.mongoDB.connect()];
+                case 1:
+                    mongoClient = _a.sent();
+                    database = mongoClient.db("GreatNote");
+                    notebooID = changeList[0].metaData.notebookID;
+                    allNotebookDB = database.collection(notebooID);
+                    changeListToClients = changeList.map(function (changeData) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, automergeMainDoc.processChangeDataFromClients(allNotebookDB, changeData, socket.id)];
+                            case 1: return [2 /*return*/, _a.sent()];
+                        }
+                    }); }); });
+                    io.to(notebooID).emit("message", "finish saving");
+                    io.to(notebooID).emit("serverSendChangeFileToClient", changeList);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    // operaation on notebook
+    socket.on("createNewNotebook", function (notebookInfo) {
+        console.log("=====================");
+        console.log(636363, notebookInfo);
+        console.log("=====================");
+        automergeMainDoc.mongoDB.createNewNoteBook(notebookInfo);
+        socket.emit("message", "create New Notebook");
+    }); // createNewNotebook
+    socket.on("deleteNotebook", function (notebookID) {
+        automergeMainDoc.mongoDB.deleteNoteBook(notebookID);
+        socket.emit("message", "create New Notebook");
+    }); // createNewNotebook
+    socket.on("getPageData", function (requestData) { return __awaiter(void 0, void 0, void 0, function () {
+        var mongoClient, database, allNotebookDB, pageObject, pageInfo;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, automergeMainDoc.mongoDB.connect()];
+                case 1:
+                    mongoClient = _a.sent();
+                    database = mongoClient.db("GreatNote");
+                    allNotebookDB = database.collection(requestData.notebookID);
+                    return [4 /*yield*/, allNotebookDB.findOne({ "_identity.accessPointer": requestData.pageID })];
+                case 2:
+                    pageObject = _a.sent();
+                    return [4 /*yield*/, automergeMainDoc.mongoDB.recursiveGetChildNodeData(allNotebookDB, pageObject)];
+                case 3:
+                    pageInfo = _a.sent();
+                    socket.emit("receivePageDataFromServer", pageInfo);
                     return [2 /*return*/];
             }
         });
@@ -94,46 +161,8 @@ io.on("connection", function (socket) {
         socket.broadcast.emit('socketConnectionUpdate', {
             action: "disconnect", targetSocketId: socket.id
         });
-    });
-    socket.on("clientSendChangesToServer", function (changeList) { return __awaiter(void 0, void 0, void 0, function () {
-        var mongoClient, database, allNotebookDB, changeListToClients;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, automergeMainDoc.mongoDB.connect()];
-                case 1:
-                    mongoClient = _a.sent();
-                    database = mongoClient.db("GreatNote");
-                    allNotebookDB = database.collection("allNotebookDB");
-                    changeListToClients = changeList.map(function (changeData) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0: return [4 /*yield*/, automergeMainDoc.processChangeDataFromClients(allNotebookDB, changeData, socket.id)];
-                            case 1: return [2 /*return*/, _a.sent()];
-                        }
-                    }); }); });
-                    io.emit("message", "finish saving");
-                    io.emit("serverSendChangeFileToClient", changeList);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    socket.on("resetNoteBook", function (saveData) {
-        console.log("resetNotebook");
-        fs.writeFileSync(jsonFileLocation, saveData);
-    });
-    socket.on("saveNotebookUsingClientData", function (data) { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    // console.log(data)
-                    Automerge.load(data);
-                    return [4 /*yield*/, fs.writeFileSync(jsonFileLocation, data)];
-                case 1:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
-    }); }); // saveMainDocToDisk
-});
+    }); // disconnect
+}); // io.on(connection)
 server.listen(port, function () {
     console.log("Server is running on port " + port);
 });

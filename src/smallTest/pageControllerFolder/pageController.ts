@@ -1,4 +1,5 @@
 import { MainControllerInterface} from "../mainControllerFolder/mainControllerInterface"
+import {getPageDataFromServer} from "../buildInitialPageHelperFunctions"
 
 export interface pageControllerInterface {
     startPage: any
@@ -123,7 +124,6 @@ export function initializePageController(mainController:MainControllerInterface)
 
         fullPageHTMLObject.soul = newPage
 
-
         let alpha = pageController.currentPage
 
         let beta = pageController.currentPage.next
@@ -204,6 +204,13 @@ export function initializePageController(mainController:MainControllerInterface)
         pageController.pagNumberInput.value = "" + pageNumber
 
         mainController.layerController.renderCurrentPageLayer()
+
+        if (pageController.currentPage.fullPageHTMLObject.getAttribute("visited") == "false"){
+            let notebookID = mainController.notebookID
+            let pageID = pageController.currentPage.fullPageHTMLObject.getAccessPointer()
+            getPageDataFromServer(mainController, notebookID, pageID)
+            pageController.currentPage.fullPageHTMLObject.setAttribute("visited", "true")
+        }
     } // go To Page
 
     pageController.printAllPage = function(){

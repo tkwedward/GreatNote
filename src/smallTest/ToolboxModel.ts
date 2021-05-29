@@ -202,6 +202,14 @@ export class ToolBoxClass implements ToolBoxInterface {
             this.activateButtonFunction(toolBoxItem, "polylineItemButton")
         })
 
+        toolBoxItem.activate = function(){
+          changeSvgEventPointer("divLayer", "none")
+        }
+
+        toolBoxItem.deactivate = function(){
+          changeSvgEventPointer("divLayer", "auto")
+        }
+
         return toolBoxItem
     }
 
@@ -212,6 +220,14 @@ export class ToolBoxClass implements ToolBoxInterface {
             console.log("Selection Tool item button is activated")
             this.activateButtonFunction(toolBoxItem, "selectionToolItemButton")
         })
+
+        toolBoxItem.activate = function(){
+          changeSvgEventPointer("divLayer", "none")
+        }
+
+        toolBoxItem.deactivate = function(){
+          changeSvgEventPointer("divLayer", "auto")
+        }
 
         return toolBoxItem
     }
@@ -235,6 +251,15 @@ export class ToolBoxClass implements ToolBoxInterface {
         toolBoxItem.addEventListener("click", e=>{
             this.activateButtonFunction(toolBoxItem, "eraserItemButton")
         })
+
+        toolBoxItem.activate = function(){
+          changeSvgEventPointer("divLayer", "none")
+        }
+
+        toolBoxItem.deactivate = function(){
+          changeSvgEventPointer("divLayer", "auto")
+        }
+
 
         return toolBoxItem
     }
@@ -268,11 +293,11 @@ export class ToolBoxClass implements ToolBoxInterface {
       })
 
       toolBoxItem.activate = function(){
-        changeSvgEventPointer("none")
+        changeSvgEventPointer("svgLayer", "none")
       }
 
       toolBoxItem.deactivate = function(){
-        changeSvgEventPointer("auto")
+        changeSvgEventPointer("svgLayer", "auto")
       }
 
       return toolBoxItem
@@ -288,11 +313,11 @@ export class ToolBoxClass implements ToolBoxInterface {
 
 
         toolBoxItem.activate = function(){
-          changeSvgEventPointer("none")
+          changeSvgEventPointer("svgLayer", "none")
         }
 
         toolBoxItem.deactivate = function(){
-          changeSvgEventPointer("auto")
+          changeSvgEventPointer("svgLayer", "auto")
         }
 
         return toolBoxItem
@@ -332,10 +357,16 @@ export function getAttributeController(toolBoxItemStatus:any, itemName:string){
     return document.querySelector(`.${attributeControllerClassName}`)
 }
 
-export function changeSvgEventPointer(pointerEventOption){
-    let currentSvgLayerArray = mainController.pageController.currentPage.fullPageHTMLObject.querySelectorAll(".svgLayer")
+export function changeSvgEventPointer(type:string, pointerEventOption:string){
+  let currentLayerArray
+  if (type=="divLayer"){
+      currentLayerArray = mainController.pageController.currentPage.fullPageHTMLObject.querySelectorAll(".divLayer")
+  }
+  if (type=="svgLayer"){
+      currentLayerArray = mainController.pageController.currentPage.fullPageHTMLObject.querySelectorAll(".svgLayer")
+  }
 
-    Array.from(currentSvgLayerArray).forEach((svgLayer:any)=>{
-        svgLayer.style.pointerEvents = pointerEventOption
+    Array.from(currentLayerArray).forEach((layer:any)=>{
+        layer.style.pointerEvents = pointerEventOption
     })
 }

@@ -41,6 +41,7 @@ export interface MainControllerInterface {
     applyMainDocTemplate: boolean;
     mainDocArray: any;
     baseArrayID: string;
+    notebookID: string;
     GNDataStructureMapping: any;
     attributeControllerMapping: any;
     pageCurrentStatus: any;
@@ -96,6 +97,7 @@ export interface UpdateDataFormatInterface {
     htmlObjectData: HtmlObjectDataInterface;
     metaData: {
         action: string;
+        notebookID: string;
     };
 }
 export interface AddDatabaseFormatInterface {
@@ -106,5 +108,6 @@ export interface AddDatabaseFormatInterface {
         parentAccessPointer: string;
         accessPointer: string;
         dataPointer?: string;
+        notebookID: string;
     };
 }

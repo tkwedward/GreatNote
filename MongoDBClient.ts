@@ -33,10 +33,13 @@ export interface MongoBackEndInterface {
   connect():any
   disconnect():void
 
+  createNewNoteBook(notebookInfo: any): void
+  deleteNoteBook(notebookID: string): void
 
-  initializeFirstNotebook():any
-  processDatabaseMessage(collection: Collection, databaseMessage: any)
+  initializeFirstNotebook(notebookID: string):any
   testConnection():void
+  getOverallNotebookData():any
+  recursiveGetChildNodeData(collection:Collection, nodeData: any, level?: number)
 
 
   getItem(collection: Collection, databaseMessage: any): void
@@ -61,8 +64,51 @@ export class MongoBackEnd implements MongoBackEndInterface {
         const database =  mongoClient.db(notebookDataBaseName)
         let allNotebookDB = database.collection("allNotebookDB")
         let result = await allNotebookDB.findOne({})
-        await this.client.close())
+        await this.client.close()
         return result
+    }
+
+    async createNewNoteBook(notebookInfo: {notebookID: string, notebookName: string}){
+        let mongoClient = await this.connect()
+        const database =  mongoClient.db(notebookDataBaseName)
+
+        // this is a particular notebook
+        let newNotebookDB = database.collection(notebookInfo.notebookID)
+        await newNotebookDB.insertOne(notebookInfo)
+
+
+        // this is tthe overall
+        let overallNoteBookInfoDB = database.collection("overallNoteBookInfoDB")
+
+        await overallNoteBookInfoDB.insertOne(notebookInfo)
+
+
+        await this.disconnect()
+    }
+
+    async deleteNoteBook(notebookID: string){
+        let mongoClient = await this.connect()
+        const database =  mongoClient.db(notebookDataBaseName)
+
+        // this is a particular notebook
+        let newNotebookDB = database.collection(notebookID)
+        await newNotebookDB.drop()
+
+        // this is tthe overall
+        let overallNoteBookInfoDB = database.collection("overallNoteBookInfoDB")
+        overallNoteBookInfoDB.deleteOne({notebookID: notebookID})
+
+        await this.disconnect()
+    }
+
+    async getOverallNotebookData(){
+      let mongoClient = await this.connect()
+      const database =  mongoClient.db(notebookDataBaseName)
+      let overallNoteBookInfoDB = database.collection("overallNoteBookInfoDB")
+
+      return await overallNoteBookInfoDB.find({}, {
+        projection: {notebookName: 1, notebookID: 1, _id: 0}
+      }).toArray()
     }
 
     async createEmptyNotebook(collection){
@@ -91,14 +137,15 @@ export class MongoBackEnd implements MongoBackEndInterface {
         })// map
     }
 
-    async initializeFirstNotebook(){
+    async initializeFirstNotebook(notebookID:string){
+        console.log(125125, notebookID)
         let mongoClient = await this.connect()
         const database =  mongoClient.db(notebookDataBaseName)
-        let allNotebookDB = database.collection("allNotebookDB")
+        let allNotebookDB = database.collection(notebookID)
         let count = await allNotebookDB.countDocuments()
 
         // await allNotebookDB.drop()
-        if (count == 0) await this.createEmptyNotebook(allNotebookDB)
+        if (count <= 1) await this.createEmptyNotebook(allNotebookDB)
 
         return await this.getInitializeNotebookData(allNotebookDB)
     } // initializeFirstNotebook
@@ -114,14 +161,31 @@ export class MongoBackEnd implements MongoBackEndInterface {
 
       await collection.insertOne( databaseMessage.htmlObjectData) // insertOne
 
-      await collection.updateOne(
-        {
-          "_identity.accessPointer":  databaseMessage.metaData.parentAccessPointer
-        }, // _identity.accessPointer
-        {
-          "$push": {"_identity.children": databaseMessage.metaData.accessPointer}
-        } // push
-      )// updateONes
+      if (!databaseMessage.metaData.insertPosition){
+          await collection.updateOne(
+            {
+              "_identity.accessPointer":  databaseMessage.metaData.parentAccessPointer
+            }, // _identity.accessPointer
+            {
+              "$push": {"_identity.children": databaseMessage.metaData.accessPointer}
+            } // push
+          )// updateONes
+      } else {
+          await collection.updateOne(
+            {
+              "_identity.accessPointer":  databaseMessage.metaData.parentAccessPointer
+            }, // _identity.accessPointer
+            {
+              $push: {
+                "_identity.children": {
+                  $each: [ databaseMessage.metaData.accessPointer],
+                  $position: databaseMessage.metaData.insertPosition
+                }
+              } // #push
+            } // 2nd argumement
+          )// updateONes
+      }
+
     } // createItem
 
     async updateItem(collection: Collection, databaseMessage: any){
@@ -171,13 +235,15 @@ export class MongoBackEnd implements MongoBackEndInterface {
         return databaseMessage
     }
 
-    async getChildNodeData(collection, nodeData){
+    async recursiveGetChildNodeData(collection, nodeData, level){
       nodeData.array = []
-      if (nodeData._identity.children.length > 0){
+      if (nodeData._identity.children.length > 0 && level != 0){
+          if (level) level -= 1
+
           let childNodeArray =  nodeData._identity.children.map(async p=>{
               let childNodeData = await collection.findOne({"_identity.accessPointer": p})
 
-              return await this.getChildNodeData(collection, childNodeData)
+              return await this.recursiveGetChildNodeData(collection, childNodeData, level)
           })
 
           return Promise.all(childNodeArray).then(p=>{
@@ -190,17 +256,80 @@ export class MongoBackEnd implements MongoBackEndInterface {
       // console.log(176176, nodeData)
     }
 
-    async getInitializeNotebookData(collection){
-        let initializeNotebookData = await collection.findOne({
-          "_identity.accessPointer": "00000-00000"
-        })
+    async getChildNodeData(collection, nodeData){
+        nodeData.array = []
+        if (nodeData._identity.children.length > 0){
+            let childNodeArray =  nodeData._identity.children.map(async p=>{
+                let childNodeData = await collection.findOne({"_identity.accessPointer": p})
 
-        return await this.getChildNodeData(collection, initializeNotebookData)
+                return childNodeData
+            })
+
+            return Promise.all(childNodeArray).then(p=>{
+                nodeData.array = p
+                return nodeData
+            })
+        }
+    } // getChildNodeData
+
+    async getInitializeNotebookData(collection){
+        let rootNode = await collection.findOne({ "_identity.accessPointer": "00000-00000" })
+        rootNode["array"] = []
+
+        let result = await this.recursiveGetChildNodeData(collection, rootNode, 3)
+        console.log(result)
+
+        return await rootNode
     }
+    // async getInitializeNotebookData(collection){
+    //     let rootNode = await collection.findOne({ "_identity.accessPointer": "00000-00000" })
+    //     rootNode["array"] = []
+    //
+    //     let childNodeArray =  rootNode._identity.children.map(async p=>{
+    //         let mainArrayNode = await collection.findOne({"_identity.accessPointer": p})
+    //
+    //         mainArrayNode = await this.getChildNodeData(collection, mainArrayNode)
+    //         // console.log(262262, mainArrayNode)
+    //
+    //         mainArrayNode.array.forEach(q=>{
+    //           console.log(267267, q)
+    //         })
+    //
+    //         return mainArrayNode
+    //
+    //     })
+    //     // console.log(270270, childNodeArray)
+    //
+    //     rootNode = await this.getChildNodeData(collection, rootNode)
+    //
+    //
+    //
+    //     return await rootNode
+    // }
+
+    // async getInitializeNotebookData(collection){
+    //     let initializeNotebookData = await collection.findOne({
+    //       "_identity.accessPointer": "00000-00000"
+    //     })
+    //
+    //     let childNodeArray =  nodeData._identity.children.map(async p=>{
+    //         let childNodeData = await collection.findOne({"_identity.accessPointer": p})
+    //
+    //         return await this.getChildNodeData(collection, childNodeData)
+    //     })
+    //
+    //     return Promise.all(childNodeArray).then(p=>{
+    //         nodeData.array = p
+    //         return nodeData
+    //     })
+    //
+    //
+    //     return await this.getChildNodeData(collection, initializeNotebookData)
+    // }
 
     async connect(){
         const mongoClient = new MongoClient(this.mongoUrl, {
-          useUnifiedTopology: true,
+          // useUnifiedTopology: true,
           useNewUrlParser: true
         })
 

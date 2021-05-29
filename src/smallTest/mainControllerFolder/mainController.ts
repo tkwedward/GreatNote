@@ -14,6 +14,7 @@ import {renderDataToHTML} from "./renderDataToHTML"
 export class MainController implements MainControllerInterface{
   mainDocArray:any = {};
   mainDoc: any;
+  notebookID: string
   baseArrayID: string = "";
   previousDoc: any;
   GNDataStructureMapping:any
@@ -61,6 +62,7 @@ export class MainController implements MainControllerInterface{
                 parentAccessPointer: parentAccessPointer,
                 accessPointer: accessPointer,
                 dataPointer: dataPointer,
+                notebookID: this.notebookID
             }
         }
         // socket.emit("databaseOperation", dataMessage)
@@ -97,7 +99,8 @@ export class MainController implements MainControllerInterface{
         let updateMessage: UpdateDataFormatInterface= {
             htmlObjectData: newData,
             metaData:{
-                action: "update"
+                action: "update",
+                notebookID: this.notebookID
             }
         }
         this.changeList.push(updateMessage)
@@ -127,7 +130,8 @@ export class MainController implements MainControllerInterface{
            metaData: {
               action: "delete",
               accessPointer: accessPointer,
-              parentAccessPointer: parentAccessPointer
+              parentAccessPointer: parentAccessPointer,
+              notebookID: this.notebookID
            }
         }
         htmlObject.remove()

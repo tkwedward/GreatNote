@@ -4,7 +4,7 @@ export declare function createSubPanel(name: string): HTMLDivElement[];
 export declare function createSubPanelItem(name: string): HTMLDivElement;
 export declare function functionButtonCreater(name: string, buttonFunction: () => void): HTMLDivElement;
 export declare function createSwitchViewModeButton(fullPageModeDiv: HTMLDivElement, overviewModeDiv: HTMLDivElement): HTMLButtonElement;
-export declare function createNewPage(pageController: any, fullPageModeDiv: HTMLDivElement, overviewModeDiv: HTMLDivElement, fullPageData?: any, overviewPageData?: any, saveToDatabase?: boolean): import("./GreatNoteClass/GreatNoteObjectInterface").GNPageInterface[];
+export declare function createNewPage(pageController: any, fullPageModeDiv: HTMLDivElement, overviewModeDiv: HTMLDivElement, fullPageData?: any, overviewPageData?: any, saveToDatabase?: boolean, insertPosition?: boolean): import("./GreatNoteClass/GreatNoteObjectInterface").GNPageInterface[];
 export declare function fillInNewPageDataContent(newPage: any, fullPageData: any): void;
 export declare function fillInSmallViewDataContent(smallView: any, overviewPageData: any): void;
 export declare function insertNewPage(pageController: any, newFullPage: HTMLDivElement, newSmallView: HTMLDivElement, fullPageModeDiv: HTMLDivElement, overviewModeDiv: HTMLDivElement): void;

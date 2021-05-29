@@ -2,8 +2,10 @@ let io = require('socket.io-client');
 import { mainController } from "../index";
 export var socket;
 socket = io.io();
+socket.emit("message", "I want to connect");
 socket.on("connect", () => {
     // emit to everybody
+    socket.emit('joinRoom', mainController.notebookID);
     socket.emit("message", "user connected");
     // socket.emit("initialDataRequest")
 });

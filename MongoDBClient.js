@@ -85,6 +85,76 @@ var MongoBackEnd = /** @class */ (function () {
             });
         });
     };
+    MongoBackEnd.prototype.createNewNoteBook = function (notebookInfo) {
+        return __awaiter(this, void 0, void 0, function () {
+            var mongoClient, database, newNotebookDB, overallNoteBookInfoDB;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.connect()];
+                    case 1:
+                        mongoClient = _a.sent();
+                        database = mongoClient.db(notebookDataBaseName);
+                        newNotebookDB = database.collection(notebookInfo.notebookID);
+                        return [4 /*yield*/, newNotebookDB.insertOne(notebookInfo)
+                            // this is tthe overall
+                        ];
+                    case 2:
+                        _a.sent();
+                        overallNoteBookInfoDB = database.collection("overallNoteBookInfoDB");
+                        return [4 /*yield*/, overallNoteBookInfoDB.insertOne(notebookInfo)];
+                    case 3:
+                        _a.sent();
+                        return [4 /*yield*/, this.disconnect()];
+                    case 4:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    MongoBackEnd.prototype.deleteNoteBook = function (notebookID) {
+        return __awaiter(this, void 0, void 0, function () {
+            var mongoClient, database, newNotebookDB, overallNoteBookInfoDB;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.connect()];
+                    case 1:
+                        mongoClient = _a.sent();
+                        database = mongoClient.db(notebookDataBaseName);
+                        newNotebookDB = database.collection(notebookID);
+                        return [4 /*yield*/, newNotebookDB.drop()
+                            // this is tthe overall
+                        ];
+                    case 2:
+                        _a.sent();
+                        overallNoteBookInfoDB = database.collection("overallNoteBookInfoDB");
+                        overallNoteBookInfoDB.deleteOne({ notebookID: notebookID });
+                        return [4 /*yield*/, this.disconnect()];
+                    case 3:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    MongoBackEnd.prototype.getOverallNotebookData = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var mongoClient, database, overallNoteBookInfoDB;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.connect()];
+                    case 1:
+                        mongoClient = _a.sent();
+                        database = mongoClient.db(notebookDataBaseName);
+                        overallNoteBookInfoDB = database.collection("overallNoteBookInfoDB");
+                        return [4 /*yield*/, overallNoteBookInfoDB.find({}, {
+                                projection: { notebookName: 1, notebookID: 1, _id: 0 }
+                            }).toArray()];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
     MongoBackEnd.prototype.createEmptyNotebook = function (collection) {
         return __awaiter(this, void 0, void 0, function () {
             var mainArrayNodes;
@@ -131,22 +201,24 @@ var MongoBackEnd = /** @class */ (function () {
             });
         });
     };
-    MongoBackEnd.prototype.initializeFirstNotebook = function () {
+    MongoBackEnd.prototype.initializeFirstNotebook = function (notebookID) {
         return __awaiter(this, void 0, void 0, function () {
             var mongoClient, database, allNotebookDB, count;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.connect()];
+                    case 0:
+                        console.log(125125, notebookID);
+                        return [4 /*yield*/, this.connect()];
                     case 1:
                         mongoClient = _a.sent();
                         database = mongoClient.db(notebookDataBaseName);
-                        allNotebookDB = database.collection("allNotebookDB");
+                        allNotebookDB = database.collection(notebookID);
                         return [4 /*yield*/, allNotebookDB.countDocuments()
                             // await allNotebookDB.drop()
                         ];
                     case 2:
                         count = _a.sent();
-                        if (!(count == 0)) return [3 /*break*/, 4];
+                        if (!(count <= 1)) return [3 /*break*/, 4];
                         return [4 /*yield*/, this.createEmptyNotebook(allNotebookDB)];
                     case 3:
                         _a.sent();
@@ -176,6 +248,7 @@ var MongoBackEnd = /** @class */ (function () {
                         return [4 /*yield*/, collection.insertOne(databaseMessage.htmlObjectData)]; // insertOne
                     case 1:
                         _a.sent(); // insertOne
+                        if (!!databaseMessage.metaData.insertPosition) return [3 /*break*/, 3];
                         return [4 /*yield*/, collection.updateOne({
                                 "_identity.accessPointer": databaseMessage.metaData.parentAccessPointer
                             }, // _identity.accessPointer
@@ -185,7 +258,23 @@ var MongoBackEnd = /** @class */ (function () {
                             )]; // updateONes
                     case 2:
                         _a.sent(); // updateONes
-                        return [2 /*return*/];
+                        return [3 /*break*/, 5];
+                    case 3: return [4 /*yield*/, collection.updateOne({
+                            "_identity.accessPointer": databaseMessage.metaData.parentAccessPointer
+                        }, // _identity.accessPointer
+                        {
+                            $push: {
+                                "_identity.children": {
+                                    $each: [databaseMessage.metaData.accessPointer],
+                                    $position: databaseMessage.metaData.insertPosition
+                                }
+                            } // #push
+                        } // 2nd argumement
+                        )]; // updateONes
+                    case 4:
+                        _a.sent(); // updateONes
+                        _a.label = 5;
+                    case 5: return [2 /*return*/];
                 }
             });
         });
@@ -245,13 +334,15 @@ var MongoBackEnd = /** @class */ (function () {
         };
         return databaseMessage;
     };
-    MongoBackEnd.prototype.getChildNodeData = function (collection, nodeData) {
+    MongoBackEnd.prototype.recursiveGetChildNodeData = function (collection, nodeData, level) {
         return __awaiter(this, void 0, void 0, function () {
             var childNodeArray;
             var _this = this;
             return __generator(this, function (_a) {
                 nodeData.array = [];
-                if (nodeData._identity.children.length > 0) {
+                if (nodeData._identity.children.length > 0 && level != 0) {
+                    if (level)
+                        level -= 1;
                     childNodeArray = nodeData._identity.children.map(function (p) { return __awaiter(_this, void 0, void 0, function () {
                         var childNodeData;
                         return __generator(this, function (_a) {
@@ -259,7 +350,7 @@ var MongoBackEnd = /** @class */ (function () {
                                 case 0: return [4 /*yield*/, collection.findOne({ "_identity.accessPointer": p })];
                                 case 1:
                                     childNodeData = _a.sent();
-                                    return [4 /*yield*/, this.getChildNodeData(collection, childNodeData)];
+                                    return [4 /*yield*/, this.recursiveGetChildNodeData(collection, childNodeData, level)];
                                 case 2: return [2 /*return*/, _a.sent()];
                             }
                         });
@@ -276,22 +367,96 @@ var MongoBackEnd = /** @class */ (function () {
             });
         });
     };
+    MongoBackEnd.prototype.getChildNodeData = function (collection, nodeData) {
+        return __awaiter(this, void 0, void 0, function () {
+            var childNodeArray;
+            var _this = this;
+            return __generator(this, function (_a) {
+                nodeData.array = [];
+                if (nodeData._identity.children.length > 0) {
+                    childNodeArray = nodeData._identity.children.map(function (p) { return __awaiter(_this, void 0, void 0, function () {
+                        var childNodeData;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0: return [4 /*yield*/, collection.findOne({ "_identity.accessPointer": p })];
+                                case 1:
+                                    childNodeData = _a.sent();
+                                    return [2 /*return*/, childNodeData];
+                            }
+                        });
+                    }); });
+                    return [2 /*return*/, Promise.all(childNodeArray).then(function (p) {
+                            nodeData.array = p;
+                            return nodeData;
+                        })];
+                }
+                return [2 /*return*/];
+            });
+        });
+    }; // getChildNodeData
     MongoBackEnd.prototype.getInitializeNotebookData = function (collection) {
         return __awaiter(this, void 0, void 0, function () {
-            var initializeNotebookData;
+            var rootNode, result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, collection.findOne({
-                            "_identity.accessPointer": "00000-00000"
-                        })];
+                    case 0: return [4 /*yield*/, collection.findOne({ "_identity.accessPointer": "00000-00000" })];
                     case 1:
-                        initializeNotebookData = _a.sent();
-                        return [4 /*yield*/, this.getChildNodeData(collection, initializeNotebookData)];
-                    case 2: return [2 /*return*/, _a.sent()];
+                        rootNode = _a.sent();
+                        rootNode["array"] = [];
+                        return [4 /*yield*/, this.recursiveGetChildNodeData(collection, rootNode, 3)];
+                    case 2:
+                        result = _a.sent();
+                        console.log(result);
+                        return [4 /*yield*/, rootNode];
+                    case 3: return [2 /*return*/, _a.sent()];
                 }
             });
         });
     };
+    // async getInitializeNotebookData(collection){
+    //     let rootNode = await collection.findOne({ "_identity.accessPointer": "00000-00000" })
+    //     rootNode["array"] = []
+    //
+    //     let childNodeArray =  rootNode._identity.children.map(async p=>{
+    //         let mainArrayNode = await collection.findOne({"_identity.accessPointer": p})
+    //
+    //         mainArrayNode = await this.getChildNodeData(collection, mainArrayNode)
+    //         // console.log(262262, mainArrayNode)
+    //
+    //         mainArrayNode.array.forEach(q=>{
+    //           console.log(267267, q)
+    //         })
+    //
+    //         return mainArrayNode
+    //
+    //     })
+    //     // console.log(270270, childNodeArray)
+    //
+    //     rootNode = await this.getChildNodeData(collection, rootNode)
+    //
+    //
+    //
+    //     return await rootNode
+    // }
+    // async getInitializeNotebookData(collection){
+    //     let initializeNotebookData = await collection.findOne({
+    //       "_identity.accessPointer": "00000-00000"
+    //     })
+    //
+    //     let childNodeArray =  nodeData._identity.children.map(async p=>{
+    //         let childNodeData = await collection.findOne({"_identity.accessPointer": p})
+    //
+    //         return await this.getChildNodeData(collection, childNodeData)
+    //     })
+    //
+    //     return Promise.all(childNodeArray).then(p=>{
+    //         nodeData.array = p
+    //         return nodeData
+    //     })
+    //
+    //
+    //     return await this.getChildNodeData(collection, initializeNotebookData)
+    // }
     MongoBackEnd.prototype.connect = function () {
         return __awaiter(this, void 0, void 0, function () {
             var mongoClient;
@@ -299,7 +464,7 @@ var MongoBackEnd = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         mongoClient = new mongodb_1.MongoClient(this.mongoUrl, {
-                            useUnifiedTopology: true,
+                            // useUnifiedTopology: true,
                             useNewUrlParser: true
                         });
                         console.info("connection to MongoDB");

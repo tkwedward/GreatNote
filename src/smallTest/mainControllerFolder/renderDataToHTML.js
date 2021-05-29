@@ -22,7 +22,7 @@ export function renderDataToHTML(mainController, data, arrayHTMLObject) {
         }
         if (p.GNType == "GNSvg") {
             // cannot save any obeject to the data base here because mainController will create an infinity loop and will append new obejct forever
-            newHTMLObject = mainController.GNDataStructureMapping["GNSvg"]({ name: "name", arrayID: arrayHTMLObject.getAccessPointer(), saveToDatabase: false, injectedData: p });
+            newHTMLObject = mainController.GNDataStructureMapping["GNSvg"]({ name: "name", arrayID: arrayHTMLObject.getAccessPointer(), saveToDatabase: false, injectedData: p, _classNameList: p._classNameList });
             newHTMLObject._identity = p._identity;
             let objectData = p;
             newHTMLObject.applyStyle(objectData.stylesheet);

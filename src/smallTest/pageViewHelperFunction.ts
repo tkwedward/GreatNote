@@ -140,9 +140,9 @@ export function createSwitchViewModeButton(fullPageModeDiv: HTMLDivElement, over
     return switchViewModeButton
 }
 
-export function createNewPage(pageController: any, fullPageModeDiv:HTMLDivElement, overviewModeDiv:HTMLDivElement, fullPageData?:any, overviewPageData?:any, saveToDatabase=true){
+export function createNewPage(pageController: any, fullPageModeDiv:HTMLDivElement, overviewModeDiv:HTMLDivElement, fullPageData?:any, overviewPageData?:any, saveToDatabase=true, insertPosition=false){
     let newPage = GNPage({
-      name: "fullPage", arrayID: mainController.mainDocArray["mainArray_pageFull"], insertPosition: false,
+      name: "fullPage", arrayID: mainController.mainDocArray["mainArray_pageFull"], insertPosition: insertPosition,
       dataPointer: false,
       saveToDatabase: saveToDatabase,
       specialCreationMessage: "createNewFullPageObject",
@@ -160,7 +160,7 @@ export function createNewPage(pageController: any, fullPageModeDiv:HTMLDivElemen
     let smallView = GNPage({
         name: "overviewPage",
         arrayID: mainController.mainDocArray["mainArray_pageOverview"],
-        insertPosition: false,
+        insertPosition: insertPosition,
         dataPointer: newPageAccesssPointer,
         saveToDatabase: saveToDatabase,
         specialCreationMessage: "createNewOverviewPageObject",
@@ -209,17 +209,6 @@ export function fillInSmallViewDataContent(smallView:any, overviewPageData:any){
     // smallViewDescription.innerText = overviewPageData.data.innerText
 }
 
-
-// export function addEventToNewPage(pageController:any, newPage:any){
-//     newPage.addEventListener("click", function(e:any){
-//       if (newPage.contains(e.target)){
-//           if (pageController.selectedObject) pageController.selectedObject.classList.remove("selectedObject")
-//           pageController.selectedObject = e.target
-//           e.target.classList.add("selectedObject")
-//       }
-//     })
-// }
-
 export function insertNewPage(pageController:any, newFullPage: HTMLDivElement, newSmallView: HTMLDivElement, fullPageModeDiv: HTMLDivElement, overviewModeDiv: HTMLDivElement){
     pageController.addPage(newFullPage, newSmallView)
 
@@ -242,9 +231,12 @@ export function insertNewPage(pageController:any, newFullPage: HTMLDivElement, n
 export function createNewPageEvent(currentStatus: any, fullPageModeDiv: HTMLDivElement, overviewModeDiv: HTMLDivElement, pageDummyContent:any , htmlObject?:HTMLElement|HTMLDivElement){
     // when click the new page button, a new page is created.
 
+
     // add new page fullPageMode
     let clickEventAction = function (){
-          let [newPage, smallView] = createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv)
+          let insertPosition = currentStatus.currentPage.pageNumber
+          let saveToDatabase = true
+          let [newPage, smallView] = createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, false, false, saveToDatabase, insertPosition)
 
           insertNewPage(currentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv)
 

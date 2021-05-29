@@ -44,6 +44,7 @@ export interface AutomergeMainDocInterface {
     mainDoc: any
 
     addItemToChangeList(item:{temporaryPointer:string, arrayID: string})
+    initializeRootArray(notebookID: string):void
     processChangeDataFromClients(collection: Collection, changeData: any, socket)
 }
 
@@ -80,10 +81,8 @@ export class AutomergeMainDoc implements AutomergeMainDocInterface {
       console.log("====== test connection end ======")
     }
 
-    async initializeRootArray(){
-        let result = await this.mongoDB.initializeFirstNotebook()
-        console.log(result.then)
-
+    async initializeRootArray(notebookID: string){
+        let result = await this.mongoDB.initializeFirstNotebook(notebookID)
         await this.mongoDB.disconnect()
         return result
         // result.then(p=>{
@@ -113,33 +112,10 @@ export class AutomergeMainDoc implements AutomergeMainDocInterface {
         return {htmlObjectData, metaData}
     }
 
-    deleteFromDatabase(deleteMessage){
-      let {parentAccessPointer, accessPointer} =
-      deleteMessage.metaData
-
-      this.mainDoc = Automerge.change(this.mainDoc, JSON.stringify(deleteMessage), doc=>{
-        let parentObject = this.getObjectById(parentAccessPointer, doc)
-        let targetObject = this.getObjectById(accessPointer, doc)
-
-        let index =  parentObject["array"].indexOf(targetObject)
-        if (index!=-1) parentObject["array"].deleteAt(index)
-      })
-
-      return deleteMessage
-    }
 
     updateDataInDatabase(htmlObjectData:any){
         let {accessPointer, dataPointer} = htmlObjectData._identity
     }
-
-    loadMainDoc(){
-        let data = fs.readFileSync(this.jsonFileLocation)
-
-    }
-
-    async saveMainDoc(sendRequest:boolean=false){
-
-    } // saveMainDoc
 
     processUpdateDataHelper(updateData: any){
 

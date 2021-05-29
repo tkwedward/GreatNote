@@ -111,8 +111,9 @@ export function superGNObject(_object, saveToDatabase, arrayID, insertPosition, 
     }
 }
 function attachEventListenerToLayer(mainController, arrayID, _object, injectedData) {
-    if (_object.GNType == "GNSvg") {
+    if (_object.classList.contains("svgLayer")) {
         ToolBoxEvents.attachEventListenerToSvgBoard(mainController, _object);
+        _object.classList.add("attachedEventSvgLayer");
     }
     // console.log(1671671767, _object, _object._classNameList)
     if (_object.classList.contains("divLayer")) {

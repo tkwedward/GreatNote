@@ -11,11 +11,11 @@ export function addPasteImageEvent(mainController) {
                 var reader = new FileReader();
                 reader.onload = function (event) {
                     let xhr = new XMLHttpRequest();
-                    xhr.open('POST', 'processImageBase64Format', true);
+                    xhr.open('POST', '/talkNotes/processImageBase64Format', true);
                     xhr.onload = function () {
                         var _a;
                         console.log("finish processing image");
-                        let responseImgSrc = JSON.parse(this.responseText).imgsrc.replace("talkNotes/", "");
+                        let responseImgSrc = JSON.parse(this.responseText).imgsrc.replace("talkNotes/", "/");
                         // console.log(24242424, responseImgSrc)
                         let newImg = GNImageContainer({ "name": "", arrayID: targetDiv.getAccessPointer(), saveToDatabase: true, imgsrc: "../image/" + responseImgSrc + ".png" });
                         targetDiv.appendChild(newImg);

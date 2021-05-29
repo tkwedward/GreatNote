@@ -25,4 +25,5 @@ export declare function buildToolBoxHtmlObject(mainController: any): any;
 export declare function buildPageController(mainController: any, bookmarkSubPanelContent: any, fullPageModeDiv: any, overviewModeDiv: any, pageContentContainer: any): void;
 export declare function buildInitialHTMLSkeleton(mainController: MainControllerInterface): void;
 export declare function buildInitialPage(mainController: MainControllerInterface, saveToDatabase?: boolean): void;
-export declare function attachEvents(mainController: any, pageContentContainer: any): void;
+export declare function getPageDataFromServer(mainController: MainControllerInterface, notebookID: string, pageID: string): void;
+export declare function attachEvents(mainController: MainControllerInterface, pageContentContainer: HTMLDivElement): void;

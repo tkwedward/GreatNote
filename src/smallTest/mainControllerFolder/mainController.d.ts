@@ -4,6 +4,7 @@ import { communicationDataStructure, MainControllerInterface, AddDatabaseFormatI
 export declare class MainController implements MainControllerInterface {
     mainDocArray: any;
     mainDoc: any;
+    notebookID: string;
     baseArrayID: string;
     previousDoc: any;
     GNDataStructureMapping: any;

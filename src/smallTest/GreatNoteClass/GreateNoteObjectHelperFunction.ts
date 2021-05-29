@@ -159,8 +159,10 @@ export function superGNObject(_object:any, saveToDatabase?:boolean, arrayID?:str
 import {MainControllerInterface} from "../mainControllerFolder/mainControllerInterface"
 
 function attachEventListenerToLayer(mainController:MainControllerInterface, arrayID?:string, _object?: any, injectedData?:any){
-    if (_object.GNType == "GNSvg"){
+    if (_object.classList.contains("svgLayer")){
+
         ToolBoxEvents.attachEventListenerToSvgBoard(mainController, _object)
+        _object.classList.add("attachedEventSvgLayer")
     }
 
     // console.log(1671671767, _object, _object._classNameList)

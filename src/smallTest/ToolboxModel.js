@@ -119,6 +119,12 @@ export class ToolBoxClass {
             console.log("polyline item button is activated");
             this.activateButtonFunction(toolBoxItem, "polylineItemButton");
         });
+        toolBoxItem.activate = function () {
+            changeSvgEventPointer("divLayer", "none");
+        };
+        toolBoxItem.deactivate = function () {
+            changeSvgEventPointer("divLayer", "auto");
+        };
         return toolBoxItem;
     }
     createSelectionToolItemButton(toolBoxHtmlObject) {
@@ -127,6 +133,12 @@ export class ToolBoxClass {
             console.log("Selection Tool item button is activated");
             this.activateButtonFunction(toolBoxItem, "selectionToolItemButton");
         });
+        toolBoxItem.activate = function () {
+            changeSvgEventPointer("divLayer", "none");
+        };
+        toolBoxItem.deactivate = function () {
+            changeSvgEventPointer("divLayer", "auto");
+        };
         return toolBoxItem;
     }
     createMouseRectangleSelectionToolItemButton(toolBoxHtmlObject) {
@@ -143,6 +155,12 @@ export class ToolBoxClass {
         toolBoxItem.addEventListener("click", e => {
             this.activateButtonFunction(toolBoxItem, "eraserItemButton");
         });
+        toolBoxItem.activate = function () {
+            changeSvgEventPointer("divLayer", "none");
+        };
+        toolBoxItem.deactivate = function () {
+            changeSvgEventPointer("divLayer", "auto");
+        };
         return toolBoxItem;
     }
     createAddCommentButton(toolBoxHtmlObject) {
@@ -165,10 +183,10 @@ export class ToolBoxClass {
             this.activateButtonFunction(toolBoxItem, "moveObjectInDivButton");
         });
         toolBoxItem.activate = function () {
-            changeSvgEventPointer("none");
+            changeSvgEventPointer("svgLayer", "none");
         };
         toolBoxItem.deactivate = function () {
-            changeSvgEventPointer("auto");
+            changeSvgEventPointer("svgLayer", "auto");
         };
         return toolBoxItem;
     }
@@ -179,10 +197,10 @@ export class ToolBoxClass {
             this.activateButtonFunction(toolBoxItem, "textToolItemButton");
         });
         toolBoxItem.activate = function () {
-            changeSvgEventPointer("none");
+            changeSvgEventPointer("svgLayer", "none");
         };
         toolBoxItem.deactivate = function () {
-            changeSvgEventPointer("auto");
+            changeSvgEventPointer("svgLayer", "auto");
         };
         return toolBoxItem;
     }
@@ -212,9 +230,15 @@ export function getAttributeController(toolBoxItemStatus, itemName) {
     let attributeControllerClassName = toolBoxItemStatus[itemName]["attributeController"];
     return document.querySelector(`.${attributeControllerClassName}`);
 }
-export function changeSvgEventPointer(pointerEventOption) {
-    let currentSvgLayerArray = mainController.pageController.currentPage.fullPageHTMLObject.querySelectorAll(".svgLayer");
-    Array.from(currentSvgLayerArray).forEach((svgLayer) => {
-        svgLayer.style.pointerEvents = pointerEventOption;
+export function changeSvgEventPointer(type, pointerEventOption) {
+    let currentLayerArray;
+    if (type == "divLayer") {
+        currentLayerArray = mainController.pageController.currentPage.fullPageHTMLObject.querySelectorAll(".divLayer");
+    }
+    if (type == "svgLayer") {
+        currentLayerArray = mainController.pageController.currentPage.fullPageHTMLObject.querySelectorAll(".svgLayer");
+    }
+    Array.from(currentLayerArray).forEach((layer) => {
+        layer.style.pointerEvents = pointerEventOption;
     });
 }

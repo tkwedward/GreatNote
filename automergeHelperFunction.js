@@ -107,15 +107,14 @@ var AutomergeMainDoc = /** @class */ (function () {
             });
         });
     };
-    AutomergeMainDoc.prototype.initializeRootArray = function () {
+    AutomergeMainDoc.prototype.initializeRootArray = function (notebookID) {
         return __awaiter(this, void 0, void 0, function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.mongoDB.initializeFirstNotebook()];
+                    case 0: return [4 /*yield*/, this.mongoDB.initializeFirstNotebook(notebookID)];
                     case 1:
                         result = _a.sent();
-                        console.log(result.then);
                         return [4 /*yield*/, this.mongoDB.disconnect()];
                     case 2:
                         _a.sent();
@@ -145,32 +144,9 @@ var AutomergeMainDoc = /** @class */ (function () {
         // step 1, to regiestter a place
         return { htmlObjectData: htmlObjectData, metaData: metaData };
     };
-    AutomergeMainDoc.prototype.deleteFromDatabase = function (deleteMessage) {
-        var _this = this;
-        var _a = deleteMessage.metaData, parentAccessPointer = _a.parentAccessPointer, accessPointer = _a.accessPointer;
-        this.mainDoc = Automerge.change(this.mainDoc, JSON.stringify(deleteMessage), function (doc) {
-            var parentObject = _this.getObjectById(parentAccessPointer, doc);
-            var targetObject = _this.getObjectById(accessPointer, doc);
-            var index = parentObject["array"].indexOf(targetObject);
-            if (index != -1)
-                parentObject["array"].deleteAt(index);
-        });
-        return deleteMessage;
-    };
     AutomergeMainDoc.prototype.updateDataInDatabase = function (htmlObjectData) {
         var _a = htmlObjectData._identity, accessPointer = _a.accessPointer, dataPointer = _a.dataPointer;
     };
-    AutomergeMainDoc.prototype.loadMainDoc = function () {
-        var data = fs.readFileSync(this.jsonFileLocation);
-    };
-    AutomergeMainDoc.prototype.saveMainDoc = function (sendRequest) {
-        if (sendRequest === void 0) { sendRequest = false; }
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/];
-            });
-        });
-    }; // saveMainDoc
     AutomergeMainDoc.prototype.processUpdateDataHelper = function (updateData) {
         var oldAccessPointer = updateData.htmlObjectData._identity.accessPointer;
         var newAccessPointer = "";

@@ -84,5 +84,5 @@ export declare class ToolBoxClass implements ToolBoxInterface {
     registerSvg(svgLayer: any): void;
 }
 export declare function getAttributeController(toolBoxItemStatus: any, itemName: string): Element | null;
-export declare function changeSvgEventPointer(pointerEventOption: any): void;
+export declare function changeSvgEventPointer(type: string, pointerEventOption: string): void;
 export {};

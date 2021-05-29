@@ -80,8 +80,8 @@ export class AutomergeMainDoc implements AutomergeMainDocInterface {
       console.log("====== test connection end ======")
     }
 
-    async initializeRootArray(){
-        return await this.mongoDB.initializeFirstNotebook()
+    async initializeRootArray(notebookID: string){
+        return await this.mongoDB.initializeFirstNotebook(notebookID)
     }
 
     addData(saveDataMessage:any){

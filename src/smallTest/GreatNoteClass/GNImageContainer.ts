@@ -42,7 +42,7 @@ export function GNImageContainer(createData: CreateGreatNoteObjectInterface):GNI
             _object.style[key] = value
         })
 
-        image.src = injectedData.data.src
+        image.src = "/"+injectedData.data.src
     }
 
     _object.setMovable = function(){

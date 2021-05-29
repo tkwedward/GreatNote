@@ -45,6 +45,7 @@ export class MainController {
                 parentAccessPointer: parentAccessPointer,
                 accessPointer: accessPointer,
                 dataPointer: dataPointer,
+                notebookID: this.notebookID
             }
         };
         // socket.emit("databaseOperation", dataMessage)
@@ -75,7 +76,8 @@ export class MainController {
         let updateMessage = {
             htmlObjectData: newData,
             metaData: {
-                action: "update"
+                action: "update",
+                notebookID: this.notebookID
             }
         };
         this.changeList.push(updateMessage);
@@ -100,7 +102,8 @@ export class MainController {
             metaData: {
                 action: "delete",
                 accessPointer: accessPointer,
-                parentAccessPointer: parentAccessPointer
+                parentAccessPointer: parentAccessPointer,
+                notebookID: this.notebookID
             }
         };
         htmlObject.remove();

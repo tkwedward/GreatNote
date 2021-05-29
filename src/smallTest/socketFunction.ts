@@ -6,9 +6,11 @@ import * as CommunicatorController from "./communicationFolder/communitcationCon
 import * as Automerge from 'automerge'
 
 socket = io.io()
-
+socket.emit("message", "I want to connect")
 socket.on("connect", ()=>{
     // emit to everybody
+    socket.emit('joinRoom', mainController.notebookID);
+
     socket.emit("message", "user connected")
     // socket.emit("initialDataRequest")
 })
