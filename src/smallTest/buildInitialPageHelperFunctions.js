@@ -8,7 +8,7 @@ import { GNBookmark } from "./bookmarkFolder/GNBookmark";
 import { GNPage } from "./GreatNoteClass/GNPage";
 import * as GreatNoteSvgDataClass from "./GreatNoteClass/GreatNoteSvgDataClass";
 import * as GroupController from "./groupControllerFolder/groupController";
-import { getAllPageAnnotation, renderAnnotationPage, buildAnnotationPage } from "./pageControllerFolder/annotationHelperFunctions";
+import { getAllPageAnnotation, buildAnnotationPage } from "./pageControllerFolder/annotationHelperFunctions";
 import { socket } from "./socketFunction";
 import * as GNCommentController from "./commentFolder/commentController";
 import * as LayerConroller from "./layerControllerFolder/layerController";
@@ -107,6 +107,7 @@ export function buildPageControllerButtonArray(mainController) {
         console.log(153, mainController.mainDoc["array"][0]["array"], mainController);
     });
     let showAnnotationButton = document.createElement("button");
+    showAnnotationButton.classList.add("showAnnotationButton");
     showAnnotationButton.innerText = "showAnnotation";
     showAnnotationButton.addEventListener("click", function () {
         let annotationPage = document.querySelector(".annotationPage");
@@ -129,10 +130,11 @@ export function buildPageControllerButtonArray(mainController) {
             }
             currentPage = currentPage.next;
         }
-        console.log(177177, allPageAnnotationArray, annotationPageContentWrapper);
-        if (annotationPageContentWrapper.innerHTML == "") {
-            renderAnnotationPage(allPageAnnotationArray, annotationPageContentWrapper);
-        }
+        // console.log(177177, allPageAnnotationArray, annotationPageContentWrapper)
+        //
+        // if (annotationPageContentWrapper.innerHTML==""){
+        //     renderAnnotationPage(allPageAnnotationArray, annotationPageContentWrapper)
+        // }
     });
     // ============ scale Controller ===========//
     function scaleChange(scale) {
@@ -271,22 +273,38 @@ export function buildInitialPage(mainController, saveToDatabase = false) {
     let groupControllerWrapper = document.querySelector(".groupControllerWrapper");
     let collectionControllerWrapper = document.querySelector(".collectionControllerWrapper");
     console.log(345345, pageFullArray, mainController.mainDoc);
+    let pageNotRendered = [];
+    let targetPageIndex = pageFullArray.length - 1;
+    let preloadRange = 2;
     for (let i = 0; i < pageFullArray.length; i++) {
-        let [newPage, smallView] = pageViewHelperFunction.createNewPage(pageController, fullPageModeDiv, overviewModeDiv, pageFullArray[i], pageOverviewArray[i], saveToDatabase);
-        pageViewHelperFunction.insertNewPage(pageController, newPage, smallView, fullPageModeDiv, overviewModeDiv);
+        let newPage = pageViewHelperFunction.createNewPage(pageController, fullPageModeDiv, pageFullArray[i], saveToDatabase);
+        pageViewHelperFunction.insertNewPage(pageController, newPage, fullPageModeDiv);
         mainController.renderDataToHTML(pageFullArray[i], newPage);
-        newPage.setAttribute("visited", "false");
-        if (i == pageFullArray.length - 1) {
-            newPage.classList.add("currentPage");
-            newPage.setAttribute("visited", "true");
-            let notebookID = mainController.notebookID;
-            let pageID = pageFullArray[i]._identity.accessPointer;
-            console.log(397397, notebookID, pageID);
-            getPageDataFromServer(mainController, notebookID, pageID);
-            // let groupData = newPage.extract().data.groupData
-            // groupControllerWrapper.renderGroup(groupData)
+        // newPage.setAttribute("visited", "false")
+        let pageID = pageFullArray[i]._identity.accessPointer;
+        // getPageDataFromServer(mainController, pageID)
+        if (i >= targetPageIndex - preloadRange && i <= targetPageIndex + preloadRange) {
+            if (i == targetPageIndex)
+                newPage.classList.add("currentPage");
+            newPage.setAttribute("loaded", "true");
+            getPageDataFromServer(mainController, pageID);
+        }
+        else {
+            pageNotRendered.push(pageID);
         }
     }
+    let loadPages = setInterval(() => {
+        if (pageNotRendered.length > 0) {
+            let pageID = pageNotRendered.pop();
+            let targetPage = document.querySelector(`*[accessPointer=${pageID}]`);
+            targetPage.setAttribute("loaded", "true");
+            getPageDataFromServer(mainController, pageID);
+        }
+    }, 1000);
+    // pageNotRendered.forEach(p=>getPageDataFromServer(mainController, p))
+    let annotationButton = document.querySelector(".showAnnotationButton");
+    let switchViewModeButton = document.querySelector(".switchViewModeButton");
+    // switchViewModeButton.click()
     // let collectionPage = ColllectionControllerHelperFunctions.createCollectionPage()
     // collectionPage.injecetDataToCollectionPage(groupData)
     //
@@ -302,16 +320,11 @@ export function buildInitialPage(mainController, saveToDatabase = false) {
     //   mainController.sendChangeToServer()
     // }, 4000)
 } // buildInitialPage
-export function getPageDataFromServer(mainController, notebookID, pageID) {
+export function createSmallView(injectedData) {
+}
+export function getPageDataFromServer(mainController, pageID) {
+    let notebookID = mainController.notebookID;
     socket.emit("getPageData", { notebookID, pageID });
-    socket.on("receivePageDataFromServer", (data) => {
-        console.log(data["array"]);
-        data["array"].forEach((p) => {
-            let layerHTMLObject = document.querySelector(`*[accessPointer='${p._identity.accessPointer}']`);
-            mainController.renderDataToHTML(p, layerHTMLObject);
-        });
-        socket.off("receivePageDataFromServer");
-    });
 }
 export function attachEvents(mainController, pageContentContainer) {
     // WindowController.initalizeWindowObject()

@@ -3,8 +3,9 @@ export let ClassNameCollection = {
     commentContainer: "_commentContainer"
 }
 
-
+let fullPageSizeWidth = 1126
+let fullPageSizeHeight = 1500
 export let pageSizeInfo = {
-  fullPageSize: [1150, 1678],
-  overviewPageSize: [237.4, 144]
+  fullPageSize: [fullPageSizeWidth, fullPageSizeHeight],
+  overviewPageSize: [fullPageSizeWidth/8, fullPageSizeHeight/8]
 }

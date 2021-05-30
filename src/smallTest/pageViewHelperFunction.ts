@@ -118,6 +118,7 @@ export function functionButtonCreater(name:string, buttonFunction: ()=>void){
 
 export function createSwitchViewModeButton(fullPageModeDiv: HTMLDivElement, overviewModeDiv: HTMLDivElement){
     let switchViewModeButton = document.createElement("button")
+    switchViewModeButton.classList.add("switchViewModeButton")
     switchViewModeButton.innerText = "pageMode"
     switchViewModeButton.setAttribute("mode", "pageMode")
 
@@ -140,7 +141,7 @@ export function createSwitchViewModeButton(fullPageModeDiv: HTMLDivElement, over
     return switchViewModeButton
 }
 
-export function createNewPage(pageController: any, fullPageModeDiv:HTMLDivElement, overviewModeDiv:HTMLDivElement, fullPageData?:any, overviewPageData?:any, saveToDatabase=true, insertPosition=false){
+export function createNewPage(pageController: any, fullPageModeDiv:HTMLDivElement, fullPageData?:any, saveToDatabase=true, insertPosition=false):HTMLDivElement{
     let newPage = GNPage({
       name: "fullPage", arrayID: mainController.mainDocArray["mainArray_pageFull"], insertPosition: insertPosition,
       dataPointer: false,
@@ -156,70 +157,27 @@ export function createNewPage(pageController: any, fullPageModeDiv:HTMLDivElemen
     // newPage.style.width = `${pageController.fullPageSize[0]}px`
     // newPage.style.height = `${pageController.fullPageSize[1]}px`
 
-    let newPageAccesssPointer = saveToDatabase? newPage.getAccessPointer(): false // to avoid error when saveToDatabase is false and you cannot get the accessPointer of the new pagge
-    let smallView = GNPage({
-        name: "overviewPage",
-        arrayID: mainController.mainDocArray["mainArray_pageOverview"],
-        insertPosition: insertPosition,
-        dataPointer: newPageAccesssPointer,
-        saveToDatabase: saveToDatabase,
-        specialCreationMessage: "createNewOverviewPageObject",
-        contentEditable: false,
-        _classNameList: ["smallView"]
-    })
-    smallView.classList.add("divPageSmall")
-    smallView._dataStructure = []
-    smallView._styleStructure = ["background", "width", "height"]
-    smallView.style.background = "pink"
-    smallView.style.width = `${pageController.overviewPageSize[0]}px`
-    smallView.style.height = `${pageController.overviewPageSize[1]}px`
-
-    // ==========================
-    // add events to smallView
-    // ==========================
-    // smallViewDescription.innerText = `${pkmDatabase[dummyNumber].name}`
-
-    // ==========================
-    // add events to smallView
-    // ==========================
-    // addEventToNewPage(pageController, newPage)
-    clickEventOfSmallPage(pageController, smallView)
-
     // if saveToDatabase is false, then you do not need to save it
     if (saveToDatabase){
         newPage.saveHTMLObjectToDatabase()
-        smallView.saveHTMLObjectToDatabase()
     }
 
-    if (fullPageData && overviewPageData){
-        fillInNewPageDataContent(newPage, fullPageData)
-        fillInSmallViewDataContent(smallView, overviewPageData)
+    if (fullPageData){
+        newPage.initializeHTMLObjectFromData(fullPageData)
+        newPage.objectData = fullPageData
     }
 
-    return [newPage, smallView]
+    return newPage
 }
 
-export function fillInNewPageDataContent(newPage:any, fullPageData:any){
-    newPage.initializeHTMLObjectFromData(fullPageData)
-    newPage.objectData = fullPageData
-}
-
-export function fillInSmallViewDataContent(smallView:any, overviewPageData:any){
-    smallView.initializeHTMLObjectFromData(overviewPageData)
-    // smallViewDescription.innerText = overviewPageData.data.innerText
-}
-
-export function insertNewPage(pageController:any, newFullPage: HTMLDivElement, newSmallView: HTMLDivElement, fullPageModeDiv: HTMLDivElement, overviewModeDiv: HTMLDivElement){
-    pageController.addPage(newFullPage, newSmallView)
+export function insertNewPage(pageController:any, newFullPage: HTMLDivElement, fullPageModeDiv: HTMLDivElement){
+    pageController.addPage(newFullPage)
 
     // ==========================
     // appending new pages to the fullPageModeDiv and overviewModeDiv
     //==========================
     // newFullPage.setAttribute("pageNumber", newPageNumber)
     fullPageModeDiv.appendChild(newFullPage)
-
-    // newSmallView.setAttribute("pageNumber", newPageNumber)
-    overviewModeDiv.appendChild(newSmallView)
 
     // highlight and update the pageNumberInput
     let pageNumberInput = <HTMLInputElement> document.querySelector(".pageNumberInput")
@@ -228,17 +186,14 @@ export function insertNewPage(pageController:any, newFullPage: HTMLDivElement, n
 }
 
 //@auto-fold here
-export function createNewPageEvent(currentStatus: any, fullPageModeDiv: HTMLDivElement, overviewModeDiv: HTMLDivElement, pageDummyContent:any , htmlObject?:HTMLElement|HTMLDivElement){
+export function createNewPageEvent(currentStatus: any, fullPageModeDiv: HTMLDivElement, pageDummyContent:any , htmlObject?:HTMLElement|HTMLDivElement){
     // when click the new page button, a new page is created.
-
-
-    // add new page fullPageMode
     let clickEventAction = function (){
           let insertPosition = currentStatus.currentPage.pageNumber
           let saveToDatabase = true
-          let [newPage, smallView] = createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, false, false, saveToDatabase, insertPosition)
+          let newPage = createNewPage(currentStatus, fullPageModeDiv, false, saveToDatabase, insertPosition)
 
-          insertNewPage(currentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv)
+          insertNewPage(currentStatus, newPage, fullPageModeDiv)
 
           let addDivLayereButton = <HTMLButtonElement> document.querySelector(".addDivLayerButton")
           let addSvgLayerButton = <HTMLButtonElement> document.querySelector(".addSvgLayerButton")
@@ -257,17 +212,6 @@ function clickEventOfSmallPage(currentStatus:any, smallPage: HTMLDivElement){
         // the next page is the clicked page + 1
         currentStatus.newPageNumber = clickedPageNumber + 1
         highlightCurrentPageInOverviewMode(smallPage, clickedPageNumber, currentStatus)
-
-        for(let i = 1; i < currentStatus.pageArrayFullPage.length; i++){
-            if (i < clickedPageNumber){
-                // pages before the clicked page
-                // currentStatus.pageArrayFullPage[i].style.left = "-200%"
-            } else if (i == clickedPageNumber){
-                // currentStatus.pageArrayFullPage[i].style.left = "0"
-            } else {
-                // currentStatus.pageArrayFullPage[i].style.left = "+200vw"
-            }
-        }
     })
 }
 

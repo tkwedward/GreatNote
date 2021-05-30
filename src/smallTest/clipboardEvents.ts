@@ -24,6 +24,10 @@ export function addPasteImageEvent(mainController: MainControllerInterface){
                        // console.log(24242424, responseImgSrc)
                        let newImg = GNImageContainer({"name": "", arrayID: targetDiv.getAccessPointer(), saveToDatabase:true, imgsrc: "../image/" + responseImgSrc +".png"})
 
+                       let img = <HTMLImageElement> newImg.querySelector("img")
+                       img.src = window.location.origin
+                       + "/image/" + responseImgSrc +".png"
+
                        targetDiv.appendChild(newImg)
                        newImg.setImageSize({width:500})
                        newImg.setMovable()

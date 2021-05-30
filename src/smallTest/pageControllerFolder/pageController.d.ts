@@ -30,7 +30,6 @@ export interface PageObjectInterface {
     previous: null | PageObjectInterface;
     next: null | PageObjectInterface;
     fullPageHTMLObject: any;
-    smallViewHTMLObject: any;
     pageRelatedData: {
         sectionArray: any;
         annotationArray: {

@@ -1,12 +1,10 @@
-"use strict";
-exports.__esModule = true;
-exports.socket = void 0;
-var _io = require('socket.io-client');
-var buildInitialPage_1 = require("./buildInitialPage");
-exports.socket = _io.io();
-exports.socket.on("message", function (data) {
+let _io = require('socket.io-client');
+import { buildInitialPageFunction } from "./buildInitialPage";
+export var socket;
+socket = _io.io();
+socket.on("message", (data) => {
     console.log(data);
 });
-exports.socket.on("serverResponsesForOverallNoteBookInfo", function (data) {
-    buildInitialPage_1.buildInitialPageFunction(data);
+socket.on("serverResponsesForOverallNoteBookInfo", (data) => {
+    buildInitialPageFunction(data);
 });

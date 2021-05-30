@@ -33,6 +33,15 @@ socket.on("saveDataToServer", (data:any)=>{
     mainController.saveMainDoc(true)
 })
 
+socket.on("receivePageDataFromServer", (data: any)=>{
+  console.log(data["array"])
+  data["array"].forEach((p:any)=>{
+      let layerHTMLObject = <any> document.querySelector(`*[accessPointer='${p._identity.accessPointer}']`)
+      mainController.renderDataToHTML(p, layerHTMLObject)
+  })
+  // socket.off("receivePageDataFromServer")
+})
+
 socket.on("serverResponseToLoadMainDocRequest", (data:any)=>{
   // console.log(323232)
     mainController.loadMainDoc(data)

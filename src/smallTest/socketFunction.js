@@ -23,6 +23,14 @@ socket.on("broadcastMessage", (msg) => {
 socket.on("saveDataToServer", (data) => {
     mainController.saveMainDoc(true);
 });
+socket.on("receivePageDataFromServer", (data) => {
+    console.log(data["array"]);
+    data["array"].forEach((p) => {
+        let layerHTMLObject = document.querySelector(`*[accessPointer='${p._identity.accessPointer}']`);
+        mainController.renderDataToHTML(p, layerHTMLObject);
+    });
+    // socket.off("receivePageDataFromServer")
+});
 socket.on("serverResponseToLoadMainDocRequest", (data) => {
     // console.log(323232)
     mainController.loadMainDoc(data);

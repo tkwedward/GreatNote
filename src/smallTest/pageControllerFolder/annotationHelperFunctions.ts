@@ -85,9 +85,68 @@ export function buildAnnotationPage(mainController: MainControllerInterface){
       renderAnnotationPage(allPageAnnotationArray, annotationPageContentWrapper)
   })
 
-
-
   annotationPage.append(checkBoxContainer, getCheckedValueButton, annotationPageContentWrapper)
+
+  // let testBox = document.createElement("div")
+  // testBox.style.width = "300px"
+  // testBox.style.height = "300px"
+  // testBox.style.background = "red"
+  // testBox.style.position = "absolute"
+  // testBox.style.left = "100px"
+  // testBox.style.top = "100px"
+  //
+  // let testBox2 = document.createElement("div")
+  // testBox2.style.width = "50px"
+  // testBox2.style.height = "300px"
+  // testBox2.style.background = "red"
+  //
+  // let bottomRight = document.createElement("div")
+  // bottomRight.style.width = "10px"
+  // bottomRight.style.height = "10px"
+  // bottomRight.style.background = "black"
+  // bottomRight.style.position = "absolute"
+  // bottomRight.style.left = 300 - 10/2 + "px"
+  // bottomRight.style.top = 300 - 10/2 + "px"
+  // testBox.append(bottomRight)
+  // annotationPage.append(testBox, testBox2)
+  //
+  // bottomRight.draggable = true
+  //
+  // bottomRight.addEventListener("dragstart", e=>{
+  //     let initialPosition = {x: e.x, y: e.y}
+  //     let {left, top} = bottomRight.getBoundingClientRect()
+  //     let initialLeftAndTop = {left, top}
+  //
+  //
+  //     let [deltaX, deltaY] = [0, 0]
+  //     console.log(initialPosition, initialLeftAndTop, e)
+  //
+  //     let dragFunction = (e:DragEvent)=>{
+  //         deltaX = e.x  - initialPosition.x;
+  //         deltaY = e.y - initialPosition.y;
+  //
+  //         bottomRight.style.left = (initialLeftAndTop.left + deltaX) + "px"
+  //         bottomRight.style.top = (initialLeftAndTop.top + deltaY) + "px"
+  //         // console.log(e)
+  //         // console.log(deltaX, deltaY)
+  //     }
+  //
+  //     let dragEndFunction =(e:DragEvent)=>{
+  //         e.preventDefault()
+  //         // deltaX = e.screenX  - initialPosition.x;
+  //         // deltaY = e.screenY - initialPosition.y;
+  //
+  //         // bottomRight.style.left = initialLeftAndTop.left + deltaX + "px"
+  //         // bottomRight.style.top = initialLeftAndTop.top + deltaY + "px"
+  //
+  //         bottomRight.removeEventListener("drag", dragFunction)
+  //         bottomRight.removeEventListener("dragend", dragEndFunction)
+  //     }
+  //
+  //     bottomRight.addEventListener("drag", dragFunction)
+  //     bottomRight.addEventListener("dragend", dragEndFunction)
+  // })
+
 
   return [annotationPage, getCheckedValueButton]
 }

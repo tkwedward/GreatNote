@@ -1,5 +1,7 @@
 import { MainControllerInterface} from "../mainControllerFolder/mainControllerInterface"
 import {getPageDataFromServer} from "../buildInitialPageHelperFunctions"
+import {addFunctionToSmallViewHTMLObject} from "../pageControllerFolder/smallViewHelperFunction"
+import * as Setting from "../settings"
 
 export interface pageControllerInterface {
     startPage: any
@@ -33,7 +35,6 @@ export interface PageObjectInterface {
       previous: null | PageObjectInterface,
       next: null | PageObjectInterface,
       fullPageHTMLObject: any,
-      smallViewHTMLObject: any,
       pageRelatedData: {
           sectionArray: any,
           annotationArray: {
@@ -93,8 +94,8 @@ export function initializePageController(mainController:MainControllerInterface)
       currentPage: startPage,
       EventReceiver: document.createElement("span"),
       totalPageNumber: 0,
-      fullPageSize: [1187, 720],
-      overviewPageSize: [237.4, 144],
+      fullPageSize: Setting.pageSizeInfo.fullPageSize,
+      overviewPageSize: Setting.pageSizeInfo.overviewPageSize,
       selectedObject: null
     }
 
@@ -143,11 +144,27 @@ export function initializePageController(mainController:MainControllerInterface)
             alpha.fullPageHTMLObject.style.display = "none"
         }
 
-
-
         pageController.updatePageNumber(alpha)
         pageController.totalPageNumber += 1
+        fullPageHTMLObject.style.width = pageController.fullPageSize[0] + "px"
+        fullPageHTMLObject.style.height = pageController.fullPageSize[1] + "px"
+        //
+        let overviewModeDiv = <HTMLDivElement> document.querySelector(".overviewModeDiv")
+        let smallViewHTMLObject = <any> document.createElement("div")
+        smallViewHTMLObject.classList.add("smallView")
+        overviewModeDiv.append(smallViewHTMLObject)
+
+        //
+        smallViewHTMLObject.style.width = pageController.overviewPageSize[0] + "px"
+        smallViewHTMLObject.style.height = pageController.overviewPageSize[1] + "px"
+
+        smallViewHTMLObject.fullPageeHTMLObjecet = fullPageHTMLObject
+        fullPageHTMLObject.smallViewHTMLObject = smallViewHTMLObject
+        smallViewHTMLObject.innerText = pageController.currentPage.pageNumber
+        addFunctionToSmallViewHTMLObject(smallViewHTMLObject)
     }
+
+
 
     pageController.getPageObjectFromAccessPointer = function(accessPointer: string){
       let _currentPage = pageController.startPage.next
@@ -205,12 +222,31 @@ export function initializePageController(mainController:MainControllerInterface)
 
         mainController.layerController.renderCurrentPageLayer()
 
-        if (pageController.currentPage.fullPageHTMLObject.getAttribute("visited") == "false"){
-            let notebookID = mainController.notebookID
-            let pageID = pageController.currentPage.fullPageHTMLObject.getAccessPointer()
-            getPageDataFromServer(mainController, notebookID, pageID)
-            pageController.currentPage.fullPageHTMLObject.setAttribute("visited", "true")
+        function loadPageData(pageObject:any){
+          if (!pageObject || !pageObject?.previous || !pageObject?.next) return
+          let loaded = pageObject.fullPageHTMLObject.getAttribute("loaded")
+          if (loaded!="true") {
+              let pageID = pageObject.fullPageHTMLObject.getAccessPointer()
+              getPageDataFromServer(mainController, pageID)
+              pageObject.fullPageHTMLObject.setAttribute("loaded", "true")
+          }
         }
+
+        let notebookID = mainController.notebookID
+
+        let range = 2
+
+        // let currentPage_in_back_direction = pageController.currentPage
+        // for (let i = 0; i < range; i++){
+        //   loadPageData(currentPage_in_back_direction)
+        //   currentPage_in_back_direction = currentPage_in_back_direction?.previous
+        // }
+        // let currentPage_in_forward_direction =  pageController.currentPage.next
+        // for (let i = 0; i < range; i++){
+        //   loadPageData(currentPage_in_forward_direction)
+        //   currentPage_in_forward_direction = currentPage_in_forward_direction?.next
+        // }
+
     } // go To Page
 
     pageController.printAllPage = function(){
@@ -270,8 +306,6 @@ export function pageControllerHTMLObject(pageController: any, subPanelContainer:
             pageController.EventReceiver.dispatchEvent(goToPageEvent)
       }
     });
-
-
 
     let leftButton = document.createElement("div")
     let rightButton = document.createElement("div")

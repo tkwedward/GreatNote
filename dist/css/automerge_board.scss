@@ -101,8 +101,7 @@ select, option {
 
       .fullPage {
           transform-origin: top left;
-          transform: scale(1);
-          width: 1150px; height: 1678px; margin: 20px auto;
+          transform: scale(1); margin: 20px auto;
           background: white;
           position: absolute; left: 30px; right: 0;
 
@@ -161,10 +160,16 @@ select, option {
 
       .overviewModeDiv{
           position: absolute; top: 0px; left: 0px;
-          display: grid;
-          grid-template-columns: 1fr 1fr 1fr 1fr;
-          grid-row-gap: 15px;
-          .divPageSmall { background: pink; margin: 10px; }
+          display: flex;
+          flex-wrap: wrap;
+          // grid-template-columns: 1fr 1fr 1fr 1fr;
+          // grid-row-gap: 15px;
+          .smallView { background: lightblue; margin: 10px; }
+          .selectedSmallViewHTMLObject {
+            border: 1px red solid
+          }
+
+
       }
 
       .fullPageModeDiv[status="off"] { display: none; }

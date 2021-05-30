@@ -147,6 +147,7 @@ export function buildPageControllerButtonArray(mainController:MainControllerInte
 
 
   let showAnnotationButton = document.createElement("button")
+  showAnnotationButton.classList.add("showAnnotationButton")
   showAnnotationButton.innerText = "showAnnotation"
   showAnnotationButton.addEventListener("click", function(){
       let annotationPage = <HTMLDivElement> document.querySelector(".annotationPage")
@@ -174,11 +175,11 @@ export function buildPageControllerButtonArray(mainController:MainControllerInte
 
           currentPage = currentPage.next
       }
-      console.log(177177, allPageAnnotationArray, annotationPageContentWrapper)
-
-      if (annotationPageContentWrapper.innerHTML==""){
-          renderAnnotationPage(allPageAnnotationArray, annotationPageContentWrapper)
-      }
+      // console.log(177177, allPageAnnotationArray, annotationPageContentWrapper)
+      //
+      // if (annotationPageContentWrapper.innerHTML==""){
+      //     renderAnnotationPage(allPageAnnotationArray, annotationPageContentWrapper)
+      // }
   })
 
 
@@ -358,7 +359,6 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
 
 
 export function buildInitialPage(mainController:MainControllerInterface, saveToDatabase=false){
-
     createGNDataStructureMapping(mainController)
     /*
       0: pageFullArray
@@ -382,34 +382,47 @@ export function buildInitialPage(mainController:MainControllerInterface, saveToD
     let collectionControllerWrapper = <any> document.querySelector(".collectionControllerWrapper")
 
     console.log(345345, pageFullArray, mainController.mainDoc)
-    for (let i = 0; i< pageFullArray.length; i++){
-        let [newPage, smallView] = pageViewHelperFunction.createNewPage(pageController, fullPageModeDiv, overviewModeDiv, pageFullArray[i], pageOverviewArray[i], saveToDatabase)
+    let pageNotRendered:string[] = []
+    let targetPageIndex = pageFullArray.length-1
+    let preloadRange = 2
 
-        pageViewHelperFunction.insertNewPage(pageController, newPage, smallView, fullPageModeDiv, overviewModeDiv)
+    for (let i = 0; i< pageFullArray.length; i++){
+        let newPage = pageViewHelperFunction.createNewPage(pageController, fullPageModeDiv, pageFullArray[i], saveToDatabase)
+
+        pageViewHelperFunction.insertNewPage(pageController, newPage, fullPageModeDiv)
 
         mainController.renderDataToHTML(pageFullArray[i], newPage)
 
-        newPage.setAttribute("visited", "false")
+        // newPage.setAttribute("visited", "false")
 
+        let pageID = pageFullArray[i]._identity.accessPointer
 
-
-
-        if (i == pageFullArray.length-1){
-          newPage.classList.add("currentPage")
-
-
-          newPage.setAttribute("visited", "true")
-          let notebookID = mainController.notebookID
-          let pageID = pageFullArray[i]._identity.accessPointer
-
-          console.log(397397, notebookID, pageID)
-          getPageDataFromServer(mainController, notebookID, pageID)
-
-          // let groupData = newPage.extract().data.groupData
-          // groupControllerWrapper.renderGroup(groupData)
+        // getPageDataFromServer(mainController, pageID)
+        if (i >= targetPageIndex - preloadRange && i <= targetPageIndex + preloadRange){
+          if (i == targetPageIndex ) newPage.classList.add("currentPage")
+          newPage.setAttribute("loaded", "true")
+          getPageDataFromServer(mainController, pageID)
+        } else {
+          pageNotRendered.push(pageID)
         }
     }
 
+    let loadPages = setInterval(()=>{
+        if (pageNotRendered.length > 0){
+          let pageID = <string >pageNotRendered.pop()
+          let targetPage = <HTMLDivElement> document.querySelector(`*[accessPointer=${pageID}]`)
+          targetPage.setAttribute("loaded", "true")
+          getPageDataFromServer(mainController, pageID)
+        }
+    }, 1000)
+
+    // pageNotRendered.forEach(p=>getPageDataFromServer(mainController, p))
+
+    let annotationButton = <HTMLButtonElement> document.querySelector(".showAnnotationButton")
+
+
+    let switchViewModeButton = <HTMLButtonElement> document.querySelector(".switchViewModeButton")
+    // switchViewModeButton.click()
 
     // let collectionPage = ColllectionControllerHelperFunctions.createCollectionPage()
     // collectionPage.injecetDataToCollectionPage(groupData)
@@ -430,18 +443,14 @@ export function buildInitialPage(mainController:MainControllerInterface, saveToD
 
 }// buildInitialPage
 
+export function createSmallView(injectedData: any){
 
-export function getPageDataFromServer(mainController: MainControllerInterface, notebookID: string, pageID: string){
+}
+
+
+export function getPageDataFromServer(mainController: MainControllerInterface, pageID: string){
+  let notebookID = mainController.notebookID
   socket.emit("getPageData", { notebookID, pageID })
-
-  socket.on("receivePageDataFromServer", (data: any)=>{
-    console.log(data["array"])
-    data["array"].forEach((p:any)=>{
-        let layerHTMLObject = <any> document.querySelector(`*[accessPointer='${p._identity.accessPointer}']`)
-        mainController.renderDataToHTML(p, layerHTMLObject)
-    })
-    socket.off("receivePageDataFromServer")
-  })
 }
 
 export function attachEvents(mainController: MainControllerInterface, pageContentContainer: HTMLDivElement){

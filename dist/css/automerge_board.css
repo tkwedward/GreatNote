@@ -84,8 +84,6 @@ select, option {
 .pageWrapper .pageContentContainer .fullPage {
   transform-origin: top left;
   transform: scale(1);
-  width: 1150px;
-  height: 1678px;
   margin: 20px auto;
   background: white;
   position: absolute;
@@ -143,13 +141,15 @@ select, option {
   position: absolute;
   top: 0px;
   left: 0px;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-row-gap: 15px;
+  display: flex;
+  flex-wrap: wrap;
 }
-.pageWrapper .pageContentContainer .overviewModeDiv .divPageSmall {
-  background: pink;
+.pageWrapper .pageContentContainer .overviewModeDiv .smallView {
+  background: lightblue;
   margin: 10px;
+}
+.pageWrapper .pageContentContainer .overviewModeDiv .selectedSmallViewHTMLObject {
+  border: 1px red solid;
 }
 .pageWrapper .pageContentContainer .fullPageModeDiv[status=off] {
   display: none;

@@ -1,15 +1,11 @@
-"use strict";
-exports.__esModule = true;
-exports.buildInitialPageFunction = void 0;
-var mainPageHelperFunction_1 = require("./mainPageHelperFunction");
-function buildInitialPageFunction(data) {
-    var askUserInputDiv = document.querySelector(".askUserInputDiv");
-    var notebookContainerWrapper = document.querySelector(".notebookContainerWrapper");
-    var notebookContainerNavBar = document.querySelector(".navBar");
-    data.forEach(function (p) {
+import { createNotebookItem } from "./mainPageHelperFunction";
+export function buildInitialPageFunction(data) {
+    let askUserInputDiv = document.querySelector(".askUserInputDiv");
+    let notebookContainerWrapper = document.querySelector(".notebookContainerWrapper");
+    let notebookContainerNavBar = document.querySelector(".navBar");
+    data.forEach((p) => {
         console.log(11111, p);
-        var newNotebook = mainPageHelperFunction_1.createNotebookItem(p.notebookID, p.notebookName);
+        let newNotebook = createNotebookItem(p.notebookID, p.notebookName);
         notebookContainerWrapper.append(newNotebook);
     });
 }
-exports.buildInitialPageFunction = buildInitialPageFunction;
