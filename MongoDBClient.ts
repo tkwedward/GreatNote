@@ -55,7 +55,7 @@ export class MongoBackEnd implements MongoBackEndInterface {
   collection: any
 
     constructor(){
-        this.mongoUrl = "mongodb://localhost:27017"
+        this.mongoUrl = "mongodb://127.0.0.1:27017"
         this.client = null
         this.collection = null
     }

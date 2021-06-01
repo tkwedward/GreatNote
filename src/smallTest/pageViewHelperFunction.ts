@@ -72,7 +72,6 @@ export function subPanelTab(panelClassName: string){
     return [tabWrapper, tabBar, tabContent]
 }
 
-
 //@auto-fold here
 export function createSubPanel(name:string){
     let subPanelNavbarTitle =  document.createElement(`div`)

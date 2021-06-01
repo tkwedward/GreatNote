@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.MongoBackEnd = void 0;
 var mongodb_1 = require("mongodb");
+// import { MongoClient, ObjectId, Collection} from "mong"
 var notebookDataBaseName = "GreatNote";
 var mainDocArrayName = [
     "mainArray_pageFull", "mainArray_pageOverview", "mainArray_bookmark", "mainArray_pokemon", "mainArray_panel"
@@ -60,7 +61,7 @@ function createUniqueID() {
 }
 var MongoBackEnd = /** @class */ (function () {
     function MongoBackEnd() {
-        this.mongoUrl = "mongodb://localhost:27017";
+        this.mongoUrl = "mongodb://127.0.0.1:27017";
         this.client = null;
         this.collection = null;
     }

@@ -2,7 +2,7 @@ import { superGNObject, createDummyData, setObjectMovable } from "./GreateNoteOb
 export function createSelectionObject(className, valueList) {
     let selectObject = document.createElement("select");
     selectObject.classList.add(className);
-    selectObject.draggable = false;
+    // selectObject.draggable = false
     valueList.forEach(p => {
         let option = document.createElement("option");
         option.value = p;

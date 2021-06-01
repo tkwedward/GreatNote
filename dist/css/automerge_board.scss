@@ -11,9 +11,16 @@ body {
 
 .attributePanel {
   .polylineColorController{
+
       div.selectedColor {
           border: 2px solid red;
       }
+
+  }
+
+  .polylineStrokeWidthController{
+      width: 50%;
+      input{ width: 30px; }
   }
 
   .penSelectionToolController{
@@ -41,6 +48,7 @@ select, option {
       background: gold;
       height: 100vh;
       overflow-y: scroll;
+      overflow-x: hidden;
 
       .tabBar {
           display: flex ;

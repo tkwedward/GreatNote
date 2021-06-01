@@ -28,7 +28,6 @@ export interface PolylineControllerInterface extends HTMLObjectControllerInterfa
     strokeWidth: string
 }
 
-
 //
 // Option interface
 //

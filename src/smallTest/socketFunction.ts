@@ -25,6 +25,13 @@ socket.on("message", (msg:any)=>{
     console.log(msg)
 })
 
+socket.on("mongoDBError", (msg:any)=>{
+  console.log("error from DB")
+    let allTabBar = Array.from(document.querySelectorAll(".tabBar"))
+    allTabBar.forEach(p=>p.style.background = "purple")
+
+})
+
 socket.on("broadcastMessage", (msg: any)=>{
     console.log(msg)
 })

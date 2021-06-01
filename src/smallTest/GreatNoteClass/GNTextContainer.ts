@@ -10,7 +10,7 @@ interface GNTextContainerInterface extends GNContainerDivInterface{
 export function createSelectionObject(className:string, valueList: string[]):HTMLSelectElement{
   let selectObject = document.createElement("select")
   selectObject.classList.add(className)
-  selectObject.draggable = false
+  // selectObject.draggable = false
 
 
   valueList.forEach(p=>{

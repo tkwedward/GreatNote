@@ -20,7 +20,8 @@ export function changeItemPosition(p, originalPointArray, deltaX, deltaY) {
 }
 export function getOffSetXY(e) {
     let [offsetX, offsetY, touchIsPen] = [0, 0, false];
-    let rect = e.target.getBoundingClientRect();
+    let currentPage = document.querySelector(".currentPage");
+    let rect = currentPage.getBoundingClientRect();
     let ratio = rect.width / Settings.pageSizeInfo.fullPageSize[0];
     if (e.type == "touchstart" || e.type == "touchmove") {
         offsetX = mousePositionRatioAdjustment(e.targetTouches[0].pageX - rect.left, ratio);
@@ -35,7 +36,9 @@ export function getOffSetXY(e) {
 }
 export function getPageXY(e) {
     let [offsetX, offsetY, touchIsPen] = [0, 0, false];
-    let rect = e.target.getBoundingClientRect();
+    let currentPage = document.querySelector(".currentPage");
+    let rect = currentPage.getBoundingClientRect();
+    // let rect = e.target.getBoundingClientRect();
     let ratio = rect.width / Settings.pageSizeInfo.fullPageSize[0];
     if (e.type == "touchstart" || e.type == "touchmove") {
         offsetX = mousePositionRatioAdjustment(e.targetTouches[0].pageX, ratio);

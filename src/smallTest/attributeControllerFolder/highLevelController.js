@@ -1,5 +1,6 @@
 import { choiceController, dropdownListController, inputFieldAndDropdownListController } from "./basicControllerType";
 import { universalControllerCreater, superController } from "./attributeControllerHelperFunction";
+import * as ToolBoxHelperFunction from "../ToolboxFolder/toolBoxHelperFunction";
 export function createPolylineController() {
     let polylineControllerContainer = document.createElement("div");
     polylineControllerContainer.classList.add("polylineController");
@@ -94,19 +95,29 @@ export function createSelectionToolController(mainController) {
     let copyButton = document.createElement("button");
     copyButton.innerText = "copy";
     copyButton.addEventListener("click", function () {
-        selectionToolControllerContainer.copyDataArray = [];
         let selectionPolyline = document.querySelector(".selectionPolyline");
-        selectionToolControllerContainer.copyDataArray = selectionPolyline.selectedObjectArray.map((p) => p.extract());
+        selectionToolControllerContainer.copyDataArray = selectionPolyline === null || selectionPolyline === void 0 ? void 0 : selectionPolyline.selectedObjectArray.map((p) => p.extract());
+        selectionToolControllerContainer.selectionRectInfo = createSelectionRectInformation(selectionPolyline);
+        selectionPolyline.remove();
     });
     let cutButton = document.createElement("button");
     cutButton.innerText = "cut";
     cutButton.addEventListener("click", function () {
-        duplicateSvgData(mainController, selectionToolControllerContainer, true);
+        selectionToolControllerContainer.copyDataArray = [];
+        let selectionPolyline = document.querySelector(".selectionPolyline");
+        selectionToolControllerContainer.copyDataArray = selectionPolyline === null || selectionPolyline === void 0 ? void 0 : selectionPolyline.selectedObjectArray.map((p) => {
+            let polylineData = p.extract();
+            p.deleteFromDatabase();
+            return polylineData;
+        });
+        selectionToolControllerContainer.selectionRectInfo = createSelectionRectInformation(selectionPolyline);
+        selectionPolyline.remove();
     });
     let pasteButton = document.createElement("button");
     pasteButton.innerText = "paste";
     pasteButton.addEventListener("click", function () {
         duplicateSvgData(mainController, selectionToolControllerContainer);
+        selectionToolControllerContainer.copyDataArray = [];
     });
     let deleteButton = document.createElement("button");
     deleteButton.innerText = "delete";
@@ -119,16 +130,101 @@ export function createSelectionToolController(mainController) {
     return selectionToolControllerContainer;
 }
 function duplicateSvgData(mainController, selectionToolControllerContainer, removeOriginalData = false) {
+    var _a;
     let currentPageSvgLayer = document.querySelector(".currentPage svg");
-    selectionToolControllerContainer.copyDataArray.forEach((p) => {
+    let copiedItemArray = [];
+    (_a = selectionToolControllerContainer.copyDataArray) === null || _a === void 0 ? void 0 : _a.forEach((p) => {
         let newHTMLObject;
         if (p.GNType == "GNSvgPolyLine") {
-            newHTMLObject = mainController.createGNObjectThroughName("GNSvgPolyLine", { name: "", saveToDatabase: true, injectedData: p });
-            console.log(159159, currentPageSvgLayer, newHTMLObject);
+            newHTMLObject = mainController.createGNObjectThroughName("GNSvgPolyLine", { name: "", arrayID: currentPageSvgLayer.getAccessPointer(), saveToDatabase: true, injectedData: p });
+            copiedItemArray.push(newHTMLObject);
             currentPageSvgLayer.append(newHTMLObject);
         }
     });
-    selectionToolControllerContainer.copyDataArray = [];
     let selectionPolyline = document.querySelector(".selectionPolyline");
-    selectionPolyline.remove();
+    let selectionRectInfo = selectionToolControllerContainer.selectionRectInfo;
+    // currentPageSvgLayer.svgController.rect()
+    createMovableSelectionRect(currentPageSvgLayer, selectionRectInfo, copiedItemArray);
+    selectionPolyline === null || selectionPolyline === void 0 ? void 0 : selectionPolyline.remove();
+    selectionToolControllerContainer.copyDataArray = [];
+}
+function createSelectionRectInformation(selectionPolyline) {
+    let polylinePoints = selectionPolyline.soul.array().value;
+    let firstPoint = polylinePoints[0];
+    let rectInfo = { x0: firstPoint[0], y0: firstPoint[1], x1: firstPoint[1], y1: firstPoint[1] };
+    polylinePoints.forEach((p) => {
+        let x = p[0];
+        let y = p[1];
+        if (x < rectInfo.x0)
+            rectInfo.x0 = x;
+        if (y < rectInfo.y0)
+            rectInfo.y0 = y;
+        if (x > rectInfo.x1)
+            rectInfo.x1 = x;
+        if (y > rectInfo.y1)
+            rectInfo.y1 = y;
+    });
+    rectInfo["x0"] -= 50;
+    rectInfo["y0"] -= 50;
+    rectInfo["x1"] += 50;
+    rectInfo["y1"] += 50;
+    let width = rectInfo["x1"] - rectInfo["x0"];
+    let height = rectInfo["y1"] - rectInfo["y0"];
+    return rectInfo;
+}
+function createMovableSelectionRect(currentPageSvgLayer, selectionRectInfo, copiedItemArray) {
+    let width = selectionRectInfo["x1"] - selectionRectInfo["x0"];
+    let height = selectionRectInfo["y1"] - selectionRectInfo["y0"];
+    let selectionRect = currentPageSvgLayer.svgController.rect(width, height);
+    selectionRect.x(selectionRectInfo["x0"]);
+    selectionRect.y(selectionRectInfo["y0"]);
+    selectionRect.attr({ "stroke": "blue", "stroke-width": "2px" });
+    selectionRect.node.classList.add("selectionRectForCopyAndPaste");
+    selectionRect.node.style.fillOpacity = 0;
+    selectionRect.node.style.strokeDasharray = "5px";
+    selectionRect.node.addEventListener("touchstart", (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        // to get the initial points of the polyline
+        let polylineIntialArray = copiedItemArray.map((p) => ({
+            polylineObject: p,
+            initialPoints: p.soul.array().value
+        }));
+        let [initialX, initialY, touchIsPen] = ToolBoxHelperFunction.getOffSetXY(e);
+        let [currentX, currentY] = [0, 0];
+        let [deltaX, deltaY] = [0, 0];
+        let initialRectX = selectionRect.node.x.baseVal.value;
+        let initialRectY = selectionRect.node.y.baseVal.value;
+        let block = false;
+        let touchmoveFunction = (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            if (block)
+                return;
+            block = true;
+            setTimeout(() => { block = false; }, 100);
+            [currentX, currentY, touchIsPen] = ToolBoxHelperFunction.getOffSetXY(e);
+            [deltaX, deltaY] = [currentX - initialX, currentY - initialY];
+            polylineIntialArray.map((p) => {
+                p.polylineObject.soul.plot(p.initialPoints.map((q) => [q[0] + deltaX, q[1] + deltaY]));
+                p.polylineObject.saveHTMLObjectToDatabase();
+            });
+            selectionRect.x(initialRectX + deltaX);
+            selectionRect.y(initialRectY + deltaY);
+        };
+        let touchendFunction = (e) => {
+            e.stopPropagation();
+            selectionRect.node.removeEventListener("touchmove", touchmoveFunction);
+            selectionRect.node.removeEventListener("touchend", touchendFunction);
+        };
+        selectionRect.node.addEventListener("touchmove", touchmoveFunction);
+        selectionRect.node.addEventListener("touchend", touchendFunction);
+    });
+}
+function createSelectObjectAttributeController() {
+    let deleteButton = document.createElement("button");
+    deleteButton.classList.add("selectObjectDeleteButton");
+    deleteButton.addEventListener("click", e => {
+        // document.querySelector("selectedObject")
+    });
 }

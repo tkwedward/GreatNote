@@ -4,7 +4,6 @@ export function polylineMouseDownFunction(e, mainController, svgBoard, moveEvent
     if (!mainController.toolBox.checkToolBoxItemStatus("polylineItemButton")) {
         return;
     }
-    console.log(1010101010, "createNewPolypenItem");
     let polylineController = mainController.attributeControllerMapping.polylineController;
     let [offsetX, offsetY, touchIsPen, ratio] = [0, 0, false, 0];
     let originalWidth = mainController.pageCurrentStatus.fullPageSize[0];
@@ -25,7 +24,6 @@ export function polylineMouseDownFunction(e, mainController, svgBoard, moveEvent
         let [strokeColor, strokeWidth] = polylineController.extract();
         let polyline = GreatNoteSvgDataClass.GNSvgPolyLine({ name: "", arrayID: svgBoard.getAccessPointer(), insertPosition: false, dataPointer: false, saveToDatabase: true, specialCreationMessage: "polylineCreated" });
         polyline.style.pointerEvents = "none";
-        // console.log(33333, polyline)
         let pointArray = [[offsetX, offsetY]];
         //
         polyline.soul.plot(pointArray);
@@ -48,15 +46,15 @@ export function polylineMouseDownFunction(e, mainController, svgBoard, moveEvent
             pointArray.push([newOffsetX, newOffsetY]);
             polyline.soul.plot(pointArray);
         };
-        svgBoard.addEventListener(moveEventName, mouseMoveFunction);
-        //
         // define the mouse move function
         let mouseUpFunction = (e) => {
             e.preventDefault();
+            pointArray = [];
             polyline.saveHTMLObjectToDatabase();
             svgBoard.removeEventListener(moveEventName, mouseMoveFunction);
             svgBoard.removeEventListener(upEventName, mouseUpFunction);
         };
+        svgBoard.addEventListener(moveEventName, mouseMoveFunction);
         svgBoard.addEventListener(upEventName, mouseUpFunction);
     }
 }

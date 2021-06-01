@@ -102,21 +102,36 @@ io.on("connection", function (socket) {
         });
     }); });
     socket.on("clientSendChangesToServer", function (changeList) { return __awaiter(void 0, void 0, void 0, function () {
-        var mongoClient, database, notebooID, allNotebookDB, changeListToClients;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, automergeMainDoc.mongoDB.connect()];
-                case 1:
-                    mongoClient = _a.sent();
-                    database = mongoClient.db("GreatNote");
+        var notebooID, mongoClient, _a, database, allNotebookDB, changeListToClients;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
                     notebooID = changeList[0].metaData.notebookID;
+                    _b.label = 1;
+                case 1:
+                    _b.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, automergeMainDoc.mongoDB.connect()];
+                case 2:
+                    mongoClient = _b.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    _a = _b.sent();
+                    io.to(notebooID).emit("mongoDBError");
+                    return [3 /*break*/, 4];
+                case 4:
+                    database = mongoClient.db("GreatNote");
                     allNotebookDB = database.collection(notebooID);
-                    changeListToClients = changeList.map(function (changeData) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0: return [4 /*yield*/, automergeMainDoc.processChangeDataFromClients(allNotebookDB, changeData, socket.id)];
-                            case 1: return [2 /*return*/, _a.sent()];
-                        }
-                    }); }); });
+                    try {
+                        changeListToClients = changeList.map(function (changeData) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0: return [4 /*yield*/, automergeMainDoc.processChangeDataFromClients(allNotebookDB, changeData, socket.id)];
+                                case 1: return [2 /*return*/, _a.sent()];
+                            }
+                        }); }); });
+                    }
+                    catch (_c) {
+                        io.to(notebooID).emit("mongoDBError");
+                    }
                     io.to(notebooID).emit("message", "finish saving");
                     io.to(notebooID).emit("serverSendChangeFileToClient", changeList);
                     return [2 /*return*/];

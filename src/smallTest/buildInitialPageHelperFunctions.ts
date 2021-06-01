@@ -30,6 +30,7 @@ import * as ColllectionControllerHelperFunctions from "./collectionControllerFol
 import * as SwipeEventController from "./EventFolder/swipeEvent"
 import * as ToolBoxModel from "./ToolBoxModel"
 import * as TestHelper from "./testFolder/testHelperFunction"
+import * as UserControllerHelperFunction from "./UserFolder/UserController"
 // import * as WindowController from "./EventFolder/specialWindowObject"
 let openStatus = true
 
@@ -241,12 +242,12 @@ export function buildPageControllerButtonArray(mainController:MainControllerInte
   let annotationPage = document.querySelector(".annotationPage")
 
   return {pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, copyButton, linkButton, deleteButton,  showMainDocButton, showAnnotationButton, annotationPage, scaleController}
-}
+} // buildPageControllerButtonArray
 
 
 
 
-export function buildToolBoxHtmlObject(mainController){
+export function buildToolBoxHtmlObject(mainController: any){
   let toolBoxHtmlObject = mainController.toolBox.createToolboxHtmlObject()
 
   let eraserItemButton = mainController.toolBox.createEraserItemButton(toolBoxHtmlObject)
@@ -313,8 +314,10 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
       let [topSubPanel, topSubPanelTabBar, topSubPanelTabContent] = pageViewHelperFunction.subPanelTab("topSubPanel")
       let {pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, copyButton, linkButton, deleteButton, showMainDocButton, showAnnotationButton} =  buildPageControllerButtonArray(mainController)
 
+      let { userControllerSubPanelNavbarTitle, userpageControllerSubPanelContent } = UserControllerHelperFunction.buildUserController(mainController)
 
       topSubPanel.addTabAndTabContent(pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent)
+      // topSubPanel.addTabAndTabContent(userControllerSubPanelNavbarTitle, userpageControllerSubPanelContent)
 
 
       let [middleSubPanel, middleSubPanelTabBar, middleSubPanelTabContent] = pageViewHelperFunction.subPanelTab("middleSubPanel")
@@ -359,20 +362,7 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
 
 
 export function buildInitialPage(mainController:MainControllerInterface, saveToDatabase=false){
-    createGNDataStructureMapping(mainController)
-    /*
-      0: pageFullArray
-      1: "mainArray_pageOverview"
-      2: "mainArray_bookmark"
-      3: "mainArray_panel"
-      4: "mainArray_pokemon"
-    */
-    // the array of the elements to be rendered to the document body
-    let pageController = mainController.pageController
-    let pageFullArray = mainController.mainDoc["array"][0]["array"]
-    let pageOverviewArray = mainController.mainDoc["array"][1]["array"]
-    let bookmarkArray =  mainController.mainDoc["array"][2]["array"]
-    let collectionArray =mainController.mainDoc["array"][3]["array"]
+
 
 
     let fullPageModeDiv = <HTMLDivElement> document.querySelector(".fullPageModeDiv")
@@ -381,8 +371,33 @@ export function buildInitialPage(mainController:MainControllerInterface, saveToD
     let groupControllerWrapper = <any> document.querySelector(".groupControllerWrapper")
     let collectionControllerWrapper = <any> document.querySelector(".collectionControllerWrapper")
 
+    createGNDataStructureMapping(mainController)
+
+    let pageController = mainController.pageController
+
+    let pageFullArray:any[] = []
+    let pageOverviewArray:any[] = []
+    let bookmarkArray:any[] = []
+    let collectionArray:any[] = []
+
+    let arrayObject: any = {}
+    mainController.mainDoc["array"].forEach((p:any)=>{
+        if (p.GNType=="mainArray_pageFull"){
+            pageFullArray = p.array
+        }
+        if (p.GNType=="mainArray_pageOverview"){
+            pageOverviewArray = p.array
+        }
+        if (p.GNType=="mainArray_bookmark"){
+            bookmarkArray  = p.array
+        }
+        if (p.GNType=="mainArray_panel"){
+            collectionArray = p.array
+        }
+    })
+
     console.log(345345, pageFullArray, mainController.mainDoc)
-    let pageNotRendered:string[] = []
+    let pageNotRendered:string[] = [];
     let targetPageIndex = pageFullArray.length-1
     let preloadRange = 2
 
@@ -392,8 +407,6 @@ export function buildInitialPage(mainController:MainControllerInterface, saveToD
         pageViewHelperFunction.insertNewPage(pageController, newPage, fullPageModeDiv)
 
         mainController.renderDataToHTML(pageFullArray[i], newPage)
-
-        // newPage.setAttribute("visited", "false")
 
         let pageID = pageFullArray[i]._identity.accessPointer
 

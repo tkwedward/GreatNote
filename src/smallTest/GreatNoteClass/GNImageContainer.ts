@@ -21,6 +21,7 @@ export function GNImageContainer(createData: CreateGreatNoteObjectInterface):GNI
     _object.GNType = "GNImageContainer"
     _object._dataStructure = ["src"]
     _object._styleStructure = ["width", "height", "left", "top", "position"]
+    _object.classList.add("GNImageContainer")
 
     _object._classNameList = _classNameList || []
     if (_classNameList){
@@ -96,8 +97,10 @@ export function GNImageContainer(createData: CreateGreatNoteObjectInterface):GNI
       }
     }
 
-    _object.addEventListener("eventName", (e:any)=>{
+    _object.addEventListener("click", (e:MouseEvent)=>{
         // do something
+        // _object.classList.add("selectedObject")
+        // console.log(document.querySelector(".selectedObject"))
     })
 
     return _object

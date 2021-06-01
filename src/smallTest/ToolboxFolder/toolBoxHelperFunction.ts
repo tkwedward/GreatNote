@@ -28,7 +28,8 @@ export function changeItemPosition(p:any, originalPointArray:[number, number][],
 
 export function getOffSetXY(e:any): [number, number, boolean]{
   let [offsetX, offsetY, touchIsPen] = [0, 0, false]
-  let rect = e.target.getBoundingClientRect();
+  let currentPage = <HTMLDivElement> document.querySelector(".currentPage")
+  let rect = currentPage.getBoundingClientRect();
   let ratio = rect.width / Settings.pageSizeInfo.fullPageSize[0]
 
     if (e.type=="touchstart" || e.type=="touchmove"){
@@ -46,7 +47,9 @@ export function getOffSetXY(e:any): [number, number, boolean]{
 
 export function getPageXY(e:any): [number, number, boolean]{
   let [offsetX, offsetY, touchIsPen] = [0, 0, false]
-  let rect = e.target.getBoundingClientRect();
+  let currentPage = <HTMLDivElement> document.querySelector(".currentPage")
+  let rect = currentPage.getBoundingClientRect();
+  // let rect = e.target.getBoundingClientRect();
   let ratio = rect.width / Settings.pageSizeInfo.fullPageSize[0]
 
     if (e.type=="touchstart" || e.type=="touchmove" ){

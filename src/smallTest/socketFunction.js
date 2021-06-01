@@ -17,6 +17,11 @@ socket.on("serverSendSocketIdArray", (data) => {
 socket.on("message", (msg) => {
     console.log(msg);
 });
+socket.on("mongoDBError", (msg) => {
+    console.log("error from DB");
+    let allTabBar = Array.from(document.querySelectorAll(".tabBar"));
+    allTabBar.forEach(p => p.style.background = "purple");
+});
 socket.on("broadcastMessage", (msg) => {
     console.log(msg);
 });

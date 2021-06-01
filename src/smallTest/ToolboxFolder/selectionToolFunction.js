@@ -9,6 +9,10 @@ export function overallMouseDownFunction(e, mainController, svgBoard, moveEventN
     if (!touchIsPen)
         return;
     e.preventDefault();
+    let selectionRectForCopyAndPaste = document.querySelector(".selectionRectForCopyAndPaste");
+    if (selectionRectForCopyAndPaste) {
+        selectionRectForCopyAndPaste.remove();
+    }
     if (selectionStatusObject.mode == "phaseOne") {
         selectionToolPhaseOneMouseDownFunction(e, mainController, svgBoard, moveEventName, upEventName, selectionStatusObject);
         selectionStatusObject.mode = "phaseTwo";

@@ -63,12 +63,23 @@ let automergeMainDoc: AutomergeMainDocInterface = new AutomergeMainDoc(jsonFileL
   })
 
   socket.on("clientSendChangesToServer",async  changeList=>{
-    let mongoClient = await automergeMainDoc.mongoDB.connect()
-    const database =  mongoClient.db("GreatNote")
     let notebooID = changeList[0].metaData.notebookID
-    let allNotebookDB = database.collection(notebooID)
 
-    let changeListToClients = changeList.map(async changeData=> await automergeMainDoc.processChangeDataFromClients(allNotebookDB, changeData, socket.id))
+    try {
+      let mongoClient = await automergeMainDoc.mongoDB.connect()
+    }
+    catch {
+        io.to(notebooID).emit("mongoDBError")
+    }
+
+    const database =  mongoClient.db("GreatNote")
+    let allNotebookDB = database.collection(notebooID)
+    try {
+        let changeListToClients = changeList.map(async changeData=> await automergeMainDoc.processChangeDataFromClients(allNotebookDB, changeData, socket.id))
+    } catch {
+        io.to(notebooID).emit("mongoDBError")
+    }
+
 
     io.to(notebooID).emit("message", "finish saving")
     io.to(notebooID).emit("serverSendChangeFileToClient", changeList)

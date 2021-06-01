@@ -14,8 +14,12 @@ export function selectionToolPhaseTwoMouseDownEvent(e: any, mainController: Main
     // if (!touchIsPen) return
 
     e.preventDefault();
-
-    let targetObjectOriginalDataArray = selectionStatusObject.selectedObjectArray.map((p:any) => p.soul.array().value);
+    let targetObjectOriginalDataArray: any = []
+    selectionStatusObject.selectedObjectArray.forEach((p:any) =>{
+      if (p){
+          targetObjectOriginalDataArray.push(p.soul.array().value)
+      }
+    });
 
     let selectionPolylineOriginalData = selectionStatusObject.polyline.soul.array().value;
 

@@ -13,7 +13,7 @@ export function GNPage(createData: CreateGreatNoteObjectInterface) : GNPageInter
     _object._dataStructure = []
     _object._styleStructure = []
     _object.groupData = []
-
+ 
     // add classname
     _object._classNameList = _classNameList || []
     _classNameList?.forEach(p=>{

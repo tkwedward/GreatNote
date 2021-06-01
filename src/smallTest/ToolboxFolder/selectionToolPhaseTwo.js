@@ -9,7 +9,12 @@ export function selectionToolPhaseTwoMouseDownEvent(e, mainController, svgBoard,
     [clickedPoint.x, clickedPoint.y, touchIsPen] = getOffSetXY(e);
     // if (!touchIsPen) return
     e.preventDefault();
-    let targetObjectOriginalDataArray = selectionStatusObject.selectedObjectArray.map((p) => p.soul.array().value);
+    let targetObjectOriginalDataArray = [];
+    selectionStatusObject.selectedObjectArray.forEach((p) => {
+        if (p) {
+            targetObjectOriginalDataArray.push(p.soul.array().value);
+        }
+    });
     let selectionPolylineOriginalData = selectionStatusObject.polyline.soul.array().value;
     // if the clicked point is outside the area, then just delete the selected circle and then go back to selection Mode
     if (!selectionStatusObject.polyline.isPointInFill(clickedPoint)) {

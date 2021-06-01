@@ -2,7 +2,7 @@ import {HTMLObjectControllerInterface, PolylineControllerInterface} from "./attr
 import {choiceController, dropdownListController,  inputFieldAndDropdownListController} from "./basicControllerType"
 import {universalControllerCreater, superController} from "./attributeControllerHelperFunction"
 import { MainControllerInterface } from "../mainControllerFolder/mainControllerInterface"
-
+import * as ToolBoxHelperFunction from "../ToolboxFolder/toolBoxHelperFunction"
 
 export function createPolylineController():PolylineControllerInterface{
   let polylineControllerContainer = <PolylineControllerInterface> document.createElement("div")
@@ -122,6 +122,7 @@ export function createSvgCircleControllerContainer():HTMLObjectControllerInterfa
 
 interface SelectionToolControllerInterface extends HTMLObjectControllerInterface{
     copyDataArray: any
+    selectionRectInfo: {x0: number, y0: number, x1: number, y1: number}
 }
 
 export function createSelectionToolController(mainController:MainControllerInterface):SelectionToolControllerInterface{
@@ -133,21 +134,34 @@ export function createSelectionToolController(mainController:MainControllerInter
     let copyButton = document.createElement("button")
     copyButton.innerText = "copy"
     copyButton.addEventListener("click", function(){
-      selectionToolControllerContainer.copyDataArray = []
       let selectionPolyline = <any> document.querySelector(".selectionPolyline")
-      selectionToolControllerContainer.copyDataArray = selectionPolyline.selectedObjectArray.map((p:any)=> p.extract())
+
+      selectionToolControllerContainer.copyDataArray = selectionPolyline?.selectedObjectArray.map((p:any)=> p.extract())
+
+      selectionToolControllerContainer.selectionRectInfo = createSelectionRectInformation(selectionPolyline)
+      selectionPolyline.remove()
     })
 
     let cutButton = document.createElement("button")
     cutButton.innerText = "cut"
     cutButton.addEventListener("click", function(){
-        duplicateSvgData(mainController, selectionToolControllerContainer, true)
+      selectionToolControllerContainer.copyDataArray = []
+      let selectionPolyline = <any> document.querySelector(".selectionPolyline")
+      selectionToolControllerContainer.copyDataArray = selectionPolyline?.selectedObjectArray.map((p:any)=> {
+          let polylineData = p.extract()
+          p.deleteFromDatabase()
+          return polylineData
+      })
+
+      selectionToolControllerContainer.selectionRectInfo = createSelectionRectInformation(selectionPolyline)
+      selectionPolyline.remove()
     })
 
     let pasteButton = document.createElement("button")
     pasteButton.innerText = "paste"
     pasteButton.addEventListener("click", function(){
         duplicateSvgData(mainController, selectionToolControllerContainer)
+        selectionToolControllerContainer.copyDataArray = []
     })
 
     let deleteButton = document.createElement("button")
@@ -163,22 +177,131 @@ export function createSelectionToolController(mainController:MainControllerInter
     return selectionToolControllerContainer
 }
 
-function duplicateSvgData(mainController:MainControllerInterface, selectionToolControllerContainer:any , removeOriginalData: boolean = false){
+function duplicateSvgData(mainController:MainControllerInterface, selectionToolControllerContainer: SelectionToolControllerInterface , removeOriginalData: boolean = false){
   let currentPageSvgLayer = <any> document.querySelector(".currentPage svg")
-
-  selectionToolControllerContainer.copyDataArray.forEach((p:any)=>{
+  let copiedItemArray:any = []
+  selectionToolControllerContainer.copyDataArray?.forEach((p:any)=>{
       let newHTMLObject
       if (p.GNType=="GNSvgPolyLine") {
 
-          newHTMLObject = mainController.createGNObjectThroughName("GNSvgPolyLine", {name: "", saveToDatabase: true, injectedData: p})
+          newHTMLObject = mainController.createGNObjectThroughName("GNSvgPolyLine", {name: "", arrayID: currentPageSvgLayer.getAccessPointer(), saveToDatabase: true, injectedData: p})
 
-          console.log(159159, currentPageSvgLayer, newHTMLObject )
-
+          copiedItemArray.push(newHTMLObject)
           currentPageSvgLayer.append(newHTMLObject)
       }
   })
-  selectionToolControllerContainer.copyDataArray = []
+
 
   let selectionPolyline = <any> document.querySelector(".selectionPolyline")
-  selectionPolyline.remove()
+  let selectionRectInfo = selectionToolControllerContainer.selectionRectInfo
+  // currentPageSvgLayer.svgController.rect()
+  createMovableSelectionRect(currentPageSvgLayer, selectionRectInfo, copiedItemArray)
+
+  selectionPolyline?.remove()
+
+  selectionToolControllerContainer.copyDataArray = []
+
+
+
+}
+
+function createSelectionRectInformation(selectionPolyline: any): { x0:number, y0: number, x1: number, y1: number}{
+  let polylinePoints: [number, number][] =  selectionPolyline.soul.array().value
+  let firstPoint: [number, number] = polylinePoints[0]
+  let rectInfo = { x0:firstPoint[0], y0: firstPoint[1], x1: firstPoint[1], y1:firstPoint[1]}
+
+  polylinePoints.forEach((p: [number, number])=>{
+      let x = p[0]
+      let y = p[1]
+      if (x < rectInfo.x0) rectInfo.x0 = x
+      if (y < rectInfo.y0) rectInfo.y0 = y
+      if (x > rectInfo.x1) rectInfo.x1 = x
+      if (y > rectInfo.y1) rectInfo.y1 = y
+  })
+
+  rectInfo["x0"] -= 50
+  rectInfo["y0"] -= 50
+  rectInfo["x1"] += 50
+  rectInfo["y1"] += 50
+
+  let width = rectInfo["x1"] - rectInfo["x0"]
+  let height = rectInfo["y1"] - rectInfo["y0"]
+
+  return rectInfo
+}
+
+function createMovableSelectionRect(currentPageSvgLayer: any, selectionRectInfo:any, copiedItemArray: any){
+    let width = selectionRectInfo["x1"] - selectionRectInfo["x0"]
+    let height = selectionRectInfo["y1"] - selectionRectInfo["y0"]
+
+    let selectionRect = currentPageSvgLayer.svgController.rect(width, height)
+
+    selectionRect.x(selectionRectInfo["x0"])
+    selectionRect.y(selectionRectInfo["y0"])
+    selectionRect.attr({"stroke": "blue", "stroke-width": "2px"})
+
+    selectionRect.node.classList.add("selectionRectForCopyAndPaste")
+    selectionRect.node.style.fillOpacity = 0
+    selectionRect.node.style.strokeDasharray = "5px"
+
+    selectionRect.node.addEventListener("touchstart", (e:TouchEvent)=>{
+        e.stopPropagation()
+        e.preventDefault()
+
+        // to get the initial points of the polyline
+        let polylineIntialArray = copiedItemArray.map((p:any)=>({
+          polylineObject: p,
+          initialPoints: p.soul.array().value
+        }))
+
+        let [initialX, initialY, touchIsPen]  = ToolBoxHelperFunction.getOffSetXY(e);
+        let [currentX, currentY] = [0, 0]
+        let [deltaX, deltaY] = [0, 0]
+
+        let initialRectX = selectionRect.node.x.baseVal.value
+        let initialRectY = selectionRect.node.y.baseVal.value
+
+        let block = false
+        let touchmoveFunction = (e:TouchEvent)=>{
+            e.stopPropagation()
+            e.preventDefault();
+            if (block) return
+            block = true
+            setTimeout(()=>{ block = false }, 100);
+            [currentX, currentY, touchIsPen] = ToolBoxHelperFunction.getOffSetXY(e);
+            [deltaX, deltaY] = [currentX - initialX, currentY - initialY]
+
+            polylineIntialArray.map((p:{polylineObject: any, initialPoints: [number, number][]})=>{
+                p.polylineObject.soul.plot(
+                  p.initialPoints.map((q:[number, number])=>[q[0]+deltaX, q[1]+deltaY])
+                )
+
+                p.polylineObject.saveHTMLObjectToDatabase()
+            })
+
+            selectionRect.x(initialRectX + deltaX)
+            selectionRect.y(initialRectY + deltaY)
+        }
+
+        let touchendFunction = (e:TouchEvent)=>{
+            e.stopPropagation()
+            selectionRect.node.removeEventListener("touchmove", touchmoveFunction)
+            selectionRect.node.removeEventListener("touchend", touchendFunction)
+        }
+
+        selectionRect.node.addEventListener("touchmove", touchmoveFunction)
+
+        selectionRect.node.addEventListener("touchend", touchendFunction)
+
+    })
+}
+
+
+function createSelectObjectAttributeController(){
+    let deleteButton = document.createElement("button")
+    deleteButton.classList.add("selectObjectDeleteButton")
+    deleteButton.addEventListener("click", e=>{
+        // document.querySelector("selectedObject")
+    })
+
 }

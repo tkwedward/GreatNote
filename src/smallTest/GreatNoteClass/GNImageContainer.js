@@ -8,6 +8,7 @@ export function GNImageContainer(createData) {
     _object.GNType = "GNImageContainer";
     _object._dataStructure = ["src"];
     _object._styleStructure = ["width", "height", "left", "top", "position"];
+    _object.classList.add("GNImageContainer");
     _object._classNameList = _classNameList || [];
     if (_classNameList) {
         _classNameList.forEach(p => _object.classList.add(p));
@@ -67,8 +68,10 @@ export function GNImageContainer(createData) {
             _object.objectData._classNameList.forEach((p) => _object.classList.add(p));
         }
     }
-    _object.addEventListener("eventName", (e) => {
+    _object.addEventListener("click", (e) => {
         // do something
+        // _object.classList.add("selectedObject")
+        // console.log(document.querySelector(".selectedObject"))
     });
     return _object;
 } // GNImage
