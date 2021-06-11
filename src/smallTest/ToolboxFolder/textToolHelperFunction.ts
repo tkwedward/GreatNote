@@ -13,7 +13,6 @@ export function textToolMouseDownFunction(e: any, mainController: MainController
     let textContainer = GNTextContainer({name: "GNTextContainer", arrayID: divLayer.getAccessPointer() , _classNameList: ["GNTextContainer"], saveToDatabase: true})
     textContainer.style.left = offsetX + "px"
     textContainer.style.top = offstY + "px"
-    textContainer.draggable = true
     textContainer.saveHTMLObjectToDatabase()
 
     let pageAccessPointer = divLayer.parentElement.getAttribute("accessPointer")

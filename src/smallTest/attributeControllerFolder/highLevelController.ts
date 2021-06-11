@@ -303,5 +303,4 @@ function createSelectObjectAttributeController(){
     deleteButton.addEventListener("click", e=>{
         // document.querySelector("selectedObject")
     })
-
 }

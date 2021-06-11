@@ -65,6 +65,7 @@ export function initializePageController(mainController) {
         return annotationObject;
     };
     pageController.addPage = function (fullPageHTMLObject) {
+        var _a;
         let newPage = new PageObject();
         fullPageHTMLObject.soul = newPage;
         let alpha = pageController.currentPage;
@@ -87,16 +88,26 @@ export function initializePageController(mainController) {
         fullPageHTMLObject.style.height = pageController.fullPageSize[1] + "px";
         //
         let overviewModeDiv = document.querySelector(".overviewModeDiv");
+        let smallViewDivWrapper = document.createElement("div");
         let smallViewHTMLObject = document.createElement("div");
         smallViewHTMLObject.classList.add("smallView");
         overviewModeDiv.append(smallViewHTMLObject);
         //
         smallViewHTMLObject.style.width = pageController.overviewPageSize[0] + "px";
         smallViewHTMLObject.style.height = pageController.overviewPageSize[1] + "px";
-        smallViewHTMLObject.fullPageeHTMLObjecet = fullPageHTMLObject;
+        smallViewHTMLObject.fullPageHTMLObject = fullPageHTMLObject;
         fullPageHTMLObject.smallViewHTMLObject = smallViewHTMLObject;
-        smallViewHTMLObject.innerText = pageController.currentPage.pageNumber;
-        addFunctionToSmallViewHTMLObject(smallViewHTMLObject);
+        let smallViewContent = document.createElement("div");
+        smallViewContent.classList.add("smallViewContent");
+        smallViewContent.innerText = pageController.currentPage.pageNumber;
+        smallViewHTMLObject.append(smallViewContent);
+        addFunctionToSmallViewHTMLObject(pageController, smallViewHTMLObject, smallViewContent);
+        let smallViewData = (_a = fullPageHTMLObject.objectData) === null || _a === void 0 ? void 0 : _a.data.smallViewData;
+        if (smallViewData)
+            smallViewHTMLObject.loadFromData(smallViewData);
+        // render current Page
+        let showCurrentPageButton = document.querySelector(".showCurrentPageButton");
+        showCurrentPageButton.click();
     };
     pageController.getPageObjectFromAccessPointer = function (accessPointer) {
         let _currentPage = pageController.startPage.next;
@@ -139,7 +150,7 @@ export function initializePageController(mainController) {
         // turn targetPage to current Page
         pageController.currentPage = _targetPage;
         pageController.currentPage.fullPageHTMLObject.classList.add("currentPage");
-        pageController.pagNumberInput.value = "" + pageNumber;
+        pageController.pagNumberInput.value = `${pageNumber}`;
         mainController.layerController.renderCurrentPageLayer();
         function loadPageData(pageObject) {
             if (!pageObject || !(pageObject === null || pageObject === void 0 ? void 0 : pageObject.previous) || !(pageObject === null || pageObject === void 0 ? void 0 : pageObject.next))
@@ -153,16 +164,16 @@ export function initializePageController(mainController) {
         }
         let notebookID = mainController.notebookID;
         let range = 2;
-        // let currentPage_in_back_direction = pageController.currentPage
-        // for (let i = 0; i < range; i++){
-        //   loadPageData(currentPage_in_back_direction)
-        //   currentPage_in_back_direction = currentPage_in_back_direction?.previous
-        // }
-        // let currentPage_in_forward_direction =  pageController.currentPage.next
-        // for (let i = 0; i < range; i++){
-        //   loadPageData(currentPage_in_forward_direction)
-        //   currentPage_in_forward_direction = currentPage_in_forward_direction?.next
-        // }
+        let currentPage_in_back_direction = pageController.currentPage;
+        for (let i = 0; i < range; i++) {
+            loadPageData(currentPage_in_back_direction);
+            currentPage_in_back_direction = currentPage_in_back_direction === null || currentPage_in_back_direction === void 0 ? void 0 : currentPage_in_back_direction.previous;
+        }
+        let currentPage_in_forward_direction = pageController.currentPage.next;
+        for (let i = 0; i < range; i++) {
+            loadPageData(currentPage_in_forward_direction);
+            currentPage_in_forward_direction = currentPage_in_forward_direction === null || currentPage_in_forward_direction === void 0 ? void 0 : currentPage_in_forward_direction.next;
+        }
     }; // go To Page
     pageController.printAllPage = function () {
         let array = [];
@@ -212,8 +223,10 @@ export function pageControllerHTMLObject(pageController, subPanelContainer) {
             pageController.EventReceiver.dispatchEvent(goToPageEvent);
         }
     });
-    let leftButton = document.createElement("div");
-    let rightButton = document.createElement("div");
+    let leftButton = document.createElement("button");
+    leftButton.classList.add("leftButton");
+    let rightButton = document.createElement("button");
+    rightButton.classList.add("rightButton");
     leftButton.innerHTML = "L";
     pageNumberInput.value = "1";
     pageNumberInput.style.margin = "0 auto";

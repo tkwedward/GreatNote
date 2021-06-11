@@ -10,7 +10,6 @@ interface GNTextContainerInterface extends GNContainerDivInterface{
 export function createSelectionObject(className:string, valueList: string[]):HTMLSelectElement{
   let selectObject = document.createElement("select")
   selectObject.classList.add(className)
-  // selectObject.draggable = false
 
 
   valueList.forEach(p=>{
@@ -24,36 +23,55 @@ export function createSelectionObject(className:string, valueList: string[]):HTM
   return selectObject
 }
 
-export function createTextContainerHTMLObject(): [GNTextContainerInterface, HTMLElement, HTMLInputElement,HTMLSelectElement]{
+
+export function inputFunction(_object: any, item:any):((e:any)=>void){
+    return function itemInputFunction(e:InputEvent){
+        setTimeout(function(){
+          _object.saveHTMLObjectToDatabase()
+          item.addEventListener("input",  itemInputFunction)
+        }, 3000)
+        item.removeEventListener("input", itemInputFunction)
+    }
+}
+
+
+export function createTextBox(_object: any, uniqueID?: string){
+    let textBox = document.createElement("div");
+    if (!uniqueID){
+        uniqueID = `${Date.now().toString(36) + Math.random().toString(36).substr(2)}`
+    }
+    textBox.setAttribute("textBoxID", uniqueID)
+    textBox.innerHTML = "TextContainerTextContainer"
+    textBox.classList.add("textContainer")
+    textBox.contentEditable = "true"
+    textBox.draggable = false
+
+    textBox.addEventListener("input", inputFunction(_object, textBox))
+    return textBox
+}
+
+
+export function createTextContainerHTMLObject(): [GNTextContainerInterface, HTMLInputElement,HTMLSelectElement]{
     let _object = <GNTextContainerInterface> document.createElement("div");
     _object.classList.add("GNTextContainer")
     _object.addEventListener("mousedown", e=>{
         e.stopPropagation()
         console.log("from textContainer")
     })
-    _object.style.width = "800px";
+    _object.style.width = "500px";
     _object.style.minHeight = "50px";
     _object.style.background = "lightblue";
 
     let title = document.createElement("input")
 
-    let textContainer = document.createElement("div");
+    title.addEventListener("input", inputFunction(_object, title))
 
-    textContainer.innerHTML = "TextContainerTextContainer"
-    textContainer.contentEditable = "true"
-
-    let inputFunction = function(item:any):((e:any)=>void){
-        return function itemInputFunction(e:InputEvent){
-            setTimeout(function(){
-              _object.saveHTMLObjectToDatabase()
-              item.addEventListener("input",  itemInputFunction)
-            }, 3000)
-            item.removeEventListener("input", itemInputFunction)
-        }
-    }
-
-    textContainer.addEventListener("input", inputFunction(textContainer))
-    title.addEventListener("input", inputFunction(title))
+    let addTextBoxButton = document.createElement("button")
+    addTextBoxButton.innerText = "addTextBox"
+    addTextBoxButton.addEventListener("click", e=>{
+        let _textContainer = createTextBox(_object);
+        _object.append(_textContainer)
+    })
 
 
     let textTypeSelection = createSelectionObject("textTypeSelect", ["normal", "comment", "question", "solution", "section", "equation"])
@@ -79,16 +97,21 @@ export function createTextContainerHTMLObject(): [GNTextContainerInterface, HTML
         annotationObject.annotationType = textTypeSelection.value
     })
 
-    _object.append(textTypeSelection, title, deleteButton, textContainer)
+    _object.append(textTypeSelection, title, deleteButton, addTextBoxButton)
 
     setObjectMovable(_object)
 
-    return [_object, textContainer, title, textTypeSelection]
+    return [_object, title, textTypeSelection]
 }
 
 export function GNTextContainer(createData: CreateGreatNoteObjectInterface) : GNTextContainerInterface {
     let {name, arrayID, insertPosition, dataPointer, saveToDatabase, specialCreationMessage, injectedData, _classNameList} = createData
-    let [_object, textContainer, title, textTypeSelection] =  createTextContainerHTMLObject()
+    let [_object, title, textTypeSelection] =  createTextContainerHTMLObject()
+
+    if (!injectedData){
+        let textContainer = createTextBox(_object)
+        _object.append(textContainer)
+    }
 
     _object.childrenList = {}
 
@@ -97,11 +120,11 @@ export function GNTextContainer(createData: CreateGreatNoteObjectInterface) : GN
     _object._dataStructure = ["innerHTML"]
     _object._styleStructure = ["background", "width", "height", "position", "left", "top"]
     _object._classNameList = _classNameList || []
-    _classNameList?.forEach(p=>{
-      _object.classList.add(p)
-    })
+    _classNameList?.forEach(p=> _object.classList.add(p))
 
-    _object.loadFromData = (injectedData:any, saveToDatabase) => {
+    _object.loadFromData = (injectedData:any, saveToDatabase=false) => {
+        if (saveToDatabase) debugger
+
         _object.GNSpecialCreationMessage = injectedData.GNSpecialCreationMessage
 
          _object.specialGNType = injectedData.specialGNType
@@ -115,9 +138,20 @@ export function GNTextContainer(createData: CreateGreatNoteObjectInterface) : GN
         _object.applyStyle(injectedData.stylesheet, saveToDatabase)
 
         title.value = injectedData["data"]["title"]
-        textContainer.innerHTML = injectedData["data"]["textContainer"]
         textTypeSelection.value = injectedData["data"]["textTypeSelection"]
         textTypeSelection
+
+        injectedData["data"]["textContainerArray"]?.forEach((p:{uniqueID: string, textContent: string})=>{
+          let textContainer = <HTMLDivElement> _object.querySelector(`div[textBoxID='${p.uniqueID}']`)
+
+          if (!textContainer){
+            textContainer = createTextBox(_object, p.uniqueID)
+            _object.append(textContainer)
+          }
+
+          textContainer.innerHTML = p.textContent
+
+        })
     }
 
     _object.extract = () => _object.createDataObject()
@@ -142,14 +176,20 @@ export function GNTextContainer(createData: CreateGreatNoteObjectInterface) : GN
         dataObject["_classNameList"] = Array.from(_object.classList)
 
         // data structure
-        dataObject["data"]["textContainer"] = textContainer.innerHTML
         dataObject["data"]["title"] = title.value
         dataObject["data"]["textTypeSelection"] = textTypeSelection.value
+        let textContainerArray = Array.from(_object.querySelectorAll(".textContainer"))
+        dataObject["data"]["textContainerArray"] = textContainerArray.map((p:any)=>({
+            uniqueID: p.getAttribute("textBoxID"),
+            textContent: p.innerHTML
+        }))
 
         // stylesheet data
         _object?._styleStructure?.forEach((p:any)=>{
             dataObject["stylesheet"][p] = _object.style[p]
         })
+
+        // console.log(dataObject)
 
         return dataObject
     }
@@ -162,6 +202,7 @@ export function GNTextContainer(createData: CreateGreatNoteObjectInterface) : GN
         Object.entries(styleObject).forEach(([key, value], _)=>{
             _object["style"][key] = value
         })
+        // throw "unknown exception"
 
         if (saveToDatabase) _object.saveHTMLObjectToDatabase()
     }
@@ -186,10 +227,4 @@ export function GNTextContainer(createData: CreateGreatNoteObjectInterface) : GN
     }
 
     return _object
-}
-
-
-//@auto-fold here
-export interface GNTemplateInterface extends GNObjectInterface, HTMLImageElement {
-
 }

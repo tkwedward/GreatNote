@@ -13,7 +13,7 @@ export function GNPage(createData: CreateGreatNoteObjectInterface) : GNPageInter
     _object._dataStructure = []
     _object._styleStructure = []
     _object.groupData = []
- 
+
     // add classname
     _object._classNameList = _classNameList || []
     _classNameList?.forEach(p=>{
@@ -30,6 +30,8 @@ export function GNPage(createData: CreateGreatNoteObjectInterface) : GNPageInter
         if (injectedData._classNameList) injectedData._classNameList.forEach((p:any)=>_object.classList.add(p))
 
         _object._identity = injectedData._identity
+
+        _object.objectData = injectedData
 
         _object.setAttribute("accessPointer", injectedData._identity.accessPointer)
     }
@@ -54,6 +56,10 @@ export function GNPage(createData: CreateGreatNoteObjectInterface) : GNPageInter
 
         // data structure
         dataObject["data"]["groupData"] = _object["groupData"]
+
+        if (_object.smallViewHTMLObject){
+          dataObject["data"]["smallViewData"] = _object.smallViewHTMLObject.extract()
+        }
 
         // stylesheet data
         return dataObject

@@ -22,6 +22,7 @@ export function GNPage(createData) {
         if (injectedData._classNameList)
             injectedData._classNameList.forEach((p) => _object.classList.add(p));
         _object._identity = injectedData._identity;
+        _object.objectData = injectedData;
         _object.setAttribute("accessPointer", injectedData._identity.accessPointer);
     };
     _object.extract = () => _object.createDataObject();
@@ -40,6 +41,9 @@ export function GNPage(createData) {
         dataObject["_classNameList"] = Array.from(_object.classList).filter(p => p != "currentPage");
         // data structure
         dataObject["data"]["groupData"] = _object["groupData"];
+        if (_object.smallViewHTMLObject) {
+            dataObject["data"]["smallViewData"] = _object.smallViewHTMLObject.extract();
+        }
         // stylesheet data
         return dataObject;
     };

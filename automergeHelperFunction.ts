@@ -147,5 +147,11 @@ export class AutomergeMainDoc implements AutomergeMainDocInterface {
             // return deleteMessage
             await this.mongoDB.deleteItem(collection, data).then(this.mongoDB.disconnect())
         } // delete
+
+
+        if (data.metaData.action=="microUpdate"){
+          console.log("received microUpdateData")
+          await this.mongoDB.microUpdate(collection, data).then(this.mongoDB.disconnect())
+        }
     }
 }

@@ -21,6 +21,26 @@ body {
   margin: 10px;
   background: CornflowerBlue;
 }
+.attributePanel .moveObjectInDivController {
+  min-height: 200px;
+  margin: 10px auto;
+  background: CornflowerBlue;
+}
+.attributePanel .moveObjectInDivController .imageContainerAttributeController {
+  text-align: center;
+}
+.attributePanel .moveObjectInDivController .imageContainerAttributeController label, .attributePanel .moveObjectInDivController .imageContainerAttributeController input {
+  width: 100px;
+  display: inline-block;
+}
+.attributePanel .moveObjectInDivController .imageContainerAttributeController img {
+  width: 200px;
+  display: inline-block;
+  margin: 10px auto;
+}
+.attributePanel .moveObjectInDivController .imageContainerAttributeController button {
+  margin-bottom: 10px;
+}
 
 select, option {
   -moz-user-select: none;
@@ -119,11 +139,18 @@ select, option {
   position: absolute;
   left: 0;
   right: 0;
+  top: 0;
 }
 .pageWrapper .pageContentContainer .fullPage .divLayer .GNTextContainer {
   width: 800px;
   min-height: 100px;
   background: lightblue;
+}
+.pageWrapper .pageContentContainer .fullPage .divLayer .textContainer {
+  margin: 10px 10px;
+  padding: 10px;
+  background: lightgrey;
+  border: 2px solid black;
 }
 .pageWrapper .pageContentContainer .fullPage .divLayer .GNTextContainer[section_annotation=true] {
   background: maroon;
@@ -144,24 +171,39 @@ select, option {
   margin: 10px;
   width: 90%;
 }
-.pageWrapper .pageContentContainer .overviewModeDiv {
+.pageWrapper .pageContentContainer .overviewModeDivWrapper {
+  width: 100%;
+  height: 100px;
+}
+.pageWrapper .pageContentContainer .overviewModeDivWrapper .overViewModePageController {
+  height: 100px;
+  background: lightyellow;
+  position: fixed;
+  width: 100%;
+  z-index: 2;
+}
+.pageWrapper .pageContentContainer .overviewModeDivWrapper .overviewModeDiv {
   position: absolute;
-  top: 0px;
   left: 0px;
   display: flex;
   flex-wrap: wrap;
+  top: 120px;
 }
-.pageWrapper .pageContentContainer .overviewModeDiv .smallView {
-  background: lightblue;
+.pageWrapper .pageContentContainer .overviewModeDivWrapper .overviewModeDiv .smallView {
   margin: 10px;
 }
-.pageWrapper .pageContentContainer .overviewModeDiv .selectedSmallViewHTMLObject {
+.pageWrapper .pageContentContainer .overviewModeDivWrapper .overviewModeDiv .smallView .smallViewContent {
+  background: lightblue;
+  width: 100%;
+  height: 100%;
+}
+.pageWrapper .pageContentContainer .overviewModeDivWrapper .overviewModeDiv .selectedSmallViewHTMLObject {
   border: 1px red solid;
 }
-.pageWrapper .pageContentContainer .fullPageModeDiv[status=off] {
+.pageWrapper .pageContentContainer .overviewModeDivWrapper[status=off] {
   display: none;
 }
-.pageWrapper .pageContentContainer .overviewModeDiv[status=off] {
+.pageWrapper .pageContentContainer .fullPageModeDiv[status=off] {
   display: none;
 }
 .pageWrapper .subPanel .subPanelNavbar {
@@ -207,18 +249,17 @@ select, option {
   background: coral;
 }
 
-.bookmarkSubPanel .pageController {
-  display: flex;
-}
 .bookmarkSubPanel .pageController * {
   text-align: center;
 }
+.bookmarkSubPanel .pageController button {
+  width: 50px;
+}
 .bookmarkSubPanel .pageNumberInput {
-  width: 50%;
+  width: 30%;
   margin: 0 10px;
 }
 .bookmarkSubPanel .functionButton {
-  width: 90%;
   height: 30px;
   margin: 10px auto;
   background: grey;
@@ -230,7 +271,8 @@ select, option {
 }
 .layerController .layerControllerFunction {
   background: lightblue;
-  height: 50px;
+  min-height: 50px;
+  padding: 8px;
 }
 .layerController .layerView {
   background: grey;
@@ -298,6 +340,10 @@ select, option {
   width: 80%;
   height: 100%;
   background: lightgreen;
+}
+
+.testInfo {
+  display: none;
 }
 
 .bookmarkWrapper .selectedBookmark {

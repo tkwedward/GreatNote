@@ -319,6 +319,27 @@ var MongoBackEnd = /** @class */ (function () {
             });
         });
     }; // deleteItem
+    MongoBackEnd.prototype.microUpdate = function (collection, databaseMessage) {
+        return __awaiter(this, void 0, void 0, function () {
+            var modifyField, newData, updateDescription;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        modifyField = databaseMessage.metaData.modifyField;
+                        newData = databaseMessage.metaData.newData;
+                        updateDescription = {};
+                        updateDescription[modifyField] = newData;
+                        console.log(databaseMessage.metaData.accessPointer, updateDescription);
+                        return [4 /*yield*/, collection.update({
+                                "_identity.accessPointer": databaseMessage.metaData.accessPointer
+                            }, { "$set": updateDescription })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    }; // deleteItem
     MongoBackEnd.prototype.createDatabaseMessage = function (action, htmlObjectData) {
         var parentAccessPointer = htmlObjectData._identity.parentAccessPointer;
         var accessPointer = htmlObjectData._identity.accessPointer;

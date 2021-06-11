@@ -110,15 +110,27 @@ export function superGNObject(_object, saveToDatabase, arrayID, insertPosition, 
         // _object.editEvent(editEvent)
     }
 }
-function attachEventListenerToLayer(mainController, arrayID, _object, injectedData) {
-    if (_object.classList.contains("svgLayer")) {
+export function attachEventListenerToLayer(mainController, arrayID, _object, injectedData) {
+    var _a, _b;
+    let alreadyAttach = _object.getAttribute("eventAttached");
+    if (alreadyAttach == "true")
+        return;
+    if (_object.classList.contains("svgLayer") || ((_a = injectedData === null || injectedData === void 0 ? void 0 : injectedData._classNameList) === null || _a === void 0 ? void 0 : _a.includes("svgLayer"))) {
         ToolBoxEvents.attachEventListenerToSvgBoard(mainController, _object);
         _object.classList.add("attachedEventSvgLayer");
+        _object.setAttribute("eventAttached", "true");
     }
-    // console.log(1671671767, _object, _object._classNameList)
-    if (_object.classList.contains("divLayer")) {
+    else {
+        _object.classList.add("notSvgLayer");
+    }
+    if (_object.classList.contains("divPage") || _object.classList.contains("divLayer") || ((_b = injectedData === null || injectedData === void 0 ? void 0 : injectedData._classNameList) === null || _b === void 0 ? void 0 : _b.includes("divLayer"))) {
         ToolBoxEvents.attachEventListenerToDivLayer(mainController, _object);
+        _object.setAttribute("eventAttached", "true");
     }
+    else {
+        _object.classList.add("notDivLayer");
+    }
+    _object.setAttribute("passedAtachEventListenerToLayer", "true");
 }
 export function setObjectMovable(_object) {
     let eventName = "mousedown";
@@ -128,7 +140,7 @@ export function setObjectMovable(_object) {
     _object.style.position = "absolute";
     _object.addEventListener("mousedown", (e) => {
         // console.log(e)
-        e.stopPropagation();
+        // e.stopPropagation()
         let [startX, startY] = [e["screenX"], e["screenY"]];
         let objectInitialX = 0;
         let objectInitialY = 0;
@@ -156,11 +168,14 @@ export function setObjectMovable(_object) {
         let mouseUpEvent = (e) => {
             e.stopPropagation();
             endDragEvent(e);
+            _object.removeEventListener("mouseup", mouseUpEvent);
+            _object.removeEventListener("mouseout", mouseUpEvent);
+            console.log(220, "deltaX and deltaY", deltaX, deltaY);
+            if (deltaX == 0 && deltaY == 0)
+                return;
             if (e.type == "mouseup") {
                 _object.saveHTMLObjectToDatabase();
             }
-            _object.removeEventListener("mouseup", mouseUpEvent);
-            _object.removeEventListener("mouseout", mouseUpEvent);
         };
         _object.addEventListener("mousemove", mousemoveFunction, false);
         _object.addEventListener("mouseup", mouseUpEvent, false);

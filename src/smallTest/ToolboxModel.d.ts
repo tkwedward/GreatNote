@@ -58,6 +58,10 @@ interface ToolBoxItemStatusInterface {
         status: boolean;
         attributeController: string;
     };
+    bothLayerSelectionToolItemButton: {
+        status: boolean;
+        attributeController: string;
+    };
 }
 export declare class ToolBoxClass implements ToolBoxInterface {
     itemArray: any[];
@@ -74,6 +78,7 @@ export declare class ToolBoxClass implements ToolBoxInterface {
     createToolBoxItem(name: string, toolBoxContainer: any, imagePath?: string): ToolBoxItemInterface;
     createNewPolyLineItemButton(toolBoxHtmlObject: any): ToolBoxItemInterface;
     createSelectionToolItemButton(toolBoxHtmlObject: any): ToolBoxItemInterface;
+    createBothLayerSelectionToolItemButton(toolBoxHtmlObject: any): ToolBoxItemInterface;
     createMouseRectangleSelectionToolItemButton(toolBoxHtmlObject: any): ToolBoxItemInterface;
     createEraserItemButton(toolBoxHtmlObject: any): ToolBoxItemInterface;
     createAddCommentButton(toolBoxHtmlObject: any): ToolBoxItemInterface;

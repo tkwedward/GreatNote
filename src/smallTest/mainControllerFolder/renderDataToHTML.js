@@ -48,7 +48,7 @@ export function renderDataToHTML(mainController, data, arrayHTMLObject) {
             newHTMLObject = mainController.GNDataStructureMapping["GNImageContainer"]({ name: "name", arrayID: arrayHTMLObject.getAccessPointer(), saveToDatabase: false, imgsrc: p["data"]["src"] });
             newHTMLObject._identity = p._identity;
             newHTMLObject.loadFromData(p);
-            newHTMLObject.setImageSize({ width: 500 });
+            // newHTMLObject.setImageSize({width:500})
             newHTMLObject.setMovable();
         }
         if (p.GNType == "GNBookmark") {

@@ -150,6 +150,8 @@ export function initializePageController(mainController:MainControllerInterface)
         fullPageHTMLObject.style.height = pageController.fullPageSize[1] + "px"
         //
         let overviewModeDiv = <HTMLDivElement> document.querySelector(".overviewModeDiv")
+        let smallViewDivWrapper = document.createElement("div")
+
         let smallViewHTMLObject = <any> document.createElement("div")
         smallViewHTMLObject.classList.add("smallView")
         overviewModeDiv.append(smallViewHTMLObject)
@@ -158,12 +160,24 @@ export function initializePageController(mainController:MainControllerInterface)
         smallViewHTMLObject.style.width = pageController.overviewPageSize[0] + "px"
         smallViewHTMLObject.style.height = pageController.overviewPageSize[1] + "px"
 
-        smallViewHTMLObject.fullPageeHTMLObjecet = fullPageHTMLObject
+        smallViewHTMLObject.fullPageHTMLObject = fullPageHTMLObject
         fullPageHTMLObject.smallViewHTMLObject = smallViewHTMLObject
-        smallViewHTMLObject.innerText = pageController.currentPage.pageNumber
-        addFunctionToSmallViewHTMLObject(smallViewHTMLObject)
-    }
 
+
+        let smallViewContent = document.createElement("div")
+        smallViewContent.classList.add("smallViewContent")
+        smallViewContent.innerText = pageController.currentPage.pageNumber
+        smallViewHTMLObject.append(smallViewContent)
+
+        addFunctionToSmallViewHTMLObject(pageController, smallViewHTMLObject, smallViewContent)
+
+        let smallViewData = fullPageHTMLObject.objectData?.data.smallViewData
+        if (smallViewData) smallViewHTMLObject.loadFromData(smallViewData)
+
+        // render current Page
+        let showCurrentPageButton = <HTMLButtonElement> document.querySelector(".showCurrentPageButton")
+        showCurrentPageButton.click()
+    }
 
 
     pageController.getPageObjectFromAccessPointer = function(accessPointer: string){
@@ -218,7 +232,7 @@ export function initializePageController(mainController:MainControllerInterface)
         pageController.currentPage.fullPageHTMLObject.classList.add("currentPage")
 
 
-        pageController.pagNumberInput.value = "" + pageNumber
+        pageController.pagNumberInput.value =  `${pageNumber}`
 
         mainController.layerController.renderCurrentPageLayer()
 
@@ -236,16 +250,16 @@ export function initializePageController(mainController:MainControllerInterface)
 
         let range = 2
 
-        // let currentPage_in_back_direction = pageController.currentPage
-        // for (let i = 0; i < range; i++){
-        //   loadPageData(currentPage_in_back_direction)
-        //   currentPage_in_back_direction = currentPage_in_back_direction?.previous
-        // }
-        // let currentPage_in_forward_direction =  pageController.currentPage.next
-        // for (let i = 0; i < range; i++){
-        //   loadPageData(currentPage_in_forward_direction)
-        //   currentPage_in_forward_direction = currentPage_in_forward_direction?.next
-        // }
+        let currentPage_in_back_direction = pageController.currentPage
+        for (let i = 0; i < range; i++){
+          loadPageData(currentPage_in_back_direction)
+          currentPage_in_back_direction = currentPage_in_back_direction?.previous
+        }
+        let currentPage_in_forward_direction =  pageController.currentPage.next
+        for (let i = 0; i < range; i++){
+          loadPageData(currentPage_in_forward_direction)
+          currentPage_in_forward_direction = currentPage_in_forward_direction?.next
+        }
 
     } // go To Page
 
@@ -307,8 +321,10 @@ export function pageControllerHTMLObject(pageController: any, subPanelContainer:
       }
     });
 
-    let leftButton = document.createElement("div")
-    let rightButton = document.createElement("div")
+    let leftButton = document.createElement("button")
+    leftButton.classList.add("leftButton")
+    let rightButton = document.createElement("button")
+    rightButton.classList.add("rightButton")
     leftButton.innerHTML = "L"
     pageNumberInput.value = "1"
     pageNumberInput.style.margin = "0 auto"

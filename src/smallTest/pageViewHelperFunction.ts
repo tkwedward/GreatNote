@@ -3,6 +3,7 @@ import {GNPage} from "./GreatNoteClass/GNPage"
 import * as GreatNoteSvgDataClass from "./GreatNoteClass/GreatNoteSvgDataClass"
 import {socket} from "./socketFunction"
 import {highlightCurrentPageInOverviewMode} from "./pageControllerFolder/pageController"
+import html2canvas from "html2canvas"
 // import {pageController, updatePageController, updatePageNumberInNewOrder, highlightCurrentPageInOverviewMode} from "./pageControllerFolder/pageController"
 
 
@@ -121,6 +122,8 @@ export function createSwitchViewModeButton(fullPageModeDiv: HTMLDivElement, over
     switchViewModeButton.innerText = "pageMode"
     switchViewModeButton.setAttribute("mode", "pageMode")
 
+    let overviewModeDivWrapper = <HTMLDivElement> document.querySelector(".overviewModeDivWrapper")
+
     switchViewModeButton.addEventListener("click", function(e){
        let mode = (switchViewModeButton.getAttribute("mode") == "overviewMode") ? "pageMode": "overviewMode"
        switchViewModeButton.setAttribute("mode", mode)
@@ -128,15 +131,19 @@ export function createSwitchViewModeButton(fullPageModeDiv: HTMLDivElement, over
 
        if (mode=="overviewMode"){
           fullPageModeDiv.setAttribute("status", "off")
-          overviewModeDiv.setAttribute("status", "on")
-
-          // pageViewHelperFunction.renderOverviewMode()
+          overviewModeDivWrapper.setAttribute("status", "on")
        } else {
           fullPageModeDiv.setAttribute("status", "on")
-          overviewModeDiv.setAttribute("status", "off")
-          // pageViewHelperFunction.renderFullPageMode()
+          overviewModeDivWrapper.setAttribute("status", "off")
        }
+
+       let smallViewHTMLObjectArray: any[]= Array.from(overviewModeDivWrapper.querySelectorAll(".smallView"))
+
+       // html2canvas(smallViewHTMLObjectArray[0].fullPageHTMLObject).then(p=>smallViewHTMLObjectArray[0].append(p))
     })
+
+
+
     return switchViewModeButton
 }
 
@@ -194,6 +201,8 @@ export function createNewPageEvent(currentStatus: any, fullPageModeDiv: HTMLDivE
 
           insertNewPage(currentStatus, newPage, fullPageModeDiv)
 
+
+          // the functinos are defined at layerController
           let addDivLayereButton = <HTMLButtonElement> document.querySelector(".addDivLayerButton")
           let addSvgLayerButton = <HTMLButtonElement> document.querySelector(".addSvgLayerButton")
           addDivLayereButton.click()

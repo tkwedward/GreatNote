@@ -1,5 +1,6 @@
 import { mainController } from "../index";
 let iconName = {
+    bothLayerSelectionTool: "/graphics/toolBox/bothLayerSelectionTool.png",
     rectangleSelectionTool: "/graphics/toolBox/rectangleSelection.png",
     penSelectionTool: "/graphics/toolBox/penSelection.png",
     eraserTool: "/graphics/toolBox/eraserTool.png",
@@ -47,6 +48,10 @@ export class ToolBoxClass {
             textToolItemButton: {
                 status: false,
                 attributeController: "textToolController"
+            },
+            bothLayerSelectionToolItemButton: {
+                status: false,
+                attributeController: "bothLayerSelectionToolController"
             }
         };
     }
@@ -139,6 +144,14 @@ export class ToolBoxClass {
         toolBoxItem.deactivate = function () {
             changeSvgEventPointer("divLayer", "auto");
         };
+        return toolBoxItem;
+    }
+    createBothLayerSelectionToolItemButton(toolBoxHtmlObject) {
+        let toolBoxItem = this.createToolBoxItem("BothLayerSelectionTool", toolBoxHtmlObject, iconName.bothLayerSelectionTool);
+        toolBoxItem.addEventListener("click", (e) => {
+            console.log("Selection Tool item button is activated");
+            this.activateButtonFunction(toolBoxItem, "bothLayerSelectionToolItemButton");
+        });
         return toolBoxItem;
     }
     createMouseRectangleSelectionToolItemButton(toolBoxHtmlObject) {

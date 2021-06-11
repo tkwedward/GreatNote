@@ -64,9 +64,9 @@ let automergeMainDoc: AutomergeMainDocInterface = new AutomergeMainDoc(jsonFileL
 
   socket.on("clientSendChangesToServer",async  changeList=>{
     let notebooID = changeList[0].metaData.notebookID
-
+    let mongoClient
     try {
-      let mongoClient = await automergeMainDoc.mongoDB.connect()
+      mongoClient = await automergeMainDoc.mongoDB.connect()
     }
     catch {
         io.to(notebooID).emit("mongoDBError")

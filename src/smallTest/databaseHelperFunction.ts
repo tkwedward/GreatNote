@@ -15,7 +15,7 @@ export function processCreationDataHelper(mainController:MainControllerInterface
     let htmlObjectName = htmlObjectData.GNType
 
     let htmlObject = <any> mainController.createGNObjectThroughName(htmlObjectName, {name:"", injectedData: htmlObjectData})
-    console.log(htmlObject)
+
     if (htmlObject.classList.contains("fullPage")){
         console.log("create new page")
         mainController.pageController.addPage(htmlObject)

@@ -8,6 +8,7 @@ interface AutomergeDataStructureInterface {
   data: any
   specialGNType: string
   stylesheet: any
+  _classNameList: string[]
   _identity: {"accessPointer": string, "dataPointer": string, linkArray: string[]}
 }
 
@@ -39,11 +40,19 @@ export function GNImageContainer(createData: CreateGreatNoteObjectInterface):GNI
 
 
     _object.loadFromData = (injectedData:AutomergeDataStructureInterface) => {
+        image.src = "/"+injectedData.data.src
+
+        _object.identity = injectedData._identity
+        _object.setAttribute("accessPointer", _object.identity.accessPointer)
+        _object.objectData = injectedData
+
+        if (injectedData._classNameList && injectedData._classNameList.length>0){
+          _object.objectData._classNameList.forEach((p:any)=>_object.classList.add(p))
+        }
+
         Object.entries(injectedData.stylesheet).forEach(([key, value], _): void=>{
             _object.style[key] = value
         })
-
-        image.src = "/"+injectedData.data.src
     }
 
     _object.setMovable = function(){
@@ -83,18 +92,22 @@ export function GNImageContainer(createData: CreateGreatNoteObjectInterface):GNI
 
         _object.style.width = width + "px"
         _object.style.height = height + "px"
+        console.log(97979797, width, height)
+        return [width, height]
     }
 
     superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage)
 
     if (injectedData){
-      _object.identity = injectedData._identity
-      _object.setAttribute("accessPointer", _object.identity.accessPointer)
-      _object.objectData = injectedData
-
-      if (injectedData._classNameList && injectedData._classNameList.length>0){
-        _object.objectData._classNameList.forEach((p:any)=>_object.classList.add(p))
-      }
+      console.log(103103, injectedData)
+      _object.loadFromData(injectedData)
+      // _object.identity = injectedData._identity
+      // _object.setAttribute("accessPointer", _object.identity.accessPointer)
+      // _object.objectData = injectedData
+      //
+      // if (injectedData._classNameList && injectedData._classNameList.length>0){
+      //   _object.objectData._classNameList.forEach((p:any)=>_object.classList.add(p))
+      // }
     }
 
     _object.addEventListener("click", (e:MouseEvent)=>{

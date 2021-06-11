@@ -181,7 +181,14 @@ var AutomergeMainDoc = /** @class */ (function () {
                         // return deleteMessage
                         _a.sent();
                         _a.label = 6;
-                    case 6: return [2 /*return*/];
+                    case 6:
+                        if (!(data.metaData.action == "microUpdate")) return [3 /*break*/, 8];
+                        console.log("received microUpdateData");
+                        return [4 /*yield*/, this.mongoDB.microUpdate(collection, data).then(this.mongoDB.disconnect())];
+                    case 7:
+                        _a.sent();
+                        _a.label = 8;
+                    case 8: return [2 /*return*/];
                 }
             });
         });

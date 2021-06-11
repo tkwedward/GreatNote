@@ -74,13 +74,10 @@ export function attachEventListenerToDivLayer(mainController: MainControllerInte
   } // addCommentMouseDownFunction
 
 
-  let divSelctionObjectStatus = {
-      "selectedObject": null
-  }
   let moveObjectInDivMouseDownFunction = {
     eventNameList: ["mousedown"],
     eventFunction: (e: any)=>{
-      MoveObjectInDivFunction.moveObejectInDivMouseDownFunction(e, mainController, divLayer, "mousemove", "mouseup", divSelctionObjectStatus)
+      MoveObjectInDivFunction.moveObejectInDivMouseDownFunction(e, mainController, divLayer, "mousemove", "mouseup")
     }
   }
 
@@ -91,11 +88,14 @@ export function attachEventListenerToDivLayer(mainController: MainControllerInte
     }
   }
   // let eventArray = [addCommentMouseDownFunction, moveObjectInDivMouseDownFunction]
-  let eventArray = [addCommentMouseDownFunction, addBookmarkMouseDownFunction, textToolMouseDownFunction]
+  let nameArray = ["addComment", "addBookmark", "moveObject", "textToolMouseDown"]
+  let eventArray = [addCommentMouseDownFunction, addBookmarkMouseDownFunction, moveObjectInDivMouseDownFunction,  textToolMouseDownFunction]
+  divLayer.greatNoteEventList = []
 
-  eventArray.forEach(toolboxEvent=>{
-      toolboxEvent.eventNameList.forEach(eventName=>{
+  eventArray.forEach((toolboxEvent: any, index :number)=>{
+      divLayer.greatNoteEventList.push(nameArray[index])
+      toolboxEvent.eventNameList.forEach((eventName: string)=>{
           divLayer.addEventListener(eventName, toolboxEvent.eventFunction)
       })
   })
-}
+}MoveObjectInDivFunction

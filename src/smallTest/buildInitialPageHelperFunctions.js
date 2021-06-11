@@ -17,6 +17,7 @@ import * as pageViewHelperFunction from "./pageViewHelperFunction";
 import * as InitializeAttributeControllerFunction from "./attributeControllerFolder/initializeAttributeControllers";
 import * as CollectionController from "./collectionControllerFolder/collectionController";
 import * as SwipeEventController from "./EventFolder/swipeEvent";
+import * as SmallViewHelperFunction from "./pageControllerFolder/smallViewHelperFunction";
 import * as UserControllerHelperFunction from "./UserFolder/UserController";
 // import * as WindowController from "./EventFolder/specialWindowObject"
 let openStatus = true;
@@ -46,7 +47,9 @@ export function getImportantDivFromHTML(mainController) {
     fullPageModeDiv.setAttribute("accessPointer", mainController.mainDocArray["mainArray_pageFull"]);
     let overviewModeDiv = document.querySelector(".overviewModeDiv");
     overviewModeDiv.setAttribute("accessPointer", mainController.mainDocArray["mainArray_pageOverview"]);
-    overviewModeDiv.setAttribute("status", "off");
+    let overviewModeDivWrapper = document.querySelector(".overviewModeDivWrapper");
+    overviewModeDivWrapper.setAttribute("status", "off");
+    console.log(overviewModeDivWrapper);
     let [bookmarkSubPanelNavbarTitle, bookmarkSubPanelContent] = pageViewHelperFunction.createSubPanel("bookmark");
     return { pageArrayID, panelContainer, pageContentContainer, fullPageModeDiv, overviewModeDiv, bookmarkSubPanelNavbarTitle, bookmarkSubPanelContent };
 }
@@ -63,33 +66,6 @@ export function buildPageControllerButtonArray(mainController) {
     InitializeAttributeControllerFunction.initializeMainControllerAttributeControllerMapping(mainController);
     Object.values(mainController.attributeControllerMapping).forEach(p => {
         attributePanel.appendChild(p);
-    });
-    let copyButton = editorController.querySelector(".copyButton");
-    let linkButton = editorController.querySelector(".linkButton");
-    let deleteButton = editorController.querySelector(".deleteButton");
-    copyButton.addEventListener("click", function () {
-        let selectedObject = mainController.pageCurrentStatus.selectedObject;
-        let nameOfGNtype = selectedObject._type;
-        let selectedObjectData = selectedObject.extract();
-        selectedObjectData["data"]["cx"] += 100;
-        let copiedObject = mainController.createGNObjectThroughName(nameOfGNtype, { name: "", arrayID: "", insertPosition: false, dataPointer: selectedObject.getAccessPointer(), saveToDatabase: false });
-        copiedObject.loadFromData(selectedObjectData);
-        selectedObject.parentNode.appendChild(copiedObject);
-    });
-    linkButton.addEventListener("click", function () {
-        let selectedObject = mainController.pageCurrentStatus.selectedObject;
-        let nameOfGNtype = selectedObject._type;
-        let selectedObjectData = selectedObject.extract();
-        selectedObjectData["data"]["cx"] += 100;
-        let parentContainerObjectID = selectedObject.parentNode.getAccessPointer();
-        let linkedObject = mainController.createGNObjectThroughName(nameOfGNtype, { name: "", arrayID: parentContainerObjectID, insertPosition: false, dataPointer: selectedObject.getAccessPointer(), saveToDatabase: true });
-        linkedObject.loadFromData(selectedObjectData);
-        selectedObject.parentNode.appendChild(linkedObject);
-    });
-    deleteButton.addEventListener("click", function () {
-        let selectedObject = document.querySelector(".selectedObject");
-        selectedObject.deleteFromDatabase();
-        // selectedObject?.remove()
     });
     let testFieldButton = document.createElement("button");
     testFieldButton.innerText = "testFieldButton";
@@ -183,7 +159,7 @@ export function buildPageControllerButtonArray(mainController) {
     let toolBoxHtmlObject = buildToolBoxHtmlObject(mainController);
     pageControllerSubPanelContent.append(toolBoxHtmlObject, scaleController, editorController);
     let annotationPage = document.querySelector(".annotationPage");
-    return { pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, copyButton, linkButton, deleteButton, showMainDocButton, showAnnotationButton, annotationPage, scaleController };
+    return { pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, showMainDocButton, showAnnotationButton, annotationPage, scaleController };
 } // buildPageControllerButtonArray
 export function buildToolBoxHtmlObject(mainController) {
     let toolBoxHtmlObject = mainController.toolBox.createToolboxHtmlObject();
@@ -195,7 +171,8 @@ export function buildToolBoxHtmlObject(mainController) {
     let moveObjectInDivButton = mainController.toolBox.createMoveObjectInDivButton(toolBoxHtmlObject);
     let addBookmarkButton = mainController.toolBox.createAddBookmarkButton(toolBoxHtmlObject);
     let textToolButton = mainController.toolBox.createTextToolItemButton(toolBoxHtmlObject);
-    toolBoxHtmlObject.append(eraserItemButton, polylineItemButton, selectionToolItemButton, mouseRectangleSelectionToolItemButton, addCommentItemButton, moveObjectInDivButton, addBookmarkButton, textToolButton);
+    let bothLayerSelectionToolItemButton = mainController.toolBox.createBothLayerSelectionToolItemButton(toolBoxHtmlObject);
+    toolBoxHtmlObject.append(eraserItemButton, polylineItemButton, selectionToolItemButton, mouseRectangleSelectionToolItemButton, addCommentItemButton, moveObjectInDivButton, addBookmarkButton, textToolButton, bothLayerSelectionToolItemButton);
     return toolBoxHtmlObject;
 }
 export function buildPageController(mainController, bookmarkSubPanelContent, fullPageModeDiv, overviewModeDiv, pageContentContainer) {
@@ -214,23 +191,27 @@ export function buildPageController(mainController, bookmarkSubPanelContent, ful
         mainController.pageController.updatePageNumber(mainController.pageController.currentPage);
     });
     let switchViewModeButton = pageViewHelperFunction.createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv);
-    let saveButton = document.createElement("button");
-    saveButton.innerHTML = "saveButton";
-    saveButton.addEventListener("click", function () {
-        let saveData = mainController.saveMainDoc(true);
-        socket.emit("saveNotebookUsingClientData", saveData);
-    });
+    //
+    // let saveButton = document.createElement("button")
+    // saveButton.innerHTML = "saveButton"
+    // saveButton.addEventListener("click", function(){
+    //     let saveData = mainController.saveMainDoc(true)
+    //     socket.emit("saveNotebookUsingClientData", saveData)
+    //
+    // })
     let layerControllerHTMLObject = LayerConroller.createLayerController(mainController);
-    bookmarkSubPanelContent.append(createNewDivButton, deletePageButton, switchViewModeButton, layerControllerHTMLObject, saveButton);
+    bookmarkSubPanelContent.append(createNewDivButton, deletePageButton, switchViewModeButton, layerControllerHTMLObject);
 }
 export function buildInitialHTMLSkeleton(mainController) {
     let currentStatus = mainController.pageCurrentStatus;
     let annotationPage = buildAnnotationPage(mainController);
     let [topSubPanel, topSubPanelTabBar, topSubPanelTabContent] = pageViewHelperFunction.subPanelTab("topSubPanel");
+    // usr controller
+    let [userControllerSubPanelNavbarTitle, userpageControllerSubPanelContent, userViewer] = UserControllerHelperFunction.buildUserController(mainController);
+    topSubPanel.addTabAndTabContent(userControllerSubPanelNavbarTitle, userpageControllerSubPanelContent, false);
+    // pageController
     let { pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, copyButton, linkButton, deleteButton, showMainDocButton, showAnnotationButton } = buildPageControllerButtonArray(mainController);
-    let { userControllerSubPanelNavbarTitle, userpageControllerSubPanelContent } = UserControllerHelperFunction.buildUserController(mainController);
     topSubPanel.addTabAndTabContent(pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent);
-    // topSubPanel.addTabAndTabContent(userControllerSubPanelNavbarTitle, userpageControllerSubPanelContent)
     let [middleSubPanel, middleSubPanelTabBar, middleSubPanelTabContent] = pageViewHelperFunction.subPanelTab("middleSubPanel");
     let { pageArrayID, panelContainer, pageContentContainer, fullPageModeDiv, overviewModeDiv, bookmarkSubPanelNavbarTitle, bookmarkSubPanelContent } = getImportantDivFromHTML(mainController);
     let [groupControllerNavbarTitle, groupControllerContent] = GroupController.GroupController(mainController);
@@ -282,7 +263,6 @@ export function buildInitialPage(mainController, saveToDatabase = false) {
             collectionArray = p.array;
         }
     });
-    console.log(345345, pageFullArray, mainController.mainDoc);
     let pageNotRendered = [];
     let targetPageIndex = pageFullArray.length - 1;
     let preloadRange = 2;
@@ -306,31 +286,17 @@ export function buildInitialPage(mainController, saveToDatabase = false) {
         if (pageNotRendered.length > 0) {
             let pageID = pageNotRendered.pop();
             let targetPage = document.querySelector(`*[accessPointer=${pageID}]`);
-            targetPage.setAttribute("loaded", "true");
-            getPageDataFromServer(mainController, pageID);
+            if (targetPage.getAttribute("loaded") != "true") {
+                targetPage.setAttribute("loaded", "true");
+                getPageDataFromServer(mainController, pageID);
+            }
         }
-    }, 1000);
+    }, 10000);
     // pageNotRendered.forEach(p=>getPageDataFromServer(mainController, p))
     let annotationButton = document.querySelector(".showAnnotationButton");
     let switchViewModeButton = document.querySelector(".switchViewModeButton");
-    // switchViewModeButton.click()
-    // let collectionPage = ColllectionControllerHelperFunctions.createCollectionPage()
-    // collectionPage.injecetDataToCollectionPage(groupData)
-    //
-    //  if (pageFullArray.length > 0) mainController.layerController.renderCurrentPageLayer()
-    //
-    //  bookmarkArray.forEach((p:any)=>{
-    //      let bookmarkLinkedObject = GNBookmarkLinkedObject({name: "bookmarkLinkedObject", injectedData: p})
-    //      commentSubPanelContent.append(bookmarkLinkedObject)
-    //  })
-    // TestHelper.testFunction(mainController)
-    // let updateEvent = setInterval(() =>{
-    //   console.log("send changes to server")
-    //   mainController.sendChangeToServer()
-    // }, 4000)
+    SmallViewHelperFunction.createSmallViewPageController(mainController);
 } // buildInitialPage
-export function createSmallView(injectedData) {
-}
 export function getPageDataFromServer(mainController, pageID) {
     let notebookID = mainController.notebookID;
     socket.emit("getPageData", { notebookID, pageID });

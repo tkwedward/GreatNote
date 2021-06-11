@@ -215,6 +215,19 @@ export class MongoBackEnd implements MongoBackEndInterface {
       )
     } // deleteItem
 
+    async microUpdate(collection, databaseMessage){
+      let modifyField = databaseMessage.metaData.modifyField
+      let newData = databaseMessage.metaData.newData
+
+      let updateDescription = {}
+      updateDescription[modifyField] =newData
+      console.log(databaseMessage.metaData.accessPointer, updateDescription)
+      await collection.update({
+        "_identity.accessPointer": databaseMessage.metaData.accessPointer},
+        {"$set": updateDescription}
+      )
+    } // deleteItem
+
     createDatabaseMessage(action: string, htmlObjectData: any){
 
         let parentAccessPointer = htmlObjectData._identity.parentAccessPointer

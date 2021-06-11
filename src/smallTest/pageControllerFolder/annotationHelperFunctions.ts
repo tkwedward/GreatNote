@@ -85,7 +85,92 @@ export function buildAnnotationPage(mainController: MainControllerInterface){
       renderAnnotationPage(allPageAnnotationArray, annotationPageContentWrapper)
   })
 
-  annotationPage.append(checkBoxContainer, getCheckedValueButton, annotationPageContentWrapper)
+
+  let firstRect = document.createElement("div")
+  firstRect.classList.add("firstRect")
+  firstRect.style.width = "200px"
+  firstRect.style.height = "100px"
+  firstRect.style.position = "absolute"
+  firstRect.style.top = "200px"
+  firstRect.style.left = "200px"
+  firstRect.style.background = "green"
+
+
+  let secondRect = document.createElement("div")
+  secondRect.classList.add("secondRect")
+  secondRect.style.width = "200px"
+  secondRect.style.height = "250px"
+  secondRect.style.position = "absolute"
+  secondRect.style.top = "200px"
+  secondRect.style.left = "500px"
+  secondRect.style.background = "red"
+
+
+  function getPointWidthAndHeight(rect: HTMLDivElement){
+      let rectData = rect.getBoundingClientRect()
+      let {x, y, width, height} = rectData
+      let w = width
+      let h = height
+
+      return {x, y, w, h}
+  }
+
+
+
+  function checkPointInsideRect(point: {x: number, y: number}, rectData: {x: number, y: number, w: number, h: number}){
+    return point.x > rectData.x && point.x < rectData.x + rectData.w  && point.y > rectData.y && point.y < rectData.y + rectData.h
+  }
+
+  function checkCornersInside(rect1Data: {x: number, y: number, w: number, h: number}, rect2Data: {x: number, y: number, w: number, h: number}){
+      let c1 = { x: rect1Data.x, y: rect1Data.y}
+      let c2 = { x: rect1Data.x + rect1Data.w, y: rect1Data.y }
+      let c3 = { x: rect1Data.x+ rect1Data.w, y: rect1Data.y + rect1Data.h }
+      let c4 = { x: rect1Data.x, y: rect1Data.y + rect1Data.h  };
+
+
+      return [checkPointInsideRect(c1, rect2Data), checkPointInsideRect(c2, rect2Data), checkPointInsideRect(c3, rect2Data), checkPointInsideRect(c4, rect2Data)]
+  }
+
+  function checkSideInsideRect(rect1Data: {x: number, y: number, w: number, h: number}, rect2Data: {x: number, y: number, w: number, h: number}){
+      let x1_1 = rect1Data.x
+      let x1_2 = rect1Data.x + rect1Data.w
+      let y1_1 = rect1Data.y
+      let y1_2 = rect1Data.y + rect1Data.h
+
+      let x2_1 = rect2Data.x
+      let x2_2 = rect2Data.x + rect2Data.w
+      let y2_1 = rect2Data.y
+      let y2_2 = rect2Data.y + rect2Data.h
+
+      if (x1_1 < x2_1 && x1_2 > x2_2 && y1_1 > y2_1 && y1_2 < y2_2) {
+        return true
+      } else {
+        return false
+      }
+  }
+
+  let result = document.createElement("input")
+  result.style.width = "300px"
+
+  let checkButton = document.createElement("button")
+  checkButton.innerHTML = "checkButton"
+  checkButton.addEventListener("click", e=>{
+    let rect1Data = getPointWidthAndHeight(firstRect)
+    let rect2Data = getPointWidthAndHeight(secondRect)
+
+    let cornerCheck1 = checkCornersInside(rect1Data, rect2Data)
+    let cornerCheck2 = checkCornersInside(rect2Data, rect1Data)
+    let sideCheck1 = checkSideInsideRect(rect1Data, rect2Data)
+    let sideCheck2 = checkSideInsideRect(rect2Data, rect1Data)
+    let resultRect = [cornerCheck1, cornerCheck2, sideCheck1, sideCheck2].flat()
+
+    result.value = `${resultRect.some(p=>p==true)}`
+  })
+
+
+
+
+  annotationPage.append(checkBoxContainer, getCheckedValueButton, annotationPageContentWrapper, checkButton, result, firstRect, secondRect)
 
   // let testBox = document.createElement("div")
   // testBox.style.width = "300px"

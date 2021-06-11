@@ -28,6 +28,20 @@ body {
       margin: 10px;
       background: CornflowerBlue;
   }
+
+  .moveObjectInDivController{
+      min-height: 200px;
+      margin: 10px auto;
+      background: CornflowerBlue;
+
+      .imageContainerAttributeController{
+        text-align: center;
+        label, input { width: 100px; display: inline-block;}
+        img { width: 200px; display: inline-block; margin: 10px auto}
+        button { margin-bottom: 10px; }
+      }
+
+  }
 }
 
 
@@ -135,11 +149,19 @@ select, option {
           .divLayer {
             width: 100%; height: 100%;
             position: absolute; left: 0; right: 0;
+            top: 0;
 
             .GNTextContainer{
               width: 800px;
               min-height: 100px;
               background: lightblue;
+            }
+
+            .textContainer{
+              margin: 10px 10px;
+              padding: 10px;
+              background: lightgrey;
+              border: 2px solid black;
             }
 
             .GNTextContainer[section_annotation="true"]{
@@ -166,22 +188,44 @@ select, option {
 
       } // .divPage
 
-      .overviewModeDiv{
-          position: absolute; top: 0px; left: 0px;
-          display: flex;
-          flex-wrap: wrap;
-          // grid-template-columns: 1fr 1fr 1fr 1fr;
-          // grid-row-gap: 15px;
-          .smallView { background: lightblue; margin: 10px; }
-          .selectedSmallViewHTMLObject {
-            border: 1px red solid
-          }
 
+      .overviewModeDivWrapper{
+        width: 100%;
+        height: 100px;
+        $overViewModePageControllerHeight: 100px;
 
-      }
+        .overViewModePageController {
+            height: $overViewModePageControllerHeight;
+            background: lightyellow;
+            position: fixed;
+            width: 100%;
+            z-index: 2;
+        }
+
+        .overviewModeDiv{
+            position: absolute; left: 0px;
+            display: flex;
+            flex-wrap: wrap;
+            top: $overViewModePageControllerHeight + 20px;
+            // grid-template-columns: 1fr 1fr 1fr 1fr;
+            // grid-row-gap: 15px;
+            .smallView {
+              margin: 10px;
+              .smallViewContent{
+                  background: lightblue;
+                  width: 100%;
+                  height: 100%;
+              }
+            }
+            .selectedSmallViewHTMLObject {
+              border: 1px red solid
+            }
+        } // overviewModeDiv
+      } // overviewModeDivModeButton
+      .overviewModeDivWrapper[status="off"] { display: none; }
 
       .fullPageModeDiv[status="off"] { display: none; }
-      .overviewModeDiv[status="off"] { display: none; }
+
     }
 
     .subPanel {
@@ -240,15 +284,17 @@ select, option {
 
 .bookmarkSubPanel{
     .pageController {
-        display: flex;
+        // display: flex;
         * {text-align: center;}
+        button { width: 50px;}
         // grid-template-columns: 1fr 1fr 1fr;
     }
 
-    .pageNumberInput { width: 50%; margin: 0 10px; }
+
+    .pageNumberInput { width: 30%; margin: 0 10px; }
 
     .functionButton{
-        width: 90%; height: 30px;
+        height: 30px;
         margin: 10px auto; background: grey;
         text-align: center;
     }
@@ -258,7 +304,8 @@ select, option {
     margin: 10px 10px ;
 
     .layerControllerFunction {
-      background: lightblue; height: 50px;
+      background: lightblue;
+      min-height: 50px; padding: 8px;
     }
 
     .layerView{
@@ -328,6 +375,7 @@ select, option {
     }
 }
 
+.testInfo { display: none; }
 
 .bookmarkWrapper {
     .selectedBookmark{

@@ -249,6 +249,12 @@ export class MainController implements MainControllerInterface{
 
           if (changeData.metaData.action=="delete"){
               let _object = <any> document.querySelector(`*[accessPointer='${changeData.metaData.accessPointer}']`)
+
+              if (_object.GNType == "GNPage") {
+                let leftButton = <HTMLButtonElement> document.querySelector(".leftButton")
+                leftButton.click()
+              }
+
               _object?.remove()
           }
     }

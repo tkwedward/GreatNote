@@ -129,6 +129,7 @@ export interface GNPageInterface extends HTMLDivElement, GNObjectInterface {
     _parent?: any
     _identity?: any
     childrenList?: {string:GNObjectInterface}|{}
+    smallViewHTMLObject: HTMLDivElement
     applyStyle(data:any, saveToDatabase?: boolean):void
     loadFromData(data:any):void
     extract(): any

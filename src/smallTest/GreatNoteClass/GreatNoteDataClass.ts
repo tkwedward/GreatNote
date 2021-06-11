@@ -1,6 +1,6 @@
 
 import {GNObjectInterface, GNInputFieldInterface, CreateGreatNoteObjectInterface, GNButtonInterface, GNImageContainerInterface, GNContainerDivInterface, superGNObjectInterface, GNExtractDataInterface} from "./GreatNoteObjectInterface"
-import {superGNObject, createDummyData} from "./GreateNoteObjectHelperFunction"
+import {superGNObject, createDummyData, attachEventListenerToLayer} from "./GreateNoteObjectHelperFunction"
 
 
 

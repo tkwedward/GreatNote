@@ -1,7 +1,14 @@
 import { ClassNameCollection } from "../settings";
 import * as ToolBoxHelperFunction from "./toolBoxHelperFunction";
 let allowedSelectionObject = [ClassNameCollection.commentContainer];
-export function moveObejectInDivMouseDownFunction(e, mainController, divLayer, moveEventName, upEventName, divSelctionObjectStatus) {
+export function moveObejectInDivMouseDownFunction(e, mainController, divLayer, moveEventName, upEventName) {
+    console.log(888888, e.target, divLayer, moveEventName, upEventName);
+    if (e.target.tagName == "IMG" && e.target.parentElement.GNType == "GNImageContainer") {
+        let imageContainerAttributeController = document.querySelector(".imageContainerAttributeController");
+        imageContainerAttributeController.targetImageContainer = e.target.parentElement;
+        imageContainerAttributeController.renderImage();
+        console.log(121212, imageContainerAttributeController);
+    }
     // let originalObjectPosition: any, _
     // let clickedPosition = {x: 0, y:0}
     //
@@ -40,7 +47,7 @@ export function moveObejectInDivMouseDownFunction(e, mainController, divLayer, m
     // divLayer.addEventListener(moveEventName, _moveEventFunction)
     // divLayer.addEventListener(upEventName, _upEventFunction)
 }
-function moveEventFunction(e, divSelctionObjectStatus, originalObjectPosition, clickedPosition) {
+export function moveEventFunction(e, divSelctionObjectStatus, originalObjectPosition, clickedPosition) {
     let newPosition;
     let deltaX, deltaY;
     let [offsetX, offsetY, _] = ToolBoxHelperFunction.getPageXY(e);
@@ -50,6 +57,7 @@ function moveEventFunction(e, divSelctionObjectStatus, originalObjectPosition, c
         x: originalObjectPosition.x + deltaX + "px",
         y: originalObjectPosition.y + deltaY + "px"
     };
+    console.log(52525252);
     divSelctionObjectStatus.selectedObject.style.left = newPosition.x;
     divSelctionObjectStatus.selectedObject.style.top = newPosition.y;
 }

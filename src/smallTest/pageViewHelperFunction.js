@@ -90,20 +90,21 @@ export function createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv) {
     switchViewModeButton.classList.add("switchViewModeButton");
     switchViewModeButton.innerText = "pageMode";
     switchViewModeButton.setAttribute("mode", "pageMode");
+    let overviewModeDivWrapper = document.querySelector(".overviewModeDivWrapper");
     switchViewModeButton.addEventListener("click", function (e) {
         let mode = (switchViewModeButton.getAttribute("mode") == "overviewMode") ? "pageMode" : "overviewMode";
         switchViewModeButton.setAttribute("mode", mode);
         switchViewModeButton.innerText = mode;
         if (mode == "overviewMode") {
             fullPageModeDiv.setAttribute("status", "off");
-            overviewModeDiv.setAttribute("status", "on");
-            // pageViewHelperFunction.renderOverviewMode()
+            overviewModeDivWrapper.setAttribute("status", "on");
         }
         else {
             fullPageModeDiv.setAttribute("status", "on");
-            overviewModeDiv.setAttribute("status", "off");
-            // pageViewHelperFunction.renderFullPageMode()
+            overviewModeDivWrapper.setAttribute("status", "off");
         }
+        let smallViewHTMLObjectArray = Array.from(overviewModeDivWrapper.querySelectorAll(".smallView"));
+        // html2canvas(smallViewHTMLObjectArray[0].fullPageHTMLObject).then(p=>smallViewHTMLObjectArray[0].append(p))
     });
     return switchViewModeButton;
 }
@@ -151,6 +152,7 @@ export function createNewPageEvent(currentStatus, fullPageModeDiv, pageDummyCont
         let saveToDatabase = true;
         let newPage = createNewPage(currentStatus, fullPageModeDiv, false, saveToDatabase, insertPosition);
         insertNewPage(currentStatus, newPage, fullPageModeDiv);
+        // the functinos are defined at layerController
         let addDivLayereButton = document.querySelector(".addDivLayerButton");
         let addSvgLayerButton = document.querySelector(".addSvgLayerButton");
         addDivLayereButton.click();

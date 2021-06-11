@@ -30,6 +30,7 @@ import * as ColllectionControllerHelperFunctions from "./collectionControllerFol
 import * as SwipeEventController from "./EventFolder/swipeEvent"
 import * as ToolBoxModel from "./ToolBoxModel"
 import * as TestHelper from "./testFolder/testHelperFunction"
+import * as SmallViewHelperFunction from "./pageControllerFolder/smallViewHelperFunction"
 import * as UserControllerHelperFunction from "./UserFolder/UserController"
 // import * as WindowController from "./EventFolder/specialWindowObject"
 let openStatus = true
@@ -65,7 +66,10 @@ export function getImportantDivFromHTML(mainController: MainControllerInterface)
 
   let overviewModeDiv = <HTMLDivElement> document.querySelector(".overviewModeDiv")
   overviewModeDiv.setAttribute("accessPointer", mainController.mainDocArray["mainArray_pageOverview"])
-  overviewModeDiv.setAttribute("status", "off")
+
+  let overviewModeDivWrapper = <HTMLDivElement> document.querySelector(".overviewModeDivWrapper")
+  overviewModeDivWrapper.setAttribute("status", "off")
+  console.log(overviewModeDivWrapper)
 
   let [bookmarkSubPanelNavbarTitle, bookmarkSubPanelContent] = pageViewHelperFunction.createSubPanel("bookmark")
 
@@ -89,43 +93,6 @@ export function buildPageControllerButtonArray(mainController:MainControllerInte
       attributePanel.appendChild(<HTMLDivElement>p)
   })
 
-  let copyButton = editorController.querySelector(".copyButton")
-  let linkButton = editorController.querySelector(".linkButton")
-  let deleteButton = editorController.querySelector(".deleteButton")
-
-  copyButton.addEventListener("click", function(){
-      let selectedObject = mainController.pageCurrentStatus.selectedObject
-      let nameOfGNtype = selectedObject._type
-      let selectedObjectData = selectedObject.extract()
-      selectedObjectData["data"]["cx"] += 100
-
-      let copiedObject =  mainController.createGNObjectThroughName(nameOfGNtype,
-      {name: "", arrayID: "", insertPosition: false, dataPointer: selectedObject.getAccessPointer(), saveToDatabase: false})
-      copiedObject.loadFromData(selectedObjectData)
-      selectedObject.parentNode.appendChild(copiedObject)
-  })
-
-  linkButton.addEventListener("click", function(){
-      let selectedObject = mainController.pageCurrentStatus.selectedObject
-      let nameOfGNtype = selectedObject._type
-      let selectedObjectData = selectedObject.extract()
-      selectedObjectData["data"]["cx"] += 100
-
-      let parentContainerObjectID = selectedObject.parentNode.getAccessPointer()
-
-
-      let linkedObject = mainController.createGNObjectThroughName(nameOfGNtype, {name: "", arrayID: parentContainerObjectID, insertPosition: false, dataPointer: selectedObject.getAccessPointer(), saveToDatabase: true})
-      linkedObject.loadFromData(selectedObjectData)
-
-      selectedObject.parentNode.appendChild(linkedObject)
-  })
-
-  deleteButton.addEventListener("click", function(){
-      let selectedObject = <any> document.querySelector(".selectedObject")
-
-      selectedObject.deleteFromDatabase()
-      // selectedObject?.remove()
-  })
 
   let testFieldButton = document.createElement("button")
   testFieldButton.innerText = "testFieldButton"
@@ -241,7 +208,7 @@ export function buildPageControllerButtonArray(mainController:MainControllerInte
 
   let annotationPage = document.querySelector(".annotationPage")
 
-  return {pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, copyButton, linkButton, deleteButton,  showMainDocButton, showAnnotationButton, annotationPage, scaleController}
+  return {pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, showMainDocButton, showAnnotationButton, annotationPage, scaleController}
 } // buildPageControllerButtonArray
 
 
@@ -258,14 +225,15 @@ export function buildToolBoxHtmlObject(mainController: any){
   let moveObjectInDivButton = mainController.toolBox.createMoveObjectInDivButton(toolBoxHtmlObject)
   let addBookmarkButton = mainController.toolBox.createAddBookmarkButton(toolBoxHtmlObject)
   let textToolButton = mainController.toolBox.createTextToolItemButton(toolBoxHtmlObject)
+  let bothLayerSelectionToolItemButton = mainController.toolBox.createBothLayerSelectionToolItemButton(toolBoxHtmlObject)
 
 
-  toolBoxHtmlObject.append(eraserItemButton, polylineItemButton, selectionToolItemButton, mouseRectangleSelectionToolItemButton, addCommentItemButton, moveObjectInDivButton, addBookmarkButton, textToolButton)
+  toolBoxHtmlObject.append(eraserItemButton, polylineItemButton, selectionToolItemButton, mouseRectangleSelectionToolItemButton, addCommentItemButton, moveObjectInDivButton, addBookmarkButton, textToolButton, bothLayerSelectionToolItemButton)
 
   return toolBoxHtmlObject
 }
 
-export function buildPageController(mainController, bookmarkSubPanelContent, fullPageModeDiv, overviewModeDiv, pageContentContainer){
+export function buildPageController(mainController: MainControllerInterface, bookmarkSubPanelContent: HTMLDivElement, fullPageModeDiv: HTMLDivElement, overviewModeDiv: HTMLDivElement, pageContentContainer: HTMLDivElement){
 
   // page controller
   // To create a page Controller to navigate previous and nex page
@@ -287,19 +255,19 @@ export function buildPageController(mainController, bookmarkSubPanelContent, ful
   })
 
   let switchViewModeButton = pageViewHelperFunction.createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv)
-
-  let saveButton = document.createElement("button")
-  saveButton.innerHTML = "saveButton"
-  saveButton.addEventListener("click", function(){
-      let saveData = mainController.saveMainDoc(true)
-      socket.emit("saveNotebookUsingClientData", saveData)
-
-  })
+  //
+  // let saveButton = document.createElement("button")
+  // saveButton.innerHTML = "saveButton"
+  // saveButton.addEventListener("click", function(){
+  //     let saveData = mainController.saveMainDoc(true)
+  //     socket.emit("saveNotebookUsingClientData", saveData)
+  //
+  // })
 
 
   let layerControllerHTMLObject =  LayerConroller.createLayerController(mainController)
 
-  bookmarkSubPanelContent.append( createNewDivButton,deletePageButton, switchViewModeButton, layerControllerHTMLObject, saveButton)
+  bookmarkSubPanelContent.append( createNewDivButton,deletePageButton, switchViewModeButton, layerControllerHTMLObject)
 }
 
 
@@ -312,12 +280,13 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
 
 
       let [topSubPanel, topSubPanelTabBar, topSubPanelTabContent] = pageViewHelperFunction.subPanelTab("topSubPanel")
+      // usr controller
+      let [userControllerSubPanelNavbarTitle, userpageControllerSubPanelContent, userViewer] = UserControllerHelperFunction.buildUserController(mainController)
+      topSubPanel.addTabAndTabContent(userControllerSubPanelNavbarTitle, userpageControllerSubPanelContent, false)
+
+      // pageController
       let {pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, copyButton, linkButton, deleteButton, showMainDocButton, showAnnotationButton} =  buildPageControllerButtonArray(mainController)
-
-      let { userControllerSubPanelNavbarTitle, userpageControllerSubPanelContent } = UserControllerHelperFunction.buildUserController(mainController)
-
       topSubPanel.addTabAndTabContent(pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent)
-      // topSubPanel.addTabAndTabContent(userControllerSubPanelNavbarTitle, userpageControllerSubPanelContent)
 
 
       let [middleSubPanel, middleSubPanelTabBar, middleSubPanelTabContent] = pageViewHelperFunction.subPanelTab("middleSubPanel")
@@ -362,9 +331,6 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
 
 
 export function buildInitialPage(mainController:MainControllerInterface, saveToDatabase=false){
-
-
-
     let fullPageModeDiv = <HTMLDivElement> document.querySelector(".fullPageModeDiv")
     let overviewModeDiv = <HTMLDivElement> document.querySelector(".overviewModeDiv")
     let commentSubPanelContent = <HTMLDivElement> document.querySelector(".commentSubPanel")
@@ -396,7 +362,6 @@ export function buildInitialPage(mainController:MainControllerInterface, saveToD
         }
     })
 
-    console.log(345345, pageFullArray, mainController.mainDoc)
     let pageNotRendered:string[] = [];
     let targetPageIndex = pageFullArray.length-1
     let preloadRange = 2
@@ -424,10 +389,13 @@ export function buildInitialPage(mainController:MainControllerInterface, saveToD
         if (pageNotRendered.length > 0){
           let pageID = <string >pageNotRendered.pop()
           let targetPage = <HTMLDivElement> document.querySelector(`*[accessPointer=${pageID}]`)
-          targetPage.setAttribute("loaded", "true")
-          getPageDataFromServer(mainController, pageID)
+
+          if (targetPage.getAttribute("loaded")!="true") {
+            targetPage.setAttribute("loaded", "true")
+            getPageDataFromServer(mainController, pageID)
+          }
         }
-    }, 1000)
+    }, 10000)
 
     // pageNotRendered.forEach(p=>getPageDataFromServer(mainController, p))
 
@@ -435,31 +403,10 @@ export function buildInitialPage(mainController:MainControllerInterface, saveToD
 
 
     let switchViewModeButton = <HTMLButtonElement> document.querySelector(".switchViewModeButton")
-    // switchViewModeButton.click()
 
-    // let collectionPage = ColllectionControllerHelperFunctions.createCollectionPage()
-    // collectionPage.injecetDataToCollectionPage(groupData)
-    //
-    //  if (pageFullArray.length > 0) mainController.layerController.renderCurrentPageLayer()
-    //
-    //  bookmarkArray.forEach((p:any)=>{
-    //      let bookmarkLinkedObject = GNBookmarkLinkedObject({name: "bookmarkLinkedObject", injectedData: p})
-    //      commentSubPanelContent.append(bookmarkLinkedObject)
-    //  })
-
-     // TestHelper.testFunction(mainController)
-
-     // let updateEvent = setInterval(() =>{
-     //   console.log("send changes to server")
-     //   mainController.sendChangeToServer()
-     // }, 4000)
+     SmallViewHelperFunction.createSmallViewPageController(mainController)
 
 }// buildInitialPage
-
-export function createSmallView(injectedData: any){
-
-}
-
 
 export function getPageDataFromServer(mainController: MainControllerInterface, pageID: string){
   let notebookID = mainController.notebookID

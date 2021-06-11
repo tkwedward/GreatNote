@@ -66,7 +66,7 @@ export function renderDataToHTML(mainController: MainControllerInterface, data:c
             newHTMLObject._identity = p._identity
 
             newHTMLObject.loadFromData(p)
-            newHTMLObject.setImageSize({width:500})
+            // newHTMLObject.setImageSize({width:500})
             newHTMLObject.setMovable()
         }
 

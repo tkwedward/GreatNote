@@ -190,6 +190,10 @@ export class MainController {
         } // update
         if (changeData.metaData.action == "delete") {
             let _object = document.querySelector(`*[accessPointer='${changeData.metaData.accessPointer}']`);
+            if (_object.GNType == "GNPage") {
+                let leftButton = document.querySelector(".leftButton");
+                leftButton.click();
+            }
             _object === null || _object === void 0 ? void 0 : _object.remove();
         }
     }

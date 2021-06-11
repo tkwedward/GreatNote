@@ -2,7 +2,6 @@ import { superGNObject, createDummyData, setObjectMovable } from "./GreateNoteOb
 export function createSelectionObject(className, valueList) {
     let selectObject = document.createElement("select");
     selectObject.classList.add(className);
-    // selectObject.draggable = false
     valueList.forEach(p => {
         let option = document.createElement("option");
         option.value = p;
@@ -12,6 +11,28 @@ export function createSelectionObject(className, valueList) {
     });
     return selectObject;
 }
+export function inputFunction(_object, item) {
+    return function itemInputFunction(e) {
+        setTimeout(function () {
+            _object.saveHTMLObjectToDatabase();
+            item.addEventListener("input", itemInputFunction);
+        }, 3000);
+        item.removeEventListener("input", itemInputFunction);
+    };
+}
+export function createTextBox(_object, uniqueID) {
+    let textBox = document.createElement("div");
+    if (!uniqueID) {
+        uniqueID = `${Date.now().toString(36) + Math.random().toString(36).substr(2)}`;
+    }
+    textBox.setAttribute("textBoxID", uniqueID);
+    textBox.innerHTML = "TextContainerTextContainer";
+    textBox.classList.add("textContainer");
+    textBox.contentEditable = "true";
+    textBox.draggable = false;
+    textBox.addEventListener("input", inputFunction(_object, textBox));
+    return textBox;
+}
 export function createTextContainerHTMLObject() {
     let _object = document.createElement("div");
     _object.classList.add("GNTextContainer");
@@ -19,24 +40,17 @@ export function createTextContainerHTMLObject() {
         e.stopPropagation();
         console.log("from textContainer");
     });
-    _object.style.width = "800px";
+    _object.style.width = "500px";
     _object.style.minHeight = "50px";
     _object.style.background = "lightblue";
     let title = document.createElement("input");
-    let textContainer = document.createElement("div");
-    textContainer.innerHTML = "TextContainerTextContainer";
-    textContainer.contentEditable = "true";
-    let inputFunction = function (item) {
-        return function itemInputFunction(e) {
-            setTimeout(function () {
-                _object.saveHTMLObjectToDatabase();
-                item.addEventListener("input", itemInputFunction);
-            }, 3000);
-            item.removeEventListener("input", itemInputFunction);
-        };
-    };
-    textContainer.addEventListener("input", inputFunction(textContainer));
-    title.addEventListener("input", inputFunction(title));
+    title.addEventListener("input", inputFunction(_object, title));
+    let addTextBoxButton = document.createElement("button");
+    addTextBoxButton.innerText = "addTextBox";
+    addTextBoxButton.addEventListener("click", e => {
+        let _textContainer = createTextBox(_object);
+        _object.append(_textContainer);
+    });
     let textTypeSelection = createSelectionObject("textTypeSelect", ["normal", "comment", "question", "solution", "section", "equation"]);
     let deleteButton = document.createElement("button");
     deleteButton.classList.add("textTypeDeleteButton");
@@ -54,23 +68,28 @@ export function createTextContainerHTMLObject() {
         })[0];
         annotationObject.annotationType = textTypeSelection.value;
     });
-    _object.append(textTypeSelection, title, deleteButton, textContainer);
+    _object.append(textTypeSelection, title, deleteButton, addTextBoxButton);
     setObjectMovable(_object);
-    return [_object, textContainer, title, textTypeSelection];
+    return [_object, title, textTypeSelection];
 }
 export function GNTextContainer(createData) {
     let { name, arrayID, insertPosition, dataPointer, saveToDatabase, specialCreationMessage, injectedData, _classNameList } = createData;
-    let [_object, textContainer, title, textTypeSelection] = createTextContainerHTMLObject();
+    let [_object, title, textTypeSelection] = createTextContainerHTMLObject();
+    if (!injectedData) {
+        let textContainer = createTextBox(_object);
+        _object.append(textContainer);
+    }
     _object.childrenList = {};
     _object.GNType = "GNTextContainer";
     _object.GNSpecialCreationMessage = specialCreationMessage || "";
     _object._dataStructure = ["innerHTML"];
     _object._styleStructure = ["background", "width", "height", "position", "left", "top"];
     _object._classNameList = _classNameList || [];
-    _classNameList === null || _classNameList === void 0 ? void 0 : _classNameList.forEach(p => {
-        _object.classList.add(p);
-    });
-    _object.loadFromData = (injectedData, saveToDatabase) => {
+    _classNameList === null || _classNameList === void 0 ? void 0 : _classNameList.forEach(p => _object.classList.add(p));
+    _object.loadFromData = (injectedData, saveToDatabase = false) => {
+        var _a;
+        if (saveToDatabase)
+            debugger;
         _object.GNSpecialCreationMessage = injectedData.GNSpecialCreationMessage;
         _object.specialGNType = injectedData.specialGNType;
         if (injectedData._classNameList)
@@ -79,9 +98,16 @@ export function GNTextContainer(createData) {
         _object.setAttribute("accessPointer", injectedData._identity.accessPointer);
         _object.applyStyle(injectedData.stylesheet, saveToDatabase);
         title.value = injectedData["data"]["title"];
-        textContainer.innerHTML = injectedData["data"]["textContainer"];
         textTypeSelection.value = injectedData["data"]["textTypeSelection"];
         textTypeSelection;
+        (_a = injectedData["data"]["textContainerArray"]) === null || _a === void 0 ? void 0 : _a.forEach((p) => {
+            let textContainer = _object.querySelector(`div[textBoxID='${p.uniqueID}']`);
+            if (!textContainer) {
+                textContainer = createTextBox(_object, p.uniqueID);
+                _object.append(textContainer);
+            }
+            textContainer.innerHTML = p.textContent;
+        });
     };
     _object.extract = () => _object.createDataObject();
     _object.setMovable = () => setObjectMovable(_object);
@@ -101,13 +127,18 @@ export function GNTextContainer(createData) {
             dataObject["_identity"] = _object._identity;
         dataObject["_classNameList"] = Array.from(_object.classList);
         // data structure
-        dataObject["data"]["textContainer"] = textContainer.innerHTML;
         dataObject["data"]["title"] = title.value;
         dataObject["data"]["textTypeSelection"] = textTypeSelection.value;
+        let textContainerArray = Array.from(_object.querySelectorAll(".textContainer"));
+        dataObject["data"]["textContainerArray"] = textContainerArray.map((p) => ({
+            uniqueID: p.getAttribute("textBoxID"),
+            textContent: p.innerHTML
+        }));
         // stylesheet data
         (_a = _object === null || _object === void 0 ? void 0 : _object._styleStructure) === null || _a === void 0 ? void 0 : _a.forEach((p) => {
             dataObject["stylesheet"][p] = _object.style[p];
         });
+        // console.log(dataObject)
         return dataObject;
     };
     _object.getAnnotationType = function () {
@@ -117,6 +148,7 @@ export function GNTextContainer(createData) {
         Object.entries(styleObject).forEach(([key, value], _) => {
             _object["style"][key] = value;
         });
+        // throw "unknown exception"
         if (saveToDatabase)
             _object.saveHTMLObjectToDatabase();
     };

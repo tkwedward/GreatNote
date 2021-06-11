@@ -39,9 +39,11 @@
       <div class="layerController">
           <div class="layerView"></div>
           <div class="layerControllerFunction">
-              <button class="addDivLayerButton" type="button" name="button">addDivLayer</button>
-              <button class="addSvgLayerButton" type="button" name="button">addSvgLayer</button>
-              <button class="showCurrentPageButton" type="button" name="button">showCurrentPage</button>
+              <button class="addDivLayerButton"> addDiv </button>
+              <button class="addSvgLayerButton"> addSvg </button>
+              <button class="showCurrentPageButton"> showLayers</button>
+              <button class="moveUpButton"> moveUp </button>
+              <button class="moveDownButton"> moveDown </button>
           </div>
       </div>
     </template>
@@ -55,7 +57,10 @@
         </div>
           <div class="pageContentContainer">
             <div class="fullPageModeDiv"></div>
-            <div class="overviewModeDiv"></div>
+            <div class="overviewModeDivWrapper">
+                <div class="overViewModePageController"></div>
+                <div class="overviewModeDiv"></div>
+            </div>
         </div>
     </div>
 

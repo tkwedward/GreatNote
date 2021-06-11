@@ -5,6 +5,7 @@ import { polylineMouseDownFunction } from "./ToolboxFolder/ToolboxEventFunction"
 import * as EraserFunction from "./ToolboxFolder/eraserFunction"
 
 let iconName = {
+    bothLayerSelectionTool: "/graphics/toolBox/bothLayerSelectionTool.png",
     rectangleSelectionTool: "/graphics/toolBox/rectangleSelection.png",
     penSelectionTool: "/graphics/toolBox/penSelection.png",
     eraserTool: "/graphics/toolBox/eraserTool.png",
@@ -62,6 +63,7 @@ interface ToolBoxItemStatusInterface {
     moveObjectInDivButton: {status: boolean, attributeController: string}
     addBookmarkButton: {status: boolean, attributeController: string}
     textToolItemButton: {status: boolean, attributeController: string}
+    bothLayerSelectionToolItemButton: {status: boolean, attributeController: string}
 }
 
 
@@ -108,6 +110,10 @@ export class ToolBoxClass implements ToolBoxInterface {
         textToolItemButton: {
             status: false,
             attributeController: "textToolController"
+        },
+        bothLayerSelectionToolItemButton: {
+            status: false,
+            attributeController: "bothLayerSelectionToolController"
         }
     }
 
@@ -119,23 +125,24 @@ export class ToolBoxClass implements ToolBoxInterface {
     switchToolBoxItemStatus(itemName:string){
       // turn off the attributeController and status of the buttom thaat is active
       let currentActiveButton = this.toolBoxItemStatus.currentActiveButton
-        if (currentActiveButton){
-            // switch off the current status
-            this.toolBoxItemStatus[currentActiveButton]["status"] = !this.toolBoxItemStatus[currentActiveButton]["status"]
-            // console.log(949494, currentActiveButton)
 
-            // turn off attributeControllerWant
-            let attributeControllerWantToTurnedOff = getAttributeController(this.toolBoxItemStatus, currentActiveButton)
-            if (attributeControllerWantToTurnedOff) attributeControllerWantToTurnedOff["style"].display = "none"
-        }
+      if (currentActiveButton){
+          // switch off the current status
+          this.toolBoxItemStatus[currentActiveButton]["status"] = !this.toolBoxItemStatus[currentActiveButton]["status"]
+          // console.log(949494, currentActiveButton)
 
-        this.toolBoxItemStatus.currentActiveButton = itemName
-        this.toolBoxItemStatus[itemName]["status"] = !this.toolBoxItemStatus[itemName]["status"]
+          // turn off attributeControllerWant
+          let attributeControllerWantToTurnedOff = getAttributeController(this.toolBoxItemStatus, currentActiveButton)
+          if (attributeControllerWantToTurnedOff) attributeControllerWantToTurnedOff["style"].display = "none"
+      }
 
-        // turn on attributeControllerWantToturn on
-        let attributeControllerWantToTurnedOn =  getAttributeController(this.toolBoxItemStatus, itemName)
-        console.log(attributeControllerWantToTurnedOn)
-        if (attributeControllerWantToTurnedOn) attributeControllerWantToTurnedOn["style"].display = "block"
+      this.toolBoxItemStatus.currentActiveButton = itemName
+      this.toolBoxItemStatus[itemName]["status"] = !this.toolBoxItemStatus[itemName]["status"]
+
+      // turn on attributeControllerWantToturn on
+      let attributeControllerWantToTurnedOn =  getAttributeController(this.toolBoxItemStatus, itemName)
+      console.log(attributeControllerWantToTurnedOn)
+      if (attributeControllerWantToTurnedOn) attributeControllerWantToTurnedOn["style"].display = "block"
     }
 
     createToolboxHtmlObject(){
@@ -228,6 +235,17 @@ export class ToolBoxClass implements ToolBoxInterface {
         toolBoxItem.deactivate = function(){
           changeSvgEventPointer("divLayer", "auto")
         }
+
+        return toolBoxItem
+    }
+
+    createBothLayerSelectionToolItemButton(toolBoxHtmlObject:any){
+        let toolBoxItem = this.createToolBoxItem("BothLayerSelectionTool", toolBoxHtmlObject, iconName.bothLayerSelectionTool)
+
+        toolBoxItem.addEventListener("click", (e)=>{
+            console.log("Selection Tool item button is activated")
+            this.activateButtonFunction(toolBoxItem, "bothLayerSelectionToolItemButton")
+        })
 
         return toolBoxItem
     }

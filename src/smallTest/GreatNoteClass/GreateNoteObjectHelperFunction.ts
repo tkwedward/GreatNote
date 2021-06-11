@@ -158,18 +158,28 @@ export function superGNObject(_object:any, saveToDatabase?:boolean, arrayID?:str
 
 import {MainControllerInterface} from "../mainControllerFolder/mainControllerInterface"
 
-function attachEventListenerToLayer(mainController:MainControllerInterface, arrayID?:string, _object?: any, injectedData?:any){
-    if (_object.classList.contains("svgLayer")){
+export function attachEventListenerToLayer(mainController:MainControllerInterface, arrayID?:string, _object?: any, injectedData?:any){
+    let alreadyAttach = _object.getAttribute("eventAttached")
+    if (alreadyAttach == "true") return
 
+    if (_object.classList.contains("svgLayer") || injectedData?._classNameList?.includes("svgLayer")){
         ToolBoxEvents.attachEventListenerToSvgBoard(mainController, _object)
         _object.classList.add("attachedEventSvgLayer")
+        _object.setAttribute("eventAttached", "true")
+    } else {
+      _object.classList.add("notSvgLayer")
     }
 
-    // console.log(1671671767, _object, _object._classNameList)
-    if (_object.classList.contains("divLayer")){
-
+    if (_object.classList.contains("divPage") || _object.classList.contains("divLayer") || injectedData?._classNameList?.includes("divLayer")){
         ToolBoxEvents.attachEventListenerToDivLayer(mainController, _object)
+        _object.setAttribute("eventAttached", "true")
+    } else {
+        _object.classList.add("notDivLayer")
     }
+
+
+    _object.setAttribute("passedAtachEventListenerToLayer", "true")
+
 }
 
 
@@ -182,7 +192,7 @@ export function setObjectMovable(_object:any){
 
     _object.addEventListener("mousedown", (e:any)=>{
         // console.log(e)
-       e.stopPropagation()
+       // e.stopPropagation()
        let [startX, startY] = [e["screenX"], e["screenY"]]
        let objectInitialX =  0
        let objectInitialY =  0
@@ -213,12 +223,17 @@ export function setObjectMovable(_object:any){
        let mouseUpEvent = (e:any)=>{
           e.stopPropagation()
            endDragEvent(e)
-           if (e.type == "mouseup"){
-              _object.saveHTMLObjectToDatabase()
-           }
 
            _object.removeEventListener("mouseup", mouseUpEvent)
            _object.removeEventListener("mouseout", mouseUpEvent)
+
+          console.log(220, "deltaX and deltaY", deltaX, deltaY)
+
+           if (deltaX==0 && deltaY == 0) return
+
+           if (e.type == "mouseup"){
+              _object.saveHTMLObjectToDatabase()
+           }
        }
 
        _object.addEventListener("mousemove", mousemoveFunction, false)
