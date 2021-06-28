@@ -4,7 +4,6 @@ export function GNPage(createData) {
     let { name, arrayID, insertPosition, dataPointer, saveToDatabase, specialCreationMessage, injectedData, contentEditable, _classNameList } = createData;
     let _object = document.createElement("div");
     _object.childrenList = {};
-    console.log(111111, createData);
     _object.GNType = "GNPage";
     _object.GNSpecialCreationMessage = specialCreationMessage || "";
     _object._dataStructure = [];

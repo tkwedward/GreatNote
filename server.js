@@ -56,6 +56,7 @@ app.get("/board", function (req, res) {
     res.sendFile(__dirname + "/public/board.html");
 });
 var turnOnServerMode = true;
+var changeListArray = [];
 // turnOnServerMode = false
 // socketArray = []
 var jsonFileLocation = path.join(__dirname, "./dist/data/automergeData.txt");
@@ -75,7 +76,6 @@ io.on("connection", function (socket) {
                 case 0: return [4 /*yield*/, automergeMainDoc.mongoDB.getOverallNotebookData()];
                 case 1:
                     overallNotebookInfo = _a.sent();
-                    console.log(overallNotebookInfo);
                     socket.emit("serverResponsesForOverallNoteBookInfo", overallNotebookInfo);
                     return [2 /*return*/];
             }
@@ -106,6 +106,7 @@ io.on("connection", function (socket) {
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
+                    changeList.forEach(function (p) { return changeListArray.push(p); });
                     notebooID = changeList[0].metaData.notebookID;
                     _b.label = 1;
                 case 1:
@@ -138,6 +139,9 @@ io.on("connection", function (socket) {
             }
         });
     }); });
+    // let processChangeList = setInterval(()=>{
+    //
+    // } , 500)
     // operaation on notebook
     socket.on("createNewNotebook", function (notebookInfo) {
         console.log("=====================");

@@ -48,7 +48,8 @@ export function attachEventListenerToSvgBoard(mainController: MainControllerInte
       }
     }
 
-    let eventArray = [polylineMouseDown, eraserMouseDownFunction, selectionToolMouseDownFunction, rectangleSelectionToolMouseDownFunction]
+    let eventArray = [polylineMouseDown, eraserMouseDownFunction, selectionToolMouseDownFunction]
+    // let eventArray = [polylineMouseDown, eraserMouseDownFunction, selectionToolMouseDownFunction, rectangleSelectionToolMouseDownFunction]
 
     eventArray.forEach(toolboxEvent=>{
         toolboxEvent.eventNameList.forEach(eventName=>{

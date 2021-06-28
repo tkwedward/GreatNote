@@ -54,7 +54,13 @@ export function superGNObject(_object:any, saveToDatabase?:boolean, arrayID?:str
     }
 
     _object.saveHTMLObjectToDatabase = function(){
+        let latestUpdateTime =  `${new Date()}`
+        _object.setAttribute("latestUpdateTime", latestUpdateTime)
+
         mainController.saveHTMLObjectToDatabase(_object)
+        window.markedObject = _object
+        let pageHtmlObject = mainController.tracePageFromElement(_object)
+        pageHtmlObject.setAttribute("latestUpdateTime",latestUpdateTime)
     }
 
     /** to apply stylesheet to an element */
@@ -160,21 +166,18 @@ import {MainControllerInterface} from "../mainControllerFolder/mainControllerInt
 
 export function attachEventListenerToLayer(mainController:MainControllerInterface, arrayID?:string, _object?: any, injectedData?:any){
     let alreadyAttach = _object.getAttribute("eventAttached")
-    if (alreadyAttach == "true") return
+    if (alreadyAttach == "true") return;
+    if (_object.classList.contains("divPage")) return;
 
-    if (_object.classList.contains("svgLayer") || injectedData?._classNameList?.includes("svgLayer")){
+    if ((_object.classList.contains("svgLayer") || injectedData?._classNameList?.includes("svgLayer")) && _object.getAttribute("eventAttached")!="true"){
         ToolBoxEvents.attachEventListenerToSvgBoard(mainController, _object)
         _object.classList.add("attachedEventSvgLayer")
         _object.setAttribute("eventAttached", "true")
-    } else {
-      _object.classList.add("notSvgLayer")
     }
 
-    if (_object.classList.contains("divPage") || _object.classList.contains("divLayer") || injectedData?._classNameList?.includes("divLayer")){
+    if ((_object.classList.contains("divLayer") || injectedData?._classNameList?.includes("divLayer")) && _object.getAttribute("eventAttached")!="true"){
         ToolBoxEvents.attachEventListenerToDivLayer(mainController, _object)
         _object.setAttribute("eventAttached", "true")
-    } else {
-        _object.classList.add("notDivLayer")
     }
 
 
@@ -182,6 +185,8 @@ export function attachEventListenerToLayer(mainController:MainControllerInterfac
 
 }
 
+// f = document.querySelectorAll(".currentPage>polyline")
+// Array.from(f).forEach(p=>p.deleteFromDatabase())
 
 export function setObjectMovable(_object:any){
     let eventName = "mousedown"
@@ -191,7 +196,6 @@ export function setObjectMovable(_object:any){
     _object.style.position = "absolute"
 
     _object.addEventListener("mousedown", (e:any)=>{
-        // console.log(e)
        // e.stopPropagation()
        let [startX, startY] = [e["screenX"], e["screenY"]]
        let objectInitialX =  0
@@ -226,8 +230,6 @@ export function setObjectMovable(_object:any){
 
            _object.removeEventListener("mouseup", mouseUpEvent)
            _object.removeEventListener("mouseout", mouseUpEvent)
-
-          console.log(220, "deltaX and deltaY", deltaX, deltaY)
 
            if (deltaX==0 && deltaY == 0) return
 

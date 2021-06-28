@@ -94,19 +94,34 @@ export class MainController implements MainControllerInterface{
     /** when ever the htmlObject is updated, we fetch newData from thfe HTMLObjectt, and then go to the database and update the relevant data*/
     saveHTMLObjectToDatabase(htmlObject:any){
         let newData = htmlObject.extract()
+        let latestUpdateTime = htmlObject.getAttribute("latestUpdateTime")
+
 
         // console.log(96969696, newData)
         let updateMessage: UpdateDataFormatInterface= {
             htmlObjectData: newData,
             metaData:{
                 action: "update",
-                notebookID: this.notebookID
+                notebookID: this.notebookID,
+                latestUpdateTime: latestUpdateTime
             }
         }
         this.changeList.push(updateMessage)
     }// saveHTMLObjectToDatabase
 
+    tracePageFromElement(htmlObject: HTMLElement){
+        if (htmlObject){
+            let isPage = htmlObject.classList.contains("fullPage")
+            if (isPage){
+                return htmlObject
+            } else {
+                return this.tracePageFromElement(htmlObject.parentElement)
+            }
+        }
+    }
+
     deleteFromDataBase(htmlObject:any){
+
         let accessPointer = htmlObject.getAccessPointer()
         let dataPointer = htmlObject.getDataPointer()
 
@@ -122,7 +137,6 @@ export class MainController implements MainControllerInterface{
                     linkedObject?.deleteFromDatabase()
                 }
             })
-
         }
 
         let deleteMessage = {
@@ -131,7 +145,8 @@ export class MainController implements MainControllerInterface{
               action: "delete",
               accessPointer: accessPointer,
               parentAccessPointer: parentAccessPointer,
-              notebookID: this.notebookID
+              notebookID: this.notebookID,
+              latestUpdateTime: `${new Date()}`
            }
         }
         htmlObject.remove()
@@ -201,6 +216,7 @@ export class MainController implements MainControllerInterface{
     //@auto-fold here
     loadMainDoc(data:any){
       this.mainDoc = data
+      console.log(219219, data)
       let rootArray = data["array"]
 
       data["array"].map((p:any)=>{
@@ -229,7 +245,9 @@ export class MainController implements MainControllerInterface{
           if (changeData.metaData.action=="update"){
               // console.log(213213, changeData)
               let _object = <any> document.querySelector(`*[accessPointer='${htmlObjectData._identity.accessPointer}']`)
-              // console.log(_object, _object._identity, htmlObjectData._identity)
+
+              let pageHtmlObject = this.tracePageFromElement(_object)
+              pageHtmlObject.setAttribute("latestUpdateTime", changeData.metaData.latestUpdateTime)
 
               htmlObjectData._identity.linkArray.forEach((p:string)=>{
                   // to chheck if the socket id are different and if the aaaccessPointer of the object is different from the looped aaccessPointer of the linkedObject
@@ -254,6 +272,9 @@ export class MainController implements MainControllerInterface{
                 let leftButton = <HTMLButtonElement> document.querySelector(".leftButton")
                 leftButton.click()
               }
+
+              let pageHtmlObject = this.tracePageFromElement(_object)
+              pageHtmlObject.setAttribute("latestUpdateTime", `${new Date()}`)
 
               _object?.remove()
           }

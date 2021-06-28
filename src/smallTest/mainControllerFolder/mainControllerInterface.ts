@@ -65,7 +65,7 @@ export interface MainControllerInterface {
 
     sendChangeToServer():void
 
-
+    tracePageFromElement(htmlObject: HTMLElement):any
 
 
     /** the arrayID is for attaching to the array*/
@@ -120,7 +120,8 @@ export interface UpdateDataFormatInterface {
     htmlObjectData: HtmlObjectDataInterface,
     metaData: {
       action: string,
-      notebookID: string
+      notebookID: string,
+      latestUpdateTime: string
     }
 }
 

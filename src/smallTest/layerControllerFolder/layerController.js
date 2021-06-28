@@ -10,6 +10,7 @@ export function switchStatus(item) {
 // ** make the layer controller panel so that you can add new div / new svg layer
 export function createLayerController(mainController) {
     // layerController HTML part
+    console.log(222222, "layerController");
     let layerControllerTemplate = document.querySelector("#layerControllerTemplate");
     let layerControllerHTMLObject = layerControllerTemplate["content"].cloneNode(true);
     let layerView = layerControllerHTMLObject.querySelector(".layerView");
@@ -30,6 +31,10 @@ export function createLayerController(mainController) {
         let selectedRow = layerView.querySelector(".selectedRow");
         let selectedLayerRow = selectedRow.parentElement;
         let selectedLayerRowPreviousSibling = selectedLayerRow.previousSibling;
+        if (!selectedLayerRowPreviousSibling) {
+            console.log("no previous sibling");
+            return;
+        }
         let parentElement = selectedLayerRow.parentElement;
         parentElement.insertBefore(selectedLayerRow, selectedLayerRowPreviousSibling);
         // update the data in the DB
@@ -50,6 +55,10 @@ export function createLayerController(mainController) {
         let selectedLayerRow = selectedRow.parentElement;
         let selectedLayerRowNextSibling = selectedLayerRow.nextSibling;
         let parentElement = selectedLayerRow.parentElement;
+        if (!selectedLayerRowNextSibling) {
+            console.log("no next sibling");
+            return;
+        }
         parentElement.insertBefore(selectedLayerRowNextSibling, selectedLayerRow);
         // update databasae
         let allLayerArray = Array.from(parentElement.querySelectorAll(".layerLevel"));
@@ -61,7 +70,10 @@ export function createLayerController(mainController) {
         let selectedLayer = document.querySelector(`*[accessPointer='${selectedLayerID}']`);
         let selectedLayerNextSibling = document.querySelector(`*[accessPointer='${selectedLayerNextSiblingID}']`);
         let selectedLayerParentElement = selectedLayer.parentElement;
-        console.log(68686868, selectedLayerID, selectedLayerNextSibling);
+        if (!selectedLayerNextSibling) {
+            console.log("no next sibling");
+            return;
+        }
         selectedLayerParentElement.insertBefore(selectedLayerNextSibling, selectedLayer);
     });
     //
@@ -74,10 +86,10 @@ export function createLayerController(mainController) {
         let currentPage = mainController.pageController.currentPage;
         let currentPageHTMLObject = mainController.pageController.currentPage.fullPageHTMLObject;
         let divLayer = GreatNoteDataClass.GNContainerDiv({ name: "", arrayID: currentPageHTMLObject.getAccessPointer(), saveToDatabase: true, _classNameList: ["divLayer"] });
-        divLayer.applyStyle({ width: "100%", height: "100%", "position": "absolute", "left": "0px", "top": "0px" });
-        mainController.saveHTMLObjectToDatabase(divLayer);
+        currentPageHTMLObject.append(divLayer);
         ToolBoxEvents.attachEventListenerToDivLayer(mainController, divLayer);
-        divLayer.appendTo(currentPageHTMLObject);
+        divLayer.applyStyle({ width: "100%", height: "100%", "position": "absolute", "left": "0px", "top": "0px" });
+        divLayer.saveHTMLObjectToDatabase();
         layerControllerHTMLObject.renderCurrentPageLayer();
     };
     layerControllerHTMLObject.addSvgLayer = function (e) {
@@ -85,11 +97,11 @@ export function createLayerController(mainController) {
         let currentPageHTMLObject = mainController.pageController.currentPage.fullPageHTMLObject;
         let svgLayer = GreatNoteSvgDataClass.GNSvg({ name: "", arrayID: currentPageHTMLObject.getAccessPointer(), saveToDatabase: true, _classNameList: ["svgLayer"] });
         mainController.toolBox.registerSvg(svgLayer);
+        ToolBoxEvents.attachEventListenerToSvgBoard(mainController, svgLayer);
+        currentPageHTMLObject.append(svgLayer);
         svgLayer.applyStyle({ width: "100%", height: "100%", "background": "transparent", position: "absolute", left: "0px", top: "0px" });
         mainController.saveHTMLObjectToDatabase(svgLayer);
         svgLayer.classList.add("svgLayer");
-        ToolBoxEvents.attachEventListenerToSvgBoard(mainController, svgLayer);
-        svgLayer.appendTo(currentPageHTMLObject);
         layerControllerHTMLObject.renderCurrentPageLayer();
     };
     mainController.layerController = layerControllerHTMLObject;
@@ -99,12 +111,10 @@ export function showCurrentPageButtonFunction(mainController, layerView) {
     var _a;
     layerView.innerHTML = "";
     let currentPageData = (_a = mainController.pageController.currentPage.fullPageHTMLObject) === null || _a === void 0 ? void 0 : _a.extract();
-    console.log(138138, currentPageData);
     if (currentPageData.array.length == 0) {
         let layerArray = mainController.pageController.currentPage.fullPageHTMLObject.children;
         Array.from(layerArray).forEach((p) => {
             currentPageData.array.push(p.extract());
-            console.log(p);
         });
     }
     let layerObject = buildLayerContentFunction(mainController, currentPageData, layerView);
@@ -176,15 +186,15 @@ export function buildLayerContentFunction(mainController, currentPageData, layer
         if (draggedLayerRow) {
             draggedLayerRow.classList.remove("draggedLayerRow");
             draggedLayerRow.style.background = "red";
-            console.log(draggedLayerRow.offsetTop);
-            console.log(layerView.children);
         }
     });
     // to
     layerLevel += 1;
     if (currentPageData.array.length > 0) {
         currentPageData.array.forEach((p) => {
-            item.appendChild(buildLayerContentFunction(mainController, p, layerView, layerLevel));
+            let _row = buildLayerContentFunction(mainController, p, layerView, layerLevel);
+            if (_row)
+                item.appendChild(_row);
         });
     }
     return item;

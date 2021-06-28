@@ -95,9 +95,8 @@ export function swipeDetection(mainController: MainControllerInterface, pageCont
 
        // define the mouse move function
        let mouseUpFunction = (e:any)=>{
-         // remove the mouse move event
-
-
+         // remove the mouse move even
+         
           fingerTurnPage(mainController, pageContentContainer, mouseMoveFunction, mouseUpFunction, deltaX, deltaX2, doubleFinger)
        } // mouseUpFunction
 

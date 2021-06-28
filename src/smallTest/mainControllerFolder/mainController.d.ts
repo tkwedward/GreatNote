@@ -31,6 +31,7 @@ export declare class MainController implements MainControllerInterface {
     createDummyData(data?: {}): any;
     /** when ever the htmlObject is updated, we fetch newData from thfe HTMLObjectt, and then go to the database and update the relevant data*/
     saveHTMLObjectToDatabase(htmlObject: any): void;
+    tracePageFromElement(htmlObject: HTMLElement): any;
     deleteFromDataBase(htmlObject: any): void;
     sendChangeToServer(): void;
     getObjectDataById(objectID: string, doc?: any): any;

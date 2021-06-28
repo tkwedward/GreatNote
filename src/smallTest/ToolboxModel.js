@@ -23,7 +23,7 @@ export class ToolBoxClass {
             },
             eraserItemButton: {
                 status: false,
-                attributeController: "eraserController"
+                attributeController: "eraserToolController"
             },
             selectionToolItemButton: {
                 status: false,
@@ -31,7 +31,7 @@ export class ToolBoxClass {
             },
             rectangleSelectionToolItemButton: {
                 status: false,
-                attributeController: "rectangleSelectionTool"
+                attributeController: "rectangleSelectionToolController"
             },
             addCommentItemButton: {
                 status: false,
@@ -160,6 +160,21 @@ export class ToolBoxClass {
             console.log("Mouse Rectangle Selection Tool item button is activated");
             this.activateButtonFunction(toolBoxItem, "rectangleSelectionToolItemButton");
         });
+        toolBoxItem.activate = function () {
+            let pageOverlayArray = Array.from(document.querySelectorAll(".pageOverlay"));
+            pageOverlayArray.forEach(p => {
+                let parentElemnt = p.parentElement;
+                parentElemnt.append(p);
+                p.style.display = "block";
+            });
+            console.log(pageOverlayArray);
+        };
+        toolBoxItem.deactivate = function () {
+            let pageOverlayArray = Array.from(document.querySelectorAll(".pageOverlay"));
+            pageOverlayArray.forEach(p => {
+                p.style.display = "none";
+            });
+        };
         return toolBoxItem;
     }
     createEraserItemButton(toolBoxHtmlObject) {

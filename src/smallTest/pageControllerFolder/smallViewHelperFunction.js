@@ -37,9 +37,7 @@ export function createSmallViewPageController(mainController) {
     setTagNameButton.addEventListener("click", e => {
         let selectedSmallViewArray = Array.from(document.querySelectorAll(".selectedSmallViewHTMLObject"));
         if (selectedSmallViewArray.length > 0) {
-            console.log(selectedSmallViewArray);
             selectedSmallViewArray.forEach((smallView) => {
-                console.log(212121, smallView);
                 smallView.innerText += setTagNameInput.value;
                 smallView.tagsArray.add(setTagNameInput.value);
                 smallView.fullPageHTMLObject.saveHTMLObjectToDatabase();
@@ -62,9 +60,7 @@ export function createSmallViewPageController(mainController) {
     copyButton.innerText = "copyButton";
     copyButton.addEventListener("click", e => {
         let selectedSmallViewArray = Array.from(document.querySelectorAll(".selectedSmallViewHTMLObject"));
-        console.log(selectedSmallViewArray);
         let pageAccessPointerArray = selectedSmallViewArray.map((p) => p.fullPageHTMLObject.getAttribute("accessPointer"));
-        console.log(pageAccessPointerArray);
         let lastItem = selectedSmallViewArray[selectedSmallViewArray.length - 1];
     }); // copyButton click function
     overViewmodePageController.append(copyButton, deleteButton, setTagNameButton, setTagNameInput);
@@ -78,9 +74,7 @@ export function addFunctionToSmallViewHTMLObject(pageController, smallViewHTMLOb
         clickCounter += 1;
         if (clickCounter == 2) {
             clickCounter = 0;
-            console.log("double clicked");
             let pageID = smallViewHTMLObject.fullPageHTMLObject.getAccessPointer();
-            console.log(pageID);
             let pageNumber = pageController.getPageNumberFromPageID(pageID);
             pageController.goToPage(pageNumber);
             let switchViewModeButton = document.querySelector(".switchViewModeButton");
@@ -90,7 +84,6 @@ export function addFunctionToSmallViewHTMLObject(pageController, smallViewHTMLOb
         setTimeout(() => {
             clickCounter = 0;
         }, 500);
-        console.log(115115, e);
         if (e.metaKey) {
             console.log("controlkey pressed");
             smallViewHTMLObject.classList.toggle("selectedSmallViewHTMLObject");
@@ -118,7 +111,6 @@ export function addFunctionToSmallViewHTMLObject(pageController, smallViewHTMLOb
         }
         else {
             let selectedSmallViewHTMLObjectArray = overviewModeDiv.querySelectorAll(".selectedSmallViewHTMLObject");
-            console.log(selectedSmallViewHTMLObjectArray);
             Array.from(selectedSmallViewHTMLObjectArray).forEach(p => {
                 p.classList.remove("selectedSmallViewHTMLObject");
             });
@@ -139,7 +131,6 @@ export function addFunctionToSmallViewHTMLObject(pageController, smallViewHTMLOb
         let draggedItem = document.querySelector(".smallView.draggedItem");
         let rect = smallViewHTMLObject.getBoundingClientRect();
         let middleLine = rect.x + rect.width / 2;
-        console.log(draggedItem, smallViewHTMLObject);
         if (e.pageX > middleLine) {
             overviewModeDiv.insertBefore(draggedItem, smallViewHTMLObject);
             overviewModeDiv.insertBefore(smallViewHTMLObject, draggedItem);
@@ -160,7 +151,6 @@ export function addFunctionToSmallViewHTMLObject(pageController, smallViewHTMLOb
     smallViewHTMLObject.loadFromData = function (injectedData) {
         var _a;
         smallViewContent.style.background = injectedData.color;
-        console.log(203203, injectedData);
         (_a = injectedData.tagsArray) === null || _a === void 0 ? void 0 : _a.forEach((title) => {
             smallViewHTMLObject.tagsArray.add("title");
             let tagDiv = document.createElement("div");
@@ -168,4 +158,33 @@ export function addFunctionToSmallViewHTMLObject(pageController, smallViewHTMLOb
             smallViewHTMLObject.append(tagDiv);
         });
     }; // smallViewHTMLObject.loadFromData
+}
+import { pageSizeInfo } from "../settings";
+export function renderSmallView(fullPageHTMLObject, smallViewHTMLObject, pageNumber) {
+    let smallViewPictureWrapper = smallViewHTMLObject.querySelector(".smallViewContent");
+    // let smallViewPictureWrapper = document.createElement("div")
+    smallViewPictureWrapper.style.position = "relative";
+    smallViewPictureWrapper.style.top = "0px";
+    smallViewPictureWrapper.style.left = "0px";
+    let _div = document.createElement("div");
+    _div.innerHTML = fullPageHTMLObject.innerHTML;
+    _div.style.position = "absolute";
+    _div.style.width = pageSizeInfo.fullPageSize[0] + "px";
+    _div.style.height = pageSizeInfo.fullPageSize[1] + "px";
+    _div.style.transformOrigin = "left top";
+    _div.style.transform = `scale(${pageSizeInfo.ratio})`;
+    // _div.style.transform = "scale(0.125)"
+    _div.style.top = "0px";
+    _div.style.left = "0px";
+    _div.style.background = "white";
+    let allItem = Array.from(_div.querySelectorAll("*"));
+    allItem.forEach(p => p.setAttribute("accessPointer", ""));
+    // smallViewHTMLObject.insertBefore(smallViewPictureWrapper)
+    let pageNumberDiv = document.createElement("div");
+    pageNumberDiv.innerText = `${pageNumber}`;
+    pageNumberDiv.style.position = "absolute";
+    pageNumberDiv.style.top = "3px";
+    pageNumberDiv.style.left = "3px";
+    smallViewPictureWrapper.append(_div);
+    smallViewHTMLObject.append(pageNumberDiv);
 }

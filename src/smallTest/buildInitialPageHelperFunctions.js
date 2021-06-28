@@ -157,7 +157,7 @@ export function buildPageControllerButtonArray(mainController) {
     editorController.append(objectIDGetter, objectIDGetterSubmit, testFieldButton, showMainDocButton, showAnnotationButton);
     // toolBoxObject
     let toolBoxHtmlObject = buildToolBoxHtmlObject(mainController);
-    pageControllerSubPanelContent.append(toolBoxHtmlObject, scaleController, editorController);
+    pageControllerSubPanelContent.append(toolBoxHtmlObject, editorController, scaleController);
     let annotationPage = document.querySelector(".annotationPage");
     return { pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, showMainDocButton, showAnnotationButton, annotationPage, scaleController };
 } // buildPageControllerButtonArray
@@ -210,7 +210,7 @@ export function buildInitialHTMLSkeleton(mainController) {
     let [userControllerSubPanelNavbarTitle, userpageControllerSubPanelContent, userViewer] = UserControllerHelperFunction.buildUserController(mainController);
     topSubPanel.addTabAndTabContent(userControllerSubPanelNavbarTitle, userpageControllerSubPanelContent, false);
     // pageController
-    let { pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, copyButton, linkButton, deleteButton, showMainDocButton, showAnnotationButton } = buildPageControllerButtonArray(mainController);
+    let { pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, showMainDocButton, showAnnotationButton } = buildPageControllerButtonArray(mainController);
     topSubPanel.addTabAndTabContent(pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent);
     let [middleSubPanel, middleSubPanelTabBar, middleSubPanelTabContent] = pageViewHelperFunction.subPanelTab("middleSubPanel");
     let { pageArrayID, panelContainer, pageContentContainer, fullPageModeDiv, overviewModeDiv, bookmarkSubPanelNavbarTitle, bookmarkSubPanelContent } = getImportantDivFromHTML(mainController);
@@ -265,11 +265,12 @@ export function buildInitialPage(mainController, saveToDatabase = false) {
     });
     let pageNotRendered = [];
     let targetPageIndex = pageFullArray.length - 1;
-    let preloadRange = 2;
+    let preloadRange = 1;
     for (let i = 0; i < pageFullArray.length; i++) {
         let newPage = pageViewHelperFunction.createNewPage(pageController, fullPageModeDiv, pageFullArray[i], saveToDatabase);
         pageViewHelperFunction.insertNewPage(pageController, newPage, fullPageModeDiv);
         mainController.renderDataToHTML(pageFullArray[i], newPage);
+        newPage.setAttribute("latestUpdateTime", `${new Date()}`);
         let pageID = pageFullArray[i]._identity.accessPointer;
         // getPageDataFromServer(mainController, pageID)
         if (i >= targetPageIndex - preloadRange && i <= targetPageIndex + preloadRange) {
@@ -281,17 +282,21 @@ export function buildInitialPage(mainController, saveToDatabase = false) {
         else {
             pageNotRendered.push(pageID);
         }
+        // if (i==0){
     }
-    let loadPages = setInterval(() => {
-        if (pageNotRendered.length > 0) {
-            let pageID = pageNotRendered.pop();
-            let targetPage = document.querySelector(`*[accessPointer=${pageID}]`);
-            if (targetPage.getAttribute("loaded") != "true") {
-                targetPage.setAttribute("loaded", "true");
-                getPageDataFromServer(mainController, pageID);
-            }
-        }
-    }, 10000);
+    // let loadPages = setInterval(()=>{
+    //
+    //     if (pageNotRendered.length > 0){
+    //
+    //       let pageID = <string >pageNotRendered.pop()
+    //       let targetPage = <HTMLDivElement> document.querySelector(`*[accessPointer=${pageID}]`)
+    //
+    //       if (targetPage.getAttribute("loaded")!="true") {
+    //         targetPage.setAttribute("loaded", "true")
+    //         getPageDataFromServer(mainController, pageID)
+    //       }
+    //     }
+    // }, 10000)
     // pageNotRendered.forEach(p=>getPageDataFromServer(mainController, p))
     let annotationButton = document.querySelector(".showAnnotationButton");
     let switchViewModeButton = document.querySelector(".switchViewModeButton");

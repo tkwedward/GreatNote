@@ -4,18 +4,20 @@ import {selectionToolPhaseOneMouseDownFunction} from "./rectangleSelectionToolPh
 import {selectionToolPhaseTwoMouseDownEvent} from "./rectangleSelectionToolPhaseTwo"
 import { MainControllerInterface } from "../mainControllerFolder/mainControllerInterface"
 
-export function overallMouseDownFunction(e:any, mainController: MainControllerInterface, svgBoard:any, moveEventName:string, upEventName:string, selectionStatusObject:any){
+export function overallMouseDownFunction(e:any, mainController: MainControllerInterface, overlay:any, moveEventName:string, upEventName:string){
     if (!mainController.toolBox.checkToolBoxItemStatus("rectangleSelectionToolItemButton")) return
     let offsetX, offstY, touchIsPen;
     [offsetX, offstY, touchIsPen] = getOffSetXY(e);
 
     e.preventDefault()
 
-    if (selectionStatusObject.mode=="phaseOne"){
-        selectionToolPhaseOneMouseDownFunction(e, mainController, svgBoard, moveEventName, upEventName, selectionStatusObject)
-        selectionStatusObject.mode = "phaseTwo"
+    console.log(141414, overlay)
 
-    } else if (selectionStatusObject.mode=="phaseTwo"){
-        selectionToolPhaseTwoMouseDownEvent(e, mainController, svgBoard, moveEventName, upEventName, selectionStatusObject)
-    }
+    // if (selectionStatusObject.mode=="phaseOne"){
+        selectionToolPhaseOneMouseDownFunction(e, mainController, overlay, moveEventName, upEventName)
+        // selectionStatusObject.mode = "phaseTwo"
+
+    // } else if (selectionStatusObject.mode=="phaseTwo"){
+    //     selectionToolPhaseTwoMouseDownEvent(e, mainController, svgBoard, moveEventName, upEventName, selectionStatusObject)
+    // }
 } // overallMouseDownFunction

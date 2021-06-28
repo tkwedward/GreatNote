@@ -52,9 +52,7 @@ export function createSmallViewPageController(mainController: MainControllerInte
     setTagNameButton.addEventListener("click", e=>{
         let selectedSmallViewArray = Array.from(document.querySelectorAll(".selectedSmallViewHTMLObject"))
         if (selectedSmallViewArray.length > 0){
-            console.log(selectedSmallViewArray)
             selectedSmallViewArray.forEach((smallView: any)=>{
-                console.log(212121, smallView)
                 smallView.innerText += setTagNameInput.value
                 smallView.tagsArray.add(setTagNameInput.value)
 
@@ -82,9 +80,7 @@ export function createSmallViewPageController(mainController: MainControllerInte
     copyButton.innerText = "copyButton"
     copyButton.addEventListener("click", e=>{
         let selectedSmallViewArray = Array.from(document.querySelectorAll(".selectedSmallViewHTMLObject"))
-        console.log(selectedSmallViewArray)
         let pageAccessPointerArray = selectedSmallViewArray.map((p:any)=>p.fullPageHTMLObject.getAttribute("accessPointer"))
-        console.log(pageAccessPointerArray)
         let lastItem = selectedSmallViewArray[selectedSmallViewArray.length - 1]
     }) // copyButton click function
 
@@ -101,13 +97,10 @@ export function addFunctionToSmallViewHTMLObject(pageController: PageController.
 
     let clickCounter = 0
     smallViewHTMLObject.addEventListener("click", e=>{
-
       clickCounter += 1
       if (clickCounter==2){
         clickCounter = 0
-        console.log("double clicked")
         let pageID = smallViewHTMLObject.fullPageHTMLObject.getAccessPointer()
-        console.log(pageID)
         let pageNumber = pageController.getPageNumberFromPageID(pageID)
         pageController.goToPage(pageNumber)
         let switchViewModeButton = <HTMLButtonElement> document.querySelector(".switchViewModeButton")
@@ -117,7 +110,6 @@ export function addFunctionToSmallViewHTMLObject(pageController: PageController.
       setTimeout(()=>{
         clickCounter = 0
       }, 500)
-      console.log(115115, e)
 
       if (e.metaKey) {
         console.log("controlkey pressed")
@@ -144,7 +136,6 @@ export function addFunctionToSmallViewHTMLObject(pageController: PageController.
 
       } else {
         let selectedSmallViewHTMLObjectArray = overviewModeDiv.querySelectorAll(".selectedSmallViewHTMLObject")
-        console.log(selectedSmallViewHTMLObjectArray)
         Array.from(selectedSmallViewHTMLObjectArray).forEach(p=>{
             p.classList.remove("selectedSmallViewHTMLObject")
         })
@@ -172,7 +163,6 @@ export function addFunctionToSmallViewHTMLObject(pageController: PageController.
 
       let middleLine = rect.x +  rect.width/2
 
-      console.log(draggedItem, smallViewHTMLObject)
       if (e.pageX > middleLine){
 
 
@@ -200,7 +190,6 @@ export function addFunctionToSmallViewHTMLObject(pageController: PageController.
     smallViewHTMLObject.loadFromData = function(injectedData:SmallViewDataInterface){
         smallViewContent.style.background = injectedData.color
 
-        console.log(203203, injectedData)
         injectedData.tagsArray?.forEach((title: string)=>{
             smallViewHTMLObject.tagsArray.add("title")
             let tagDiv = document.createElement("div")
@@ -213,4 +202,40 @@ export function addFunctionToSmallViewHTMLObject(pageController: PageController.
 export interface SmallViewDataInterface {
     color: string
     tagsArray: string[]
+}
+
+
+import {pageSizeInfo} from "../settings"
+export function renderSmallView(fullPageHTMLObject: HTMLDivElement, smallViewHTMLObject: HTMLDivElement, pageNumber: number){
+  let smallViewPictureWrapper = <HTMLDivElement> smallViewHTMLObject.querySelector(".smallViewContent")
+  // let smallViewPictureWrapper = document.createElement("div")
+  smallViewPictureWrapper.style.position = "relative"
+  smallViewPictureWrapper.style.top = "0px"
+  smallViewPictureWrapper.style.left = "0px"
+
+  let _div = document.createElement("div")
+  _div.innerHTML = fullPageHTMLObject.innerHTML
+  _div.style.position = "absolute"
+  _div.style.width = pageSizeInfo.fullPageSize[0] + "px"
+  _div.style.height = pageSizeInfo.fullPageSize[1] + "px"
+  _div.style.transformOrigin = "left top"
+  _div.style.transform = `scale(${pageSizeInfo.ratio})`
+  // _div.style.transform = "scale(0.125)"
+  _div.style.top = "0px"
+  _div.style.left = "0px"
+  _div.style.background = "white"
+
+  let allItem = Array.from(_div.querySelectorAll("*"))
+  allItem.forEach(p=>p.setAttribute("accessPointer", ""))
+  // smallViewHTMLObject.insertBefore(smallViewPictureWrapper)
+
+  let pageNumberDiv = document.createElement("div")
+  pageNumberDiv.innerText = `${pageNumber}`
+  pageNumberDiv.style.position = "absolute"
+  pageNumberDiv.style.top = "3px"
+  pageNumberDiv.style.left = "3px"
+
+  smallViewPictureWrapper.append(_div)
+  smallViewHTMLObject.append(pageNumberDiv)
+
 }

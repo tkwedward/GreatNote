@@ -31,6 +31,38 @@ export function createTextBox(_object, uniqueID) {
     textBox.contentEditable = "true";
     textBox.draggable = false;
     textBox.addEventListener("input", inputFunction(_object, textBox));
+    textBox.addEventListener("paste", (e) => {
+        e.stopPropagation();
+        var items = (e.clipboardData || e.originalEvent.clipboardData).items;
+        for (var index in items) {
+            var item = items[index];
+            if (item.kind === 'file') {
+                // e.preventDefault()
+                var blob = item.getAsFile();
+                var reader = new FileReader();
+                console.log(blob, item);
+                reader.onload = function (event) {
+                    console.log(event.target.result);
+                    let targetImg = textBox.querySelector(`img[src='${event.target.result}']`);
+                    targetImg.style.width = "98%";
+                    targetImg.style.margin = "auto";
+                    targetImg.style.display = "block";
+                    targetImg.style.position = "relative";
+                    let xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/talkNotes/processImageBase64Format', true);
+                    xhr.onload = function () {
+                        console.log("finish processing image");
+                        let responseImgSrc = JSON.parse(this.responseText).imgsrc.replace("talkNotes/", "/");
+                        console.log(responseImgSrc);
+                        targetImg.src = window.location.origin
+                            + "/image/" + responseImgSrc + ".png";
+                    };
+                    xhr.send(event.target.result);
+                };
+                reader.readAsDataURL(blob);
+            }
+        }
+    });
     return textBox;
 }
 export function createTextContainerHTMLObject() {

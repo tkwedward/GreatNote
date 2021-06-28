@@ -1,7 +1,7 @@
 import * as ClipboardEvent from "./clipboardEvents"
 import * as CommunicatorController from "./communicationFolder/communitcationController"
 import * as EventModel from "./EventModel"
-
+import * as RectangleSelectionToolFunction from "./ToolboxFolder/rectangleSelectionFunction"
 // GMPnkects
 import {GNContainerDiv} from "./GreatNoteClass/GreatNoteDataClass"
 import {GNImageContainer} from "./GreatNoteClass/GNImageContainer"
@@ -103,7 +103,6 @@ export function buildPageControllerButtonArray(mainController:MainControllerInte
       } else {
           testFieldDiv.classList.add("open")
       }
-
   })
 
   let showMainDocButton = document.createElement("button")
@@ -111,8 +110,6 @@ export function buildPageControllerButtonArray(mainController:MainControllerInte
   showMainDocButton.addEventListener("click", function(){
       console.log(153, mainController.mainDoc["array"][0]["array"], mainController)
   })
-
-
 
   let showAnnotationButton = document.createElement("button")
   showAnnotationButton.classList.add("showAnnotationButton")
@@ -204,7 +201,7 @@ export function buildPageControllerButtonArray(mainController:MainControllerInte
   // toolBoxObject
   let toolBoxHtmlObject = buildToolBoxHtmlObject(mainController)
 
-  pageControllerSubPanelContent.append(toolBoxHtmlObject, scaleController, editorController)
+  pageControllerSubPanelContent.append(toolBoxHtmlObject, editorController, scaleController)
 
   let annotationPage = document.querySelector(".annotationPage")
 
@@ -285,12 +282,13 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
       topSubPanel.addTabAndTabContent(userControllerSubPanelNavbarTitle, userpageControllerSubPanelContent, false)
 
       // pageController
-      let {pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, copyButton, linkButton, deleteButton, showMainDocButton, showAnnotationButton} =  buildPageControllerButtonArray(mainController)
+      let {pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, showMainDocButton, showAnnotationButton} =  buildPageControllerButtonArray(mainController)
       topSubPanel.addTabAndTabContent(pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent)
 
 
       let [middleSubPanel, middleSubPanelTabBar, middleSubPanelTabContent] = pageViewHelperFunction.subPanelTab("middleSubPanel")
       let {pageArrayID, panelContainer, pageContentContainer, fullPageModeDiv, overviewModeDiv, bookmarkSubPanelNavbarTitle, bookmarkSubPanelContent} = getImportantDivFromHTML(mainController)
+
 
       let [groupControllerNavbarTitle, groupControllerContent] = GroupController.GroupController(mainController)
       let [collectionControllerNavbarTitle, collectionControllerContent] = CollectionController.CollectionController(mainController)
@@ -364,7 +362,7 @@ export function buildInitialPage(mainController:MainControllerInterface, saveToD
 
     let pageNotRendered:string[] = [];
     let targetPageIndex = pageFullArray.length-1
-    let preloadRange = 2
+    let preloadRange = 1
 
     for (let i = 0; i< pageFullArray.length; i++){
         let newPage = pageViewHelperFunction.createNewPage(pageController, fullPageModeDiv, pageFullArray[i], saveToDatabase)
@@ -372,6 +370,8 @@ export function buildInitialPage(mainController:MainControllerInterface, saveToD
         pageViewHelperFunction.insertNewPage(pageController, newPage, fullPageModeDiv)
 
         mainController.renderDataToHTML(pageFullArray[i], newPage)
+
+        newPage.setAttribute("latestUpdateTime", `${new Date()}`)
 
         let pageID = pageFullArray[i]._identity.accessPointer
 
@@ -383,19 +383,23 @@ export function buildInitialPage(mainController:MainControllerInterface, saveToD
         } else {
           pageNotRendered.push(pageID)
         }
+
+        // if (i==0){
     }
 
-    let loadPages = setInterval(()=>{
-        if (pageNotRendered.length > 0){
-          let pageID = <string >pageNotRendered.pop()
-          let targetPage = <HTMLDivElement> document.querySelector(`*[accessPointer=${pageID}]`)
-
-          if (targetPage.getAttribute("loaded")!="true") {
-            targetPage.setAttribute("loaded", "true")
-            getPageDataFromServer(mainController, pageID)
-          }
-        }
-    }, 10000)
+    // let loadPages = setInterval(()=>{
+    //
+    //     if (pageNotRendered.length > 0){
+    //
+    //       let pageID = <string >pageNotRendered.pop()
+    //       let targetPage = <HTMLDivElement> document.querySelector(`*[accessPointer=${pageID}]`)
+    //
+    //       if (targetPage.getAttribute("loaded")!="true") {
+    //         targetPage.setAttribute("loaded", "true")
+    //         getPageDataFromServer(mainController, pageID)
+    //       }
+    //     }
+    // }, 10000)
 
     // pageNotRendered.forEach(p=>getPageDataFromServer(mainController, p))
 

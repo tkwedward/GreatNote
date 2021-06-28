@@ -428,9 +428,12 @@ var MongoBackEnd = /** @class */ (function () {
                         return [4 /*yield*/, this.recursiveGetChildNodeData(collection, rootNode, 3)];
                     case 2:
                         result = _a.sent();
-                        console.log(result);
+                        console.log(296296, result);
                         return [4 /*yield*/, rootNode];
-                    case 3: return [2 /*return*/, _a.sent()];
+                    case 3: 
+                    // console.log(result)
+                    //
+                    return [2 /*return*/, _a.sent()];
                 }
             });
         });
@@ -486,7 +489,7 @@ var MongoBackEnd = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         mongoClient = new mongodb_1.MongoClient(this.mongoUrl, {
-                            // useUnifiedTopology: true,
+                            useUnifiedTopology: true,
                             useNewUrlParser: true
                         });
                         console.info("connection to MongoDB");

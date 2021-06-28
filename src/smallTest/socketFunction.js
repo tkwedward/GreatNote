@@ -21,6 +21,7 @@ socket.on("mongoDBError", (msg) => {
     console.log("error from DB");
     let allTabBar = Array.from(document.querySelectorAll(".tabBar"));
     allTabBar.forEach(p => p.style.background = "purple");
+    document.body.innerHTML = "mongoDB error. Please refresh";
 });
 socket.on("broadcastMessage", (msg) => {
     console.log(msg);
@@ -28,10 +29,15 @@ socket.on("broadcastMessage", (msg) => {
 socket.on("saveDataToServer", (data) => {
     mainController.saveMainDoc(true);
 });
+import { renderSmallView } from "./pageControllerFolder/smallViewHelperFunction";
 socket.on("receivePageDataFromServer", (data) => {
     console.log(data["array"]);
     data["array"].forEach((p) => {
         let layerHTMLObject = document.querySelector(`*[accessPointer='${p._identity.accessPointer}']`);
+        let fullPageHTMLObject = mainController.tracePageFromElement(layerHTMLObject);
+        let smallViewHTMLObject = fullPageHTMLObject.smallViewHTMLObject;
+        fullPageHTMLObject.setAttribute("latestUpdateTime", `${new Date()}`);
+        renderSmallView(fullPageHTMLObject, smallViewHTMLObject, fullPageHTMLObject.soul.pageNumber);
         mainController.renderDataToHTML(p, layerHTMLObject);
     });
     // socket.off("receivePageDataFromServer")

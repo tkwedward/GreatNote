@@ -1,2 +1,2 @@
 import { MainControllerInterface } from "../mainControllerFolder/mainControllerInterface";
-export declare function overallMouseDownFunction(e: any, mainController: MainControllerInterface, svgBoard: any, moveEventName: string, upEventName: string, selectionStatusObject: any): void;
+export declare function overallMouseDownFunction(e: any, mainController: MainControllerInterface, overlay: any, moveEventName: string, upEventName: string): void;

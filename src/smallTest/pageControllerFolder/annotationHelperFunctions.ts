@@ -115,8 +115,6 @@ export function buildAnnotationPage(mainController: MainControllerInterface){
       return {x, y, w, h}
   }
 
-
-
   function checkPointInsideRect(point: {x: number, y: number}, rectData: {x: number, y: number, w: number, h: number}){
     return point.x > rectData.x && point.x < rectData.x + rectData.w  && point.y > rectData.y && point.y < rectData.y + rectData.h
   }

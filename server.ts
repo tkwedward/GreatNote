@@ -22,6 +22,7 @@ app.get("/board", (req, res)=>{
 })
 
 let turnOnServerMode = true
+let changeListArray = []
 // turnOnServerMode = false
 
 // socketArray = []
@@ -42,7 +43,6 @@ let automergeMainDoc: AutomergeMainDocInterface = new AutomergeMainDoc(jsonFileL
 
   socket.on("clientsAskForOverallNoteBookInfo", async ()=>{
     let overallNotebookInfo = await automergeMainDoc.mongoDB.getOverallNotebookData()
-    console.log(overallNotebookInfo)
 
     socket.emit("serverResponsesForOverallNoteBookInfo", overallNotebookInfo)
   })
@@ -63,6 +63,8 @@ let automergeMainDoc: AutomergeMainDocInterface = new AutomergeMainDoc(jsonFileL
   })
 
   socket.on("clientSendChangesToServer",async  changeList=>{
+    changeList.forEach(p=>changeListArray.push(p))
+
     let notebooID = changeList[0].metaData.notebookID
     let mongoClient
     try {
@@ -85,6 +87,10 @@ let automergeMainDoc: AutomergeMainDocInterface = new AutomergeMainDoc(jsonFileL
     io.to(notebooID).emit("serverSendChangeFileToClient", changeList)
   })
 
+  // let processChangeList = setInterval(()=>{
+  //
+  // } , 500)
+
   // operaation on notebook
   socket.on("createNewNotebook", (notebookInfo: {notebookName: string, notebookID: string})=>{
     console.log("=====================")
@@ -96,7 +102,6 @@ let automergeMainDoc: AutomergeMainDocInterface = new AutomergeMainDoc(jsonFileL
   }) // createNewNotebook
 
   socket.on("deleteNotebook", (notebookID: string)=>{
-
     automergeMainDoc.mongoDB.deleteNoteBook(notebookID)
     socket.emit("message", "create New Notebook")
   }) // createNewNotebook

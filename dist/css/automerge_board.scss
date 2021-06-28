@@ -7,6 +7,7 @@ body {
   left: 0px;
   top: 0px;
   margin: 0px;
+  touch-action: manipulation;
 }
 
 .attributePanel {
@@ -29,6 +30,18 @@ body {
       background: CornflowerBlue;
   }
 
+  .rectangleSelectionToolController{
+      height: 150px;
+      margin: 10px;
+      background: Beige;
+  }
+
+  .eraserToolController{
+      height: 150px;
+      margin: 10px;
+      background: BlueViolet;
+  }
+
   .moveObjectInDivController{
       min-height: 200px;
       margin: 10px auto;
@@ -40,7 +53,6 @@ body {
         img { width: 200px; display: inline-block; margin: 10px auto}
         button { margin-bottom: 10px; }
       }
-
   }
 }
 
@@ -188,6 +200,11 @@ select, option {
 
       } // .divPage
 
+
+      .fullPageModeDiv {
+        height: 1650px;
+        width: 1200px;
+      }
 
       .overviewModeDivWrapper{
         width: 100%;
@@ -398,7 +415,7 @@ select, option {
       $baseWidth: 600px;
       $width: 800px;
       width: $width;
-      height: $width * 3/2;
+      height: $width * 1.5;
       background: ivory;
       transform-origin: top left;
       transform: scale(0.1, 0.1);

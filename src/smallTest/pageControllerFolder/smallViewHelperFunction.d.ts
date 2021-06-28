@@ -8,3 +8,4 @@ export interface SmallViewDataInterface {
     color: string;
     tagsArray: string[];
 }
+export declare function renderSmallView(fullPageHTMLObject: HTMLDivElement, smallViewHTMLObject: HTMLDivElement, pageNumber: number): void;

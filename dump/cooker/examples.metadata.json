@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"cooker.examples"}],"uuid":"1a9705f5a03846d8aee2f1eb6b6f6c17","collectionName":"examples"}

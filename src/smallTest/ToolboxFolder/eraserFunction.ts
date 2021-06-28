@@ -1,6 +1,8 @@
 import * as GreatNoteSvgDataClass from "../GreatNoteClass/GreatNoteSvgDataClass"
 import * as ToolBoxHelperFunction from "./toolBoxHelperFunction"
 import { MainControllerInterface } from "../mainControllerFolder/mainControllerInterface"
+import * as Settings from "../settings"
+
 export function detectCollision(svgBoard:any, eraser: any){
     let objectsInTheLayer = svgBoard.querySelectorAll("polyline")
     let newPoint = svgBoard.createSVGPoint();
@@ -28,15 +30,17 @@ export function eraserMouseDownFunction(e: any, mainController: MainControllerIn
     if (!touchIsPen) return
     e.preventDefault()
 
+    let eraserRadiusInput = <HTMLInputElement> document.querySelector(".eraserRadiusInput")
+
    if (e.type=="mousedown" || touchIsPen){
         let cx = offsetX + "px"
         let cy = offsetY + "px"
-        let r = "20px"
+        let r = eraserRadiusInput.value
         let eraser  = GreatNoteSvgDataClass.GNSvgCircle({name: "123", arrayID: "", insertPosition: false, dataPointer: false, saveToDatabase: false})
 
         eraser.style["cx"] = cx
         eraser.style["cy"] = cy
-        eraser.style["r"] = r
+        eraser.style["r"] = r + "px"
 
         let mouseMoveFunction = (e)=>{
             // t1 = t2

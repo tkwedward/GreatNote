@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"GreatNote.allNotebookDB"}],"uuid":"21fd5109003c40209f8f290f9200f1b7","collectionName":"allNotebookDB"}

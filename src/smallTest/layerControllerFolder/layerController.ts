@@ -19,6 +19,7 @@ export interface LayerControllerInterface extends HTMLDivElement{
 // ** make the layer controller panel so that you can add new div / new svg layer
 export function createLayerController(mainController:MainControllerInterface){
   // layerController HTML part
+  console.log(222222, "layerController")
   let layerControllerTemplate = <LayerControllerInterface > document.querySelector("#layerControllerTemplate")
   let layerControllerHTMLObject = layerControllerTemplate["content"].cloneNode(true);
 
@@ -44,6 +45,12 @@ export function createLayerController(mainController:MainControllerInterface){
     let selectedRow = <HTMLDivElement> layerView.querySelector(".selectedRow")
     let selectedLayerRow= <HTMLDivElement> selectedRow.parentElement
     let selectedLayerRowPreviousSibling =< HTMLDivElement> selectedLayerRow.previousSibling
+
+    if(!selectedLayerRowPreviousSibling) {
+      console.log("no previous sibling")
+      return
+    }
+
     let parentElement= <HTMLDivElement> selectedLayerRow.parentElement
     parentElement.insertBefore(selectedLayerRow, selectedLayerRowPreviousSibling)
 
@@ -68,14 +75,18 @@ export function createLayerController(mainController:MainControllerInterface){
     let selectedLayerRow= <HTMLDivElement> selectedRow.parentElement
     let selectedLayerRowNextSibling =< HTMLDivElement> selectedLayerRow.nextSibling
     let parentElement= <HTMLDivElement> selectedLayerRow.parentElement
-    parentElement.insertBefore(selectedLayerRowNextSibling, selectedLayerRow)
 
+    if (!selectedLayerRowNextSibling){
+        console.log("no next sibling")
+        return
+    }
+
+    parentElement.insertBefore(selectedLayerRowNextSibling, selectedLayerRow)
 
     // update databasae
     let allLayerArray = Array.from(parentElement.querySelectorAll(".layerLevel"))
     let updatedChildArray = allLayerArray.map(p=>p.getAttribute("pageaccesspointer"))
     // changeLayerPosition(mainController, updatedChildArray)
-
 
     // chaange the layer in the fullPage
     let selectedLayerID = selectedLayerRow.getAttribute("pageaccesspointer")
@@ -84,7 +95,10 @@ export function createLayerController(mainController:MainControllerInterface){
     let selectedLayerNextSibling = <HTMLDivElement> document.querySelector(`*[accessPointer='${selectedLayerNextSiblingID}']`)
     let selectedLayerParentElement  = <HTMLDivElement> selectedLayer.parentElement
 
-    console.log(68686868, selectedLayerID, selectedLayerNextSibling)
+    if (!selectedLayerNextSibling){
+        console.log("no next sibling")
+        return
+    }
     selectedLayerParentElement.insertBefore(selectedLayerNextSibling, selectedLayer)
 
   })
@@ -102,12 +116,11 @@ export function createLayerController(mainController:MainControllerInterface){
       let currentPage = mainController.pageController.currentPage
       let currentPageHTMLObject = mainController.pageController.currentPage.fullPageHTMLObject
       let divLayer = GreatNoteDataClass.GNContainerDiv({name:"",arrayID: currentPageHTMLObject.getAccessPointer(), saveToDatabase: true,  _classNameList: ["divLayer"]})
-      divLayer.applyStyle({width: "100%", height: "100%", "position": "absolute", "left": "0px", "top": "0px"})
-      mainController.saveHTMLObjectToDatabase(divLayer)
-
+      currentPageHTMLObject.append(divLayer)
       ToolBoxEvents.attachEventListenerToDivLayer(mainController, divLayer)
 
-      divLayer.appendTo(currentPageHTMLObject)
+      divLayer.applyStyle({width: "100%", height: "100%", "position": "absolute", "left": "0px", "top": "0px"})
+      divLayer.saveHTMLObjectToDatabase()
 
       layerControllerHTMLObject.renderCurrentPageLayer()
   }
@@ -117,12 +130,12 @@ export function createLayerController(mainController:MainControllerInterface){
     let currentPageHTMLObject = mainController.pageController.currentPage.fullPageHTMLObject
       let svgLayer = GreatNoteSvgDataClass.GNSvg({name:"", arrayID: currentPageHTMLObject.getAccessPointer(), saveToDatabase: true, _classNameList: ["svgLayer"]})
       mainController.toolBox.registerSvg(svgLayer)
+      ToolBoxEvents.attachEventListenerToSvgBoard(mainController, svgLayer)
+      currentPageHTMLObject.append(svgLayer)
 
       svgLayer.applyStyle({width: "100%", height: "100%",  "background": "transparent", position: "absolute", left: "0px", top: "0px"})
       mainController.saveHTMLObjectToDatabase(svgLayer)
       svgLayer.classList.add("svgLayer")
-      ToolBoxEvents.attachEventListenerToSvgBoard(mainController, svgLayer)
-      svgLayer.appendTo(currentPageHTMLObject)
 
       layerControllerHTMLObject.renderCurrentPageLayer()
   }
@@ -137,13 +150,11 @@ export function showCurrentPageButtonFunction(mainController:MainControllerInter
     layerView.innerHTML = ""
 
     let currentPageData = mainController.pageController.currentPage.fullPageHTMLObject?.extract()
-    console.log(138138, currentPageData)
 
     if (currentPageData.array.length == 0){
       let layerArray = mainController.pageController.currentPage.fullPageHTMLObject.children
       Array.from(layerArray).forEach((p:any)=>{
-        currentPageData.array.push(p.extract())
-        console.log(p)
+         currentPageData.array.push(p.extract())
       })
     }
 
@@ -155,6 +166,7 @@ export function showCurrentPageButtonFunction(mainController:MainControllerInter
 export function buildLayerContentFunction(mainController: MainControllerInterface, currentPageData: any, layerView:HTMLDivElement, layerLevel=0){
   // first create an item object that conatin the information of the layerLeevel and pageAccessPointer
   // pageAccessPointer is used for finding the related HTML obejct show that you can manipulate them
+
     let layerRowTemplate =  document.querySelector("#layerRowTemplate")
 
     let item = document.createElement("div")
@@ -232,16 +244,17 @@ export function buildLayerContentFunction(mainController: MainControllerInterfac
       if (draggedLayerRow){
           draggedLayerRow.classList.remove("draggedLayerRow")
           draggedLayerRow.style.background = "red"
-          console.log(draggedLayerRow.offsetTop)
-          console.log(layerView.children)
       }
     })
 
     // to
     layerLevel+=1
     if (currentPageData.array.length > 0){
+
+
         currentPageData.array.forEach((p:any)=>{
-            item.appendChild(buildLayerContentFunction(mainController, p, layerView, layerLevel))
+          let _row = buildLayerContentFunction(mainController, p, layerView, layerLevel)
+            if (_row) item.appendChild(_row)
         })
     }
 

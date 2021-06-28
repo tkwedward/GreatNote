@@ -40,7 +40,8 @@ export function attachEventListenerToSvgBoard(mainController, svgBoard) {
             RectangleSelectionToolFunction.overallMouseDownFunction(e, mainController, svgBoard, "mousemove", "mouseup", rectangleSelectionStatusObject);
         }
     };
-    let eventArray = [polylineMouseDown, eraserMouseDownFunction, selectionToolMouseDownFunction, rectangleSelectionToolMouseDownFunction];
+    let eventArray = [polylineMouseDown, eraserMouseDownFunction, selectionToolMouseDownFunction];
+    // let eventArray = [polylineMouseDown, eraserMouseDownFunction, selectionToolMouseDownFunction, rectangleSelectionToolMouseDownFunction]
     eventArray.forEach(toolboxEvent => {
         toolboxEvent.eventNameList.forEach(eventName => {
             svgBoard.addEventListener(eventName, toolboxEvent.eventFunction);

@@ -25,14 +25,15 @@ export function eraserMouseDownFunction(e, mainController, svgBoard, moveEventNa
     if (!touchIsPen)
         return;
     e.preventDefault();
+    let eraserRadiusInput = document.querySelector(".eraserRadiusInput");
     if (e.type == "mousedown" || touchIsPen) {
         let cx = offsetX + "px";
         let cy = offsetY + "px";
-        let r = "20px";
+        let r = eraserRadiusInput.value;
         let eraser = GreatNoteSvgDataClass.GNSvgCircle({ name: "123", arrayID: "", insertPosition: false, dataPointer: false, saveToDatabase: false });
         eraser.style["cx"] = cx;
         eraser.style["cy"] = cy;
-        eraser.style["r"] = r;
+        eraser.style["r"] = r + "px";
         let mouseMoveFunction = (e) => {
             // t1 = t2
             // t2 = e.timeStamp

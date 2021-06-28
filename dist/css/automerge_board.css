@@ -5,6 +5,7 @@ body {
   left: 0px;
   top: 0px;
   margin: 0px;
+  touch-action: manipulation;
 }
 
 .attributePanel .polylineColorController div.selectedColor {
@@ -20,6 +21,16 @@ body {
   height: 150px;
   margin: 10px;
   background: CornflowerBlue;
+}
+.attributePanel .rectangleSelectionToolController {
+  height: 150px;
+  margin: 10px;
+  background: Beige;
+}
+.attributePanel .eraserToolController {
+  height: 150px;
+  margin: 10px;
+  background: BlueViolet;
 }
 .attributePanel .moveObjectInDivController {
   min-height: 200px;
@@ -170,6 +181,10 @@ select, option {
 .pageWrapper .pageContentContainer .fullPage ._commentContainer .replyField {
   margin: 10px;
   width: 90%;
+}
+.pageWrapper .pageContentContainer .fullPageModeDiv {
+  height: 1650px;
+  width: 1200px;
 }
 .pageWrapper .pageContentContainer .overviewModeDivWrapper {
   width: 100%;

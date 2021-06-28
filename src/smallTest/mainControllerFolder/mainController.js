@@ -72,16 +72,29 @@ export class MainController {
     /** when ever the htmlObject is updated, we fetch newData from thfe HTMLObjectt, and then go to the database and update the relevant data*/
     saveHTMLObjectToDatabase(htmlObject) {
         let newData = htmlObject.extract();
+        let latestUpdateTime = htmlObject.getAttribute("latestUpdateTime");
         // console.log(96969696, newData)
         let updateMessage = {
             htmlObjectData: newData,
             metaData: {
                 action: "update",
-                notebookID: this.notebookID
+                notebookID: this.notebookID,
+                latestUpdateTime: latestUpdateTime
             }
         };
         this.changeList.push(updateMessage);
     } // saveHTMLObjectToDatabase
+    tracePageFromElement(htmlObject) {
+        if (htmlObject) {
+            let isPage = htmlObject.classList.contains("fullPage");
+            if (isPage) {
+                return htmlObject;
+            }
+            else {
+                return this.tracePageFromElement(htmlObject.parentElement);
+            }
+        }
+    }
     deleteFromDataBase(htmlObject) {
         let accessPointer = htmlObject.getAccessPointer();
         let dataPointer = htmlObject.getDataPointer();
@@ -103,7 +116,8 @@ export class MainController {
                 action: "delete",
                 accessPointer: accessPointer,
                 parentAccessPointer: parentAccessPointer,
-                notebookID: this.notebookID
+                notebookID: this.notebookID,
+                latestUpdateTime: `${new Date()}`
             }
         };
         htmlObject.remove();
@@ -156,6 +170,7 @@ export class MainController {
     //@auto-fold here
     loadMainDoc(data) {
         this.mainDoc = data;
+        console.log(219219, data);
         let rootArray = data["array"];
         data["array"].map((p) => {
             let arrayName = p["GNType"];
@@ -175,7 +190,8 @@ export class MainController {
         if (changeData.metaData.action == "update") {
             // console.log(213213, changeData)
             let _object = document.querySelector(`*[accessPointer='${htmlObjectData._identity.accessPointer}']`);
-            // console.log(_object, _object._identity, htmlObjectData._identity)
+            let pageHtmlObject = this.tracePageFromElement(_object);
+            pageHtmlObject.setAttribute("latestUpdateTime", changeData.metaData.latestUpdateTime);
             htmlObjectData._identity.linkArray.forEach((p) => {
                 // to chheck if the socket id are different and if the aaaccessPointer of the object is different from the looped aaccessPointer of the linkedObject
                 // console.log(changeData.metaData.socketId, socket.id, _object._identity.accessPointer, p)
@@ -194,6 +210,8 @@ export class MainController {
                 let leftButton = document.querySelector(".leftButton");
                 leftButton.click();
             }
+            let pageHtmlObject = this.tracePageFromElement(_object);
+            pageHtmlObject.setAttribute("latestUpdateTime", `${new Date()}`);
             _object === null || _object === void 0 ? void 0 : _object.remove();
         }
     }

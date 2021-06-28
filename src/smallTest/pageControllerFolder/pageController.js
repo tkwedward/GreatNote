@@ -1,6 +1,7 @@
 import { getPageDataFromServer } from "../buildInitialPageHelperFunctions";
 import { addFunctionToSmallViewHTMLObject } from "../pageControllerFolder/smallViewHelperFunction";
 import * as Setting from "../settings";
+import * as RectangleSelectionToolFunction from "../ToolboxFolder/rectangleSelectionFunction";
 class PageObject {
     constructor() {
         this.pageNumber = -1;
@@ -97,6 +98,7 @@ export function initializePageController(mainController) {
         smallViewHTMLObject.style.height = pageController.overviewPageSize[1] + "px";
         smallViewHTMLObject.fullPageHTMLObject = fullPageHTMLObject;
         fullPageHTMLObject.smallViewHTMLObject = smallViewHTMLObject;
+        smallViewHTMLObject.setAttribute("smallViewAccessPoiniter", fullPageHTMLObject.getAccessPointer());
         let smallViewContent = document.createElement("div");
         smallViewContent.classList.add("smallViewContent");
         smallViewContent.innerText = pageController.currentPage.pageNumber;
@@ -105,6 +107,16 @@ export function initializePageController(mainController) {
         let smallViewData = (_a = fullPageHTMLObject.objectData) === null || _a === void 0 ? void 0 : _a.data.smallViewData;
         if (smallViewData)
             smallViewHTMLObject.loadFromData(smallViewData);
+        let overlay = document.createElement("div");
+        overlay.classList.add("pageOverlay");
+        overlay.style.position = "fixed";
+        overlay.style.width = "100%";
+        overlay.style.height = "100%";
+        // overlay.style.opacity = "0.1"
+        fullPageHTMLObject.append(overlay);
+        overlay.addEventListener("mousedown", (e) => {
+            RectangleSelectionToolFunction.overallMouseDownFunction(e, mainController, overlay, "mousemove", "mouseup");
+        });
         // render current Page
         let showCurrentPageButton = document.querySelector(".showCurrentPageButton");
         showCurrentPageButton.click();
@@ -236,14 +248,22 @@ export function pageControllerHTMLObject(pageController, subPanelContainer) {
     //@auto-fold here
     function leftButtonClickEvent() {
         if (pageController.currentPage.pageNumber > 1) {
+            removeCurrrentPageChildren(pageController.currentPage.fullPageHTMLObject);
             pageController.goToPage(+pageNumberInput.value - 1, pageNumberInput);
         }
+    }
+    function removeCurrrentPageChildren(fullPageHTMLObject) {
+        let children = Array.from(fullPageHTMLObject.children);
+        // children.forEach(child=>{
+        //       child.remove()
+        // })
     }
     leftButton.addEventListener("click", leftButtonClickEvent);
     leftButton.addEventListener("touchstart", leftButtonClickEvent);
     // turn to next page
     //@auto-fold here
     function rightButtonClickEvent() {
+        removeCurrrentPageChildren(pageController.currentPage.fullPageHTMLObject);
         if (pageController.currentPage.pageNumber < pageController.totalPageNumber) {
             pageController.goToPage(+pageNumberInput.value + 1, pageNumberInput);
         }

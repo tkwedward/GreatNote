@@ -85,7 +85,7 @@ export class ToolBoxClass implements ToolBoxInterface {
         },
         eraserItemButton: {
             status: false,
-            attributeController: "eraserController"
+            attributeController: "eraserToolController"
         },
         selectionToolItemButton: {
             status: false,
@@ -93,7 +93,7 @@ export class ToolBoxClass implements ToolBoxInterface {
         },
         rectangleSelectionToolItemButton: {
             status: false,
-            attributeController: "rectangleSelectionTool"
+            attributeController: "rectangleSelectionToolController"
         },
         addCommentItemButton: {
             status: false,
@@ -258,9 +258,28 @@ export class ToolBoxClass implements ToolBoxInterface {
             this.activateButtonFunction(toolBoxItem, "rectangleSelectionToolItemButton")
         })
 
+        toolBoxItem.activate = function(){
+          let pageOverlayArray = Array.from(document.querySelectorAll(".pageOverlay"))
+          pageOverlayArray.forEach(p=>{
+            let parentElemnt = <HTMLDivElement> p.parentElement
+            parentElemnt.append(p)
+            p.style.display = "block"
+          })
+          console.log(pageOverlayArray)
+
+        }
+
+        toolBoxItem.deactivate = function(){
+          let pageOverlayArray: HTMLDivElement[] = Array.from(document.querySelectorAll(".pageOverlay"))
+          pageOverlayArray.forEach(p=>{
+              p.style.display = "none"
+          })
+
+        }
+
+
         return toolBoxItem
     }
-
 
     createEraserItemButton(toolBoxHtmlObject:any){
         // let self = this

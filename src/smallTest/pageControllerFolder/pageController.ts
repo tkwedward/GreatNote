@@ -2,6 +2,7 @@ import { MainControllerInterface} from "../mainControllerFolder/mainControllerIn
 import {getPageDataFromServer} from "../buildInitialPageHelperFunctions"
 import {addFunctionToSmallViewHTMLObject} from "../pageControllerFolder/smallViewHelperFunction"
 import * as Setting from "../settings"
+import * as RectangleSelectionToolFunction from "../ToolboxFolder/rectangleSelectionFunction"
 
 export interface pageControllerInterface {
     startPage: any
@@ -163,6 +164,7 @@ export function initializePageController(mainController:MainControllerInterface)
         smallViewHTMLObject.fullPageHTMLObject = fullPageHTMLObject
         fullPageHTMLObject.smallViewHTMLObject = smallViewHTMLObject
 
+        smallViewHTMLObject.setAttribute("smallViewAccessPoiniter", fullPageHTMLObject.getAccessPointer())
 
         let smallViewContent = document.createElement("div")
         smallViewContent.classList.add("smallViewContent")
@@ -173,6 +175,18 @@ export function initializePageController(mainController:MainControllerInterface)
 
         let smallViewData = fullPageHTMLObject.objectData?.data.smallViewData
         if (smallViewData) smallViewHTMLObject.loadFromData(smallViewData)
+
+
+        let overlay = document.createElement("div")
+        overlay.classList.add("pageOverlay")
+        overlay.style.position = "fixed"
+        overlay.style.width = "100%"
+        overlay.style.height = "100%"
+        // overlay.style.opacity = "0.1"
+        fullPageHTMLObject.append(overlay)
+        overlay.addEventListener("mousedown", (e:any)=>{
+          RectangleSelectionToolFunction.overallMouseDownFunction(e,  mainController, overlay, "mousemove", "mouseup")
+        })
 
         // render current Page
         let showCurrentPageButton = <HTMLButtonElement> document.querySelector(".showCurrentPageButton")
@@ -225,7 +239,6 @@ export function initializePageController(mainController:MainControllerInterface)
         // set the position of the page according to the position relative to the targetPage
         pageController.currentPage.fullPageHTMLObject.classList.remove("currentPage")
         pageController.currentPage.fullPageHTMLObject.style.display = "none"
-
 
         // turn targetPage to current Page
         pageController.currentPage = _targetPage
@@ -316,6 +329,7 @@ export function pageControllerHTMLObject(pageController: any, subPanelContainer:
     pageController.pagNumberInput = pageNumberInput
     pageNumberInput.addEventListener("keyup", function(event) {
       if (event.key === "Enter") {
+
             let goToPageEvent = new CustomEvent("goToPageEvent", { 'detail': {pageNumber: parseInt(pageNumberInput.value)}});
             pageController.EventReceiver.dispatchEvent(goToPageEvent)
       }
@@ -338,8 +352,17 @@ export function pageControllerHTMLObject(pageController: any, subPanelContainer:
 
     function leftButtonClickEvent(){
         if (pageController.currentPage.pageNumber > 1){
+            removeCurrrentPageChildren(pageController.currentPage.fullPageHTMLObject)
+
             pageController.goToPage(+pageNumberInput.value - 1, pageNumberInput)
         }
+    }
+
+    function removeCurrrentPageChildren(fullPageHTMLObject: HTMLDivElement){
+        let children = Array.from(fullPageHTMLObject.children)
+        // children.forEach(child=>{
+        //       child.remove()
+        // })
     }
 
     leftButton.addEventListener("click", leftButtonClickEvent)
@@ -348,6 +371,7 @@ export function pageControllerHTMLObject(pageController: any, subPanelContainer:
     // turn to next page
     //@auto-fold here
     function rightButtonClickEvent(){
+        removeCurrrentPageChildren(pageController.currentPage.fullPageHTMLObject)
         if (pageController.currentPage.pageNumber < pageController.totalPageNumber){
             pageController.goToPage(+pageNumberInput.value + 1, pageNumberInput)
         }

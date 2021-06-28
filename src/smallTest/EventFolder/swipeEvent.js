@@ -64,7 +64,7 @@ export function swipeDetection(mainController, pageContentContainer) {
         pageContentContainer.addEventListener("touchmove", mouseMoveFunction);
         // define the mouse move function
         let mouseUpFunction = (e) => {
-            // remove the mouse move event
+            // remove the mouse move even
             fingerTurnPage(mainController, pageContentContainer, mouseMoveFunction, mouseUpFunction, deltaX, deltaX2, doubleFinger);
         }; // mouseUpFunction
         pageContentContainer.addEventListener("touchend", mouseUpFunction);

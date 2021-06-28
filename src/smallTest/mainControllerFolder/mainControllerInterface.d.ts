@@ -58,6 +58,7 @@ export interface MainControllerInterface {
     saveHTMLObjectToDatabase(htmlObject: GNObjectInterface): void;
     deleteFromDataBase(htmlObject: GNObjectInterface): void;
     sendChangeToServer(): void;
+    tracePageFromElement(htmlObject: HTMLElement): any;
     /** the arrayID is for attaching to the array*/
     getHTMLObjectById(objectID: string): any;
     getObjectById(objectID: string, doc?: any): any;
@@ -98,6 +99,7 @@ export interface UpdateDataFormatInterface {
     metaData: {
         action: string;
         notebookID: string;
+        latestUpdateTime: string;
     };
 }
 export interface AddDatabaseFormatInterface {

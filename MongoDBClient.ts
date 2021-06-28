@@ -140,6 +140,7 @@ export class MongoBackEnd implements MongoBackEndInterface {
 
     async initializeFirstNotebook(notebookID:string){
         console.log(125125, notebookID)
+
         let mongoClient = await this.connect()
         const database =  mongoClient.db(notebookDataBaseName)
         let allNotebookDB = database.collection(notebookID)
@@ -147,7 +148,6 @@ export class MongoBackEnd implements MongoBackEndInterface {
 
         // await allNotebookDB.drop()
         if (count <= 1) await this.createEmptyNotebook(allNotebookDB)
-
         return await this.getInitializeNotebookData(allNotebookDB)
     } // initializeFirstNotebook
 
@@ -251,6 +251,7 @@ export class MongoBackEnd implements MongoBackEndInterface {
 
     async recursiveGetChildNodeData(collection, nodeData, level){
       nodeData.array = []
+
       if (nodeData._identity.children.length > 0 && level != 0){
           if (level) level -= 1
 
@@ -290,9 +291,11 @@ export class MongoBackEnd implements MongoBackEndInterface {
         let rootNode = await collection.findOne({ "_identity.accessPointer": "00000-00000" })
         rootNode["array"] = []
 
+        // level 0: rootNode, level 1: mainArray, level 2: fullPage
         let result = await this.recursiveGetChildNodeData(collection, rootNode, 3)
-        console.log(result)
-
+        console.log(296296, result)
+        // console.log(result)
+        //
         return await rootNode
     }
     // async getInitializeNotebookData(collection){
@@ -343,7 +346,7 @@ export class MongoBackEnd implements MongoBackEndInterface {
 
     async connect(){
         const mongoClient = new MongoClient(this.mongoUrl, {
-          // useUnifiedTopology: true,
+          useUnifiedTopology: true,
           useNewUrlParser: true
         })
 

@@ -1,6 +1,7 @@
 import { mainController } from "../index";
 import { GNPage } from "./GreatNoteClass/GNPage";
 import { highlightCurrentPageInOverviewMode } from "./pageControllerFolder/pageController";
+import { renderSmallView } from "./pageControllerFolder/smallViewHelperFunction";
 // import {pageController, updatePageController, updatePageNumberInNewOrder, highlightCurrentPageInOverviewMode} from "./pageControllerFolder/pageController"
 export function shortNotice(noticeText) {
     let shortNoticeDiv = document.createElement("div");
@@ -96,8 +97,24 @@ export function createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv) {
         switchViewModeButton.setAttribute("mode", mode);
         switchViewModeButton.innerText = mode;
         if (mode == "overviewMode") {
+            // to turn on smaall View
             fullPageModeDiv.setAttribute("status", "off");
             overviewModeDivWrapper.setAttribute("status", "on");
+            let _currentPage = mainController.pageController.startPage.next;
+            while (_currentPage) {
+                if (_currentPage.name == "endPage")
+                    break;
+                let fullPageHTMLObject = _currentPage.fullPageHTMLObject;
+                let smallViewHTMLObject = fullPageHTMLObject.smallViewHTMLObject;
+                smallViewHTMLObject.style.position = "relative";
+                let fullPageHTMLObjectLatestDate = fullPageHTMLObject.getAttribute("latestUpdateTime");
+                let smallViewHTMLObjectLatestDate = smallViewHTMLObject.getAttribute("latestUpdateTime");
+                // to render the smallView
+                if (!smallViewHTMLObjectLatestDate || fullPageHTMLObjectLatestDate != smallViewHTMLObjectLatestDate) {
+                    renderSmallView(fullPageHTMLObject, smallViewHTMLObject, _currentPage.pageNumber);
+                }
+                _currentPage = _currentPage.next;
+            }
         }
         else {
             fullPageModeDiv.setAttribute("status", "on");
@@ -138,7 +155,9 @@ export function insertNewPage(pageController, newFullPage, fullPageModeDiv) {
     // appending new pages to the fullPageModeDiv and overviewModeDiv
     //==========================
     // newFullPage.setAttribute("pageNumber", newPageNumber)
-    fullPageModeDiv.appendChild(newFullPage);
+    console.log(211211, fullPageModeDiv, newFullPage);
+    fullPageModeDiv.append(newFullPage);
+    //
     // highlight and update the pageNumberInput
     let pageNumberInput = document.querySelector(".pageNumberInput");
     pageNumberInput.value = pageController.currentPage.pageNumber;
@@ -151,12 +170,16 @@ export function createNewPageEvent(currentStatus, fullPageModeDiv, pageDummyCont
         let insertPosition = currentStatus.currentPage.pageNumber;
         let saveToDatabase = true;
         let newPage = createNewPage(currentStatus, fullPageModeDiv, false, saveToDatabase, insertPosition);
+        // console.log(229229, newPage, newPage.getAccessPointer())
         insertNewPage(currentStatus, newPage, fullPageModeDiv);
+        newPage.style.display = "block";
+        // console.log(23323, fullPageModeDiv)
         // the functinos are defined at layerController
         let addDivLayereButton = document.querySelector(".addDivLayerButton");
-        let addSvgLayerButton = document.querySelector(".addSvgLayerButton");
         addDivLayereButton.click();
+        let addSvgLayerButton = document.querySelector(".addSvgLayerButton");
         addSvgLayerButton.click();
+        fullPageModeDiv.append(newPage);
     };
     return clickEventAction;
 }
