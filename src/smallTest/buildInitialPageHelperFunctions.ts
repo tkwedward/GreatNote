@@ -196,12 +196,21 @@ export function buildPageControllerButtonArray(mainController:MainControllerInte
       window.selectedItem = document.querySelector(`*[accessPointer='${objectIDGetter.value}']`)
   })
 
+
+  let minimizedBarButton = document.createElement("button")
+  minimizedBarButton.innerText = "minimize"
+  minimizedBarButton.addEventListener("click", e=>{
+    let pageWrapper = <HTMLDivElement> document.querySelector(".pageWrapper")
+    pageWrapper.classList.toggle("minimizedBar")
+  })
+
+
   editorController.append(objectIDGetter, objectIDGetterSubmit, testFieldButton, showMainDocButton, showAnnotationButton)
 
   // toolBoxObject
   let toolBoxHtmlObject = buildToolBoxHtmlObject(mainController)
 
-  pageControllerSubPanelContent.append(toolBoxHtmlObject, editorController, scaleController)
+  pageControllerSubPanelContent.append(toolBoxHtmlObject, minimizedBarButton, editorController, scaleController)
 
   let annotationPage = document.querySelector(".annotationPage")
 

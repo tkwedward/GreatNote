@@ -1,0 +1,23 @@
+// @media (max-width:1025px){
+    .pageWrapper.minimizedBar {
+      grid-template-columns: 0.2fr 5fr;
+
+      .middleSubPanelTabWrapper, .bottomSubPanelTabWrapper {
+        display: none;
+      }
+
+      .pageContentContainer {
+        overflow-x: hidden !important;
+      }
+
+      .toolBoxItem {
+        display: none;
+      }
+
+      .toolBoxItem.PolyLine, .toolBoxItem.SelectionTool, .toolBoxItem.Eraser {
+        display: block;
+      }
+    }
+
+
+// }

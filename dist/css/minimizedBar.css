@@ -1,0 +1,17 @@
+.pageWrapper.minimizedBar {
+  grid-template-columns: 0.2fr 5fr;
+}
+.pageWrapper.minimizedBar .middleSubPanelTabWrapper, .pageWrapper.minimizedBar .bottomSubPanelTabWrapper {
+  display: none;
+}
+.pageWrapper.minimizedBar .pageContentContainer {
+  overflow-x: hidden !important;
+}
+.pageWrapper.minimizedBar .toolBoxItem {
+  display: none;
+}
+.pageWrapper.minimizedBar .toolBoxItem.PolyLine, .pageWrapper.minimizedBar .toolBoxItem.SelectionTool, .pageWrapper.minimizedBar .toolBoxItem.Eraser {
+  display: block;
+}
+
+/*# sourceMappingURL=minimizedBar.css.map */

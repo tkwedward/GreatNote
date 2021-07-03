@@ -23,6 +23,9 @@ app.get("/board", (req, res)=>{
 
 let turnOnServerMode = true
 let changeListArray = []
+let changeListProcessing = false
+let connectedNodeIdArray = []
+// let connectedNodeIdArray = new Set()
 // turnOnServerMode = false
 
 // socketArray = []
@@ -32,13 +35,20 @@ let jsonFileLocation2 = path.join(__dirname, "./dist/data/automergeDataJSON.txt"
 
 let automergeMainDoc: AutomergeMainDocInterface = new AutomergeMainDoc(jsonFileLocation)
 
-  io.on("connection", socket=>{
-    socket.on("message", data => {
+io.on("connection", socket=>{
+  socket.on("message", data => {
     console.log(new Date(), data);
   })
 
-  socket.on('joinRoom', function(room) {
-    socket.join(room);
+  socket.on('joinRoom', function(item: {notebookID: string, nodeID: string}) {
+    socket.join(item.notebookID);
+
+
+
+    connectedNodeIdArray.push([item.nodeID, socket.id, item.notebookID])
+
+    console.log("new user joined")
+    console.log("The user list is ", connectedNodeIdArray)
   });
 
   socket.on("clientsAskForOverallNoteBookInfo", async ()=>{
@@ -64,32 +74,53 @@ let automergeMainDoc: AutomergeMainDocInterface = new AutomergeMainDoc(jsonFileL
 
   socket.on("clientSendChangesToServer",async  changeList=>{
     changeList.forEach(p=>changeListArray.push(p))
-
-    let notebooID = changeList[0].metaData.notebookID
-    let mongoClient
-    try {
-      mongoClient = await automergeMainDoc.mongoDB.connect()
-    }
-    catch {
-        io.to(notebooID).emit("mongoDBError")
-    }
-
-    const database =  mongoClient.db("GreatNote")
-    let allNotebookDB = database.collection(notebooID)
-    try {
-        let changeListToClients = changeList.map(async changeData=> await automergeMainDoc.processChangeDataFromClients(allNotebookDB, changeData, socket.id))
-    } catch {
-        io.to(notebooID).emit("mongoDBError")
-    }
-
-
-    io.to(notebooID).emit("message", "finish saving")
-    io.to(notebooID).emit("serverSendChangeFileToClient", changeList)
   })
 
-  // let processChangeList = setInterval(()=>{
-  //
-  // } , 500)
+  async function processChangeList(){
+      if (changeListArray.length>0){
+          let item = changeListArray.shift()
+
+          let notebooID = item.metaData.notebookID
+          let mongoClient
+          try {
+            mongoClient = await automergeMainDoc.mongoDB.connect()
+          }
+          catch (err) {
+              console.log(err)
+              io.to(notebooID).emit("mongoDBError")
+          }
+
+          const database =  mongoClient.db("GreatNote")
+          let allNotebookDB = database.collection(notebooID)
+
+          try {
+            await automergeMainDoc.processChangeDataFromClients(allNotebookDB, item, socket.id)
+          } catch(err) {
+              console.log(err)
+              io.to(notebooID).emit("mongoDBError")
+          }
+
+
+
+          io.to(notebooID).emit("message", "finish saving")
+          io.to(notebooID).emit("serverSendChangeFileToClient", item)
+
+          processChangeList()
+      } else {
+          changeListProcessing = false
+      }
+  }
+
+  let processChangeListIntervalFunction = setInterval(()=>{
+    if (!changeListProcessing && changeListArray.length > 0){
+      changeListProcessing = true
+      processChangeList()
+      return
+    } else {
+      // if changeListProcessing is true, that means we don't whant to do anythinig
+      return
+    }
+  } , 500)
 
   // operaation on notebook
   socket.on("createNewNotebook", (notebookInfo: {notebookName: string, notebookID: string})=>{
@@ -116,13 +147,21 @@ let automergeMainDoc: AutomergeMainDocInterface = new AutomergeMainDoc(jsonFileL
       socket.emit("receivePageDataFromServer", pageInfo)
   })
 
+  socket.on("clientAskUserData", (roomId)=>{
+      io.in(roomId).emit("serverSendUserData", connectedNodeIdArray)
+  })
+
+
 
   socket.on("disconnect", ()=>{
-    console.log("user disconnected");
-    io.emit("message", "user disconnected")
-    socket.broadcast.emit('socketConnectionUpdate', {
-      action: "disconnect", targetSocketId: socket.id
-    });
+      console.log("user disconnected");
+      io.emit("message", "user disconnected")
+
+      let connectedSocketId = Array.from(io.sockets.sockets.keys())
+
+      console.log("Before delete", connectedNodeIdArray)
+      connectedNodeIdArray = connectedNodeIdArray.filter(p=>connectedSocketId.indexOf(p[1]))
+      console.log("After delete", connectedNodeIdArray)
   })// disconnect
 }) // io.on(connection)
 

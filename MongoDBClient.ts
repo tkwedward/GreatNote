@@ -205,11 +205,11 @@ export class MongoBackEnd implements MongoBackEndInterface {
     } // updateItem
 
     async deleteItem(collection, databaseMessage){
-      await collection.remove({
+      await collection.deleteOne({
         "_identity.accessPointer":  databaseMessage.metaData.accessPointer
       })
 
-      await collection.update({
+      await collection.updateOne({
         "_identity.accessPointer": databaseMessage.metaData.parentAccessPointer},
         {"$pull": {"_identity.children": databaseMessage.metaData.accessPointer}}
       )
@@ -222,7 +222,7 @@ export class MongoBackEnd implements MongoBackEndInterface {
       let updateDescription = {}
       updateDescription[modifyField] =newData
       console.log(databaseMessage.metaData.accessPointer, updateDescription)
-      await collection.update({
+      await collection.updateOne({
         "_identity.accessPointer": databaseMessage.metaData.accessPointer},
         {"$set": updateDescription}
       )
@@ -293,7 +293,7 @@ export class MongoBackEnd implements MongoBackEndInterface {
 
         // level 0: rootNode, level 1: mainArray, level 2: fullPage
         let result = await this.recursiveGetChildNodeData(collection, rootNode, 3)
-        console.log(296296, result)
+        // console.log(296296, result)
         // console.log(result)
         //
         return await rootNode
@@ -347,7 +347,12 @@ export class MongoBackEnd implements MongoBackEndInterface {
     async connect(){
         const mongoClient = new MongoClient(this.mongoUrl, {
           useUnifiedTopology: true,
-          useNewUrlParser: true
+          useNewUrlParser: true,
+          keepAlive: true,
+          connectTimeoutMS: 300000,
+          socketTimeoutMS: 300000,
+          bufferMaxEntries: 0,
+          poolSize: 10
         })
 
         console.info("connection to MongoDB")

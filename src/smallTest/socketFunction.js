@@ -2,10 +2,11 @@ let io = require('socket.io-client');
 import { mainController } from "../index";
 export var socket;
 socket = io.io();
+window.socket = socket;
 socket.emit("message", "I want to connect");
 socket.on("connect", () => {
     // emit to everybody
-    socket.emit('joinRoom', mainController.notebookID);
+    socket.emit('joinRoom', { notebookID: mainController.notebookID, nodeID: mainController.uniqueNodeId });
     socket.emit("message", "user connected");
     // socket.emit("initialDataRequest")
 });
@@ -31,7 +32,7 @@ socket.on("saveDataToServer", (data) => {
 });
 import { renderSmallView } from "./pageControllerFolder/smallViewHelperFunction";
 socket.on("receivePageDataFromServer", (data) => {
-    console.log(data["array"]);
+    console.log(49494949, data);
     data["array"].forEach((p) => {
         let layerHTMLObject = document.querySelector(`*[accessPointer='${p._identity.accessPointer}']`);
         let fullPageHTMLObject = mainController.tracePageFromElement(layerHTMLObject);
@@ -60,12 +61,24 @@ socket.on("processInitialData", (data) => {
     mainController.buildPageFromMainDoc();
     // TestFunction.testFunction(mainController)
 });
-socket.on("socketConnectionUpdate", (data) => {
-    // mainController.communitcationController.update(data)
+socket.on("serverSendUserData", (data) => {
+    // data = []
+    console.log(9349343, data);
 });
-socket.on("serverSendChangeFileToClient", (changeDataArray) => {
+socket.on("socketConnectionUpdate", (data) => {
+    // nodeID, socket.it, notebookID mainController.communitcationController.update(data)
+    console.log(9349343, data);
+});
+socket.on('disconnected', function () {
+    socket.emit('deleteNode', mainController.uniqueNodeId);
+});
+socket.on("serverSendChangeFileToClient", (changeData) => {
     // changeData: meta, htmlObjectData
-    changeDataArray.forEach((changeData) => {
+    console.log(9292929, changeData, socket.id, changeData.metaData.socketId, changeData.metaData.uniqueNodeId);
+    if (mainController.uniqueNodeId != changeData.metaData.uniqueNodeId) {
         mainController.processChangeData(changeData);
-    });
+    }
+    else {
+        console.log("I don't process the received data.");
+    }
 });

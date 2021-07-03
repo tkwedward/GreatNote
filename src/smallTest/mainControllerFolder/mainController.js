@@ -25,6 +25,7 @@ export class MainController {
             "overviewPageSize": Setting.pageSizeInfo.overviewPageSize
         };
         this.pageController = PageController.initializePageController(this);
+        this.uniqueNodeId = "nodeNumber_" + `${Date.now().toString(36) + Math.random().toString(36).substr(2)}`;
     }
     // ******************************************
     // *     B. Modify data in the database     *
@@ -45,7 +46,8 @@ export class MainController {
                 parentAccessPointer: parentAccessPointer,
                 accessPointer: accessPointer,
                 dataPointer: dataPointer,
-                notebookID: this.notebookID
+                notebookID: this.notebookID,
+                uniqueNodeId: this.uniqueNodeId
             }
         };
         // socket.emit("databaseOperation", dataMessage)
@@ -79,7 +81,8 @@ export class MainController {
             metaData: {
                 action: "update",
                 notebookID: this.notebookID,
-                latestUpdateTime: latestUpdateTime
+                latestUpdateTime: latestUpdateTime,
+                uniqueNodeId: this.uniqueNodeId
             }
         };
         this.changeList.push(updateMessage);
@@ -117,7 +120,8 @@ export class MainController {
                 accessPointer: accessPointer,
                 parentAccessPointer: parentAccessPointer,
                 notebookID: this.notebookID,
-                latestUpdateTime: `${new Date()}`
+                latestUpdateTime: `${new Date()}`,
+                uniqueNodeId: this.uniqueNodeId
             }
         };
         htmlObject.remove();
@@ -182,9 +186,13 @@ export class MainController {
     processChangeData(changeData) {
         let { htmlObjectData, metaData } = changeData;
         // console.log(215215, metaData.socketId , socket.id)
-        if (metaData.socketId == socket.id)
-            return;
+        console.log(254254, changeData);
+        // if (metaData.socketId == socket.id) return
         if (changeData.metaData.action == "create") {
+            let item = document.querySelector(`*[accessPointe='${changeData.htmlObjectData._identity.accessPointer}']`);
+            console.log(245245, item, changeData.htmlObjectData._identity.accessPointer);
+            if (item)
+                return;
             processCreationDataHelper(this, changeData);
         } // create
         if (changeData.metaData.action == "update") {

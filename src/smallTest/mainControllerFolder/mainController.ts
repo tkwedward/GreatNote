@@ -13,7 +13,7 @@ import {renderDataToHTML} from "./renderDataToHTML"
 
 export class MainController implements MainControllerInterface{
   mainDocArray:any = {};
-  mainDoc: any;
+  mainDoc: any
   notebookID: string
   baseArrayID: string = "";
   previousDoc: any;
@@ -26,6 +26,7 @@ export class MainController implements MainControllerInterface{
   attributeControllerMapping: any
   layerController: any
   changeList: any[] = []
+  uniqueNodeId:string
 
 // *****************************
 // *     A. Initialization     *
@@ -41,6 +42,8 @@ export class MainController implements MainControllerInterface{
           "overviewPageSize": Setting.pageSizeInfo.overviewPageSize
         }
         this.pageController = PageController.initializePageController(this)
+
+        this.uniqueNodeId = "nodeNumber_" + `${Date.now().toString(36) + Math.random().toString(36).substr(2)}`
     }
 
 // ******************************************
@@ -62,7 +65,8 @@ export class MainController implements MainControllerInterface{
                 parentAccessPointer: parentAccessPointer,
                 accessPointer: accessPointer,
                 dataPointer: dataPointer,
-                notebookID: this.notebookID
+                notebookID: this.notebookID,
+                uniqueNodeId: this.uniqueNodeId
             }
         }
         // socket.emit("databaseOperation", dataMessage)
@@ -103,7 +107,8 @@ export class MainController implements MainControllerInterface{
             metaData:{
                 action: "update",
                 notebookID: this.notebookID,
-                latestUpdateTime: latestUpdateTime
+                latestUpdateTime: latestUpdateTime,
+                uniqueNodeId: this.uniqueNodeId
             }
         }
         this.changeList.push(updateMessage)
@@ -146,7 +151,8 @@ export class MainController implements MainControllerInterface{
               accessPointer: accessPointer,
               parentAccessPointer: parentAccessPointer,
               notebookID: this.notebookID,
-              latestUpdateTime: `${new Date()}`
+              latestUpdateTime: `${new Date()}`,
+              uniqueNodeId: this.uniqueNodeId
            }
         }
         htmlObject.remove()
@@ -234,11 +240,17 @@ export class MainController implements MainControllerInterface{
 
           // console.log(215215, metaData.socketId , socket.id)
 
-          if (metaData.socketId == socket.id) return
+          console.log(254254, changeData)
+
+
 
 
 
           if (changeData.metaData.action=="create"){
+              let item = document.querySelector(`*[accessPointe='${changeData.htmlObjectData._identity.accessPointer}']`)
+              console.log(245245, item, changeData.htmlObjectData._identity.accessPointer)
+              if (item) return
+
               processCreationDataHelper(this, changeData)
           }// create
 

@@ -1,3 +1,4 @@
+import { socket } from "../socketFunction";
 export function buildUserController(mainController) {
     let userControllerNavbarTitle = document.createElement("div");
     userControllerNavbarTitle.classList.add("userControllerNavbarTitle", "subPanelTitle");
@@ -12,6 +13,12 @@ export function buildUserController(mainController) {
     // controller bar
     let userControllerBar = document.createElement("div");
     userControllerBar.classList.add("userControllerBar");
+    let checkCurrentUserButton = document.createElement("button");
+    checkCurrentUserButton.classList.add("checkCurrentUser");
+    checkCurrentUserButton.innerText = "check User";
+    checkCurrentUserButton.addEventListener("click", e => {
+        socket.emit("clientAskUserData", mainController.notebookID);
+    });
     let addUserButton = document.createElement("button");
     addUserButton.classList.add("addUserButton");
     addUserButton.innerText = "add User";
@@ -19,7 +26,7 @@ export function buildUserController(mainController) {
         let userRow = createUserRow();
         userViewer.append(userRow);
     });
-    userControllerBar.append(addUserButton);
+    userControllerBar.append(addUserButton, checkCurrentUserButton);
     userControllerWrapper.append(userViewer, userControllerBar);
     return [userControllerNavbarTitle, userControllerWrapper];
 }

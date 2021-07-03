@@ -57,6 +57,9 @@ app.get("/board", function (req, res) {
 });
 var turnOnServerMode = true;
 var changeListArray = [];
+var changeListProcessing = false;
+var connectedNodeIdArray = [];
+// let connectedNodeIdArray = new Set()
 // turnOnServerMode = false
 // socketArray = []
 var jsonFileLocation = path.join(__dirname, "./dist/data/automergeData.txt");
@@ -66,8 +69,11 @@ io.on("connection", function (socket) {
     socket.on("message", function (data) {
         console.log(new Date(), data);
     });
-    socket.on('joinRoom', function (room) {
-        socket.join(room);
+    socket.on('joinRoom', function (item) {
+        socket.join(item.notebookID);
+        connectedNodeIdArray.push([item.nodeID, socket.id, item.notebookID]);
+        console.log("new user joined");
+        console.log("The user list is ", connectedNodeIdArray);
     });
     socket.on("clientsAskForOverallNoteBookInfo", function () { return __awaiter(void 0, void 0, void 0, function () {
         var overallNotebookInfo;
@@ -102,46 +108,72 @@ io.on("connection", function (socket) {
         });
     }); });
     socket.on("clientSendChangesToServer", function (changeList) { return __awaiter(void 0, void 0, void 0, function () {
-        var notebooID, mongoClient, _a, database, allNotebookDB, changeListToClients;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0:
-                    changeList.forEach(function (p) { return changeListArray.push(p); });
-                    notebooID = changeList[0].metaData.notebookID;
-                    _b.label = 1;
-                case 1:
-                    _b.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, automergeMainDoc.mongoDB.connect()];
-                case 2:
-                    mongoClient = _b.sent();
-                    return [3 /*break*/, 4];
-                case 3:
-                    _a = _b.sent();
-                    io.to(notebooID).emit("mongoDBError");
-                    return [3 /*break*/, 4];
-                case 4:
-                    database = mongoClient.db("GreatNote");
-                    allNotebookDB = database.collection(notebooID);
-                    try {
-                        changeListToClients = changeList.map(function (changeData) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0: return [4 /*yield*/, automergeMainDoc.processChangeDataFromClients(allNotebookDB, changeData, socket.id)];
-                                case 1: return [2 /*return*/, _a.sent()];
-                            }
-                        }); }); });
-                    }
-                    catch (_c) {
-                        io.to(notebooID).emit("mongoDBError");
-                    }
-                    io.to(notebooID).emit("message", "finish saving");
-                    io.to(notebooID).emit("serverSendChangeFileToClient", changeList);
-                    return [2 /*return*/];
-            }
+        return __generator(this, function (_a) {
+            changeList.forEach(function (p) { return changeListArray.push(p); });
+            return [2 /*return*/];
         });
     }); });
-    // let processChangeList = setInterval(()=>{
-    //
-    // } , 500)
+    function processChangeList() {
+        return __awaiter(this, void 0, void 0, function () {
+            var item, notebooID, mongoClient, err_1, database, allNotebookDB, err_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!(changeListArray.length > 0)) return [3 /*break*/, 9];
+                        item = changeListArray.shift();
+                        notebooID = item.metaData.notebookID;
+                        mongoClient = void 0;
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, automergeMainDoc.mongoDB.connect()];
+                    case 2:
+                        mongoClient = _a.sent();
+                        return [3 /*break*/, 4];
+                    case 3:
+                        err_1 = _a.sent();
+                        console.log(err_1);
+                        io.to(notebooID).emit("mongoDBError");
+                        return [3 /*break*/, 4];
+                    case 4:
+                        database = mongoClient.db("GreatNote");
+                        allNotebookDB = database.collection(notebooID);
+                        _a.label = 5;
+                    case 5:
+                        _a.trys.push([5, 7, , 8]);
+                        return [4 /*yield*/, automergeMainDoc.processChangeDataFromClients(allNotebookDB, item, socket.id)];
+                    case 6:
+                        _a.sent();
+                        return [3 /*break*/, 8];
+                    case 7:
+                        err_2 = _a.sent();
+                        console.log(err_2);
+                        io.to(notebooID).emit("mongoDBError");
+                        return [3 /*break*/, 8];
+                    case 8:
+                        io.to(notebooID).emit("message", "finish saving");
+                        io.to(notebooID).emit("serverSendChangeFileToClient", item);
+                        processChangeList();
+                        return [3 /*break*/, 10];
+                    case 9:
+                        changeListProcessing = false;
+                        _a.label = 10;
+                    case 10: return [2 /*return*/];
+                }
+            });
+        });
+    }
+    var processChangeListIntervalFunction = setInterval(function () {
+        if (!changeListProcessing && changeListArray.length > 0) {
+            changeListProcessing = true;
+            processChangeList();
+            return;
+        }
+        else {
+            // if changeListProcessing is true, that means we don't whant to do anythinig
+            return;
+        }
+    }, 500);
     // operaation on notebook
     socket.on("createNewNotebook", function (notebookInfo) {
         console.log("=====================");
@@ -174,12 +206,16 @@ io.on("connection", function (socket) {
             }
         });
     }); });
+    socket.on("clientAskUserData", function (roomId) {
+        io["in"](roomId).emit("serverSendUserData", connectedNodeIdArray);
+    });
     socket.on("disconnect", function () {
         console.log("user disconnected");
         io.emit("message", "user disconnected");
-        socket.broadcast.emit('socketConnectionUpdate', {
-            action: "disconnect", targetSocketId: socket.id
-        });
+        var connectedSocketId = Array.from(io.sockets.sockets.keys());
+        console.log("Before delete", connectedNodeIdArray);
+        connectedNodeIdArray = connectedNodeIdArray.filter(function (p) { return connectedSocketId.indexOf(p[1]); });
+        console.log("After delete", connectedNodeIdArray);
     }); // disconnect
 }); // io.on(connection)
 server.listen(port, function () {

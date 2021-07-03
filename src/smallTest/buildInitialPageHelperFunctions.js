@@ -154,10 +154,16 @@ export function buildPageControllerButtonArray(mainController) {
         // console.log(mainController.getObjectById(objectIDGetter.value), document.querySelector(`*[accessPointer='${objectIDGetter.value}']`));
         window.selectedItem = document.querySelector(`*[accessPointer='${objectIDGetter.value}']`);
     });
+    let minimizedBarButton = document.createElement("button");
+    minimizedBarButton.innerText = "minimize";
+    minimizedBarButton.addEventListener("click", e => {
+        let pageWrapper = document.querySelector(".pageWrapper");
+        pageWrapper.classList.toggle("minimizedBar");
+    });
     editorController.append(objectIDGetter, objectIDGetterSubmit, testFieldButton, showMainDocButton, showAnnotationButton);
     // toolBoxObject
     let toolBoxHtmlObject = buildToolBoxHtmlObject(mainController);
-    pageControllerSubPanelContent.append(toolBoxHtmlObject, editorController, scaleController);
+    pageControllerSubPanelContent.append(toolBoxHtmlObject, minimizedBarButton, editorController, scaleController);
     let annotationPage = document.querySelector(".annotationPage");
     return { pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, showMainDocButton, showAnnotationButton, annotationPage, scaleController };
 } // buildPageControllerButtonArray

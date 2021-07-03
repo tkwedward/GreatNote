@@ -11,9 +11,14 @@ let notebookID = urlSplitArray[urlSplitArray.length - 1];
 mainController.notebookID = notebookID;
 console.log(14141414, notebookID);
 socket.emit("initialDataRequest", notebookID); // processInitialDat
+console.log(202020202, mainController.uniqueNodeId);
 setInterval(function () {
     if (mainController.changeList.length > 0) {
-        console.log(mainController.changeList);
+        mainController.changeList = mainController.changeList.map(p => {
+            p.metaData.socketId = socket.id;
+            return p;
+        });
+        console.log(21212121, mainController.changeList);
         socket.emit("clientSendChangesToServer", mainController.changeList);
         mainController.changeList = [];
     }

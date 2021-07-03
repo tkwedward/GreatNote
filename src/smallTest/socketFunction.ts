@@ -6,10 +6,12 @@ import * as CommunicatorController from "./communicationFolder/communitcationCon
 import * as Automerge from 'automerge'
 
 socket = io.io()
+
+window.socket = socket
 socket.emit("message", "I want to connect")
 socket.on("connect", ()=>{
     // emit to everybody
-    socket.emit('joinRoom', mainController.notebookID);
+    socket.emit('joinRoom', {notebookID: mainController.notebookID, nodeID: mainController.uniqueNodeId} );
 
     socket.emit("message", "user connected")
     // socket.emit("initialDataRequest")
@@ -46,7 +48,7 @@ socket.on("saveDataToServer", (data:any)=>{
 import { renderSmallView } from "./pageControllerFolder/smallViewHelperFunction"
 
 socket.on("receivePageDataFromServer", (data: any)=>{
-  console.log(data["array"])
+  console.log(49494949, data)
   data["array"].forEach((p:any)=>{
       let layerHTMLObject = <any> document.querySelector(`*[accessPointer='${p._identity.accessPointer}']`)
       let fullPageHTMLObject = mainController.tracePageFromElement(layerHTMLObject)
@@ -82,15 +84,31 @@ socket.on("processInitialData", (data:any)=>{
 })
 
 
+socket.on("serverSendUserData", (data:[string, string, string])=>{
+    // data = []
+    console.log(9349343, data)
+
+    
+})
+
 socket.on("socketConnectionUpdate", (data:any)=>{
-    // mainController.communitcationController.update(data)
+    // nodeID, socket.it, notebookID mainController.communitcationController.update(data)
+    console.log(9349343, data)
 })
 
 
-socket.on("serverSendChangeFileToClient", (changeDataArray: any)=>{
+socket.on('disconnected', function() {
+  socket.emit('deleteNode', mainController.uniqueNodeId);
+})
+
+socket.on("serverSendChangeFileToClient", (changeData: any)=>{
     // changeData: meta, htmlObjectData
-    changeDataArray.forEach((changeData:any)=>{
-      mainController.processChangeData(changeData)
-    })
+    console.log(9292929, changeData, socket.id,  changeData.metaData.socketId, changeData.metaData.uniqueNodeId)
+    if (mainController.uniqueNodeId != changeData.metaData.uniqueNodeId){
+
+        mainController.processChangeData(changeData)
+    } else {
+      console.log("I don't process the received data.")
+    }
 
 })

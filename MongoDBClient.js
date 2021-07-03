@@ -304,12 +304,12 @@ var MongoBackEnd = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, collection.remove({
+                    case 0: return [4 /*yield*/, collection.deleteOne({
                             "_identity.accessPointer": databaseMessage.metaData.accessPointer
                         })];
                     case 1:
                         _a.sent();
-                        return [4 /*yield*/, collection.update({
+                        return [4 /*yield*/, collection.updateOne({
                                 "_identity.accessPointer": databaseMessage.metaData.parentAccessPointer
                             }, { "$pull": { "_identity.children": databaseMessage.metaData.accessPointer } })];
                     case 2:
@@ -330,7 +330,7 @@ var MongoBackEnd = /** @class */ (function () {
                         updateDescription = {};
                         updateDescription[modifyField] = newData;
                         console.log(databaseMessage.metaData.accessPointer, updateDescription);
-                        return [4 /*yield*/, collection.update({
+                        return [4 /*yield*/, collection.updateOne({
                                 "_identity.accessPointer": databaseMessage.metaData.accessPointer
                             }, { "$set": updateDescription })];
                     case 1:
@@ -425,12 +425,16 @@ var MongoBackEnd = /** @class */ (function () {
                     case 1:
                         rootNode = _a.sent();
                         rootNode["array"] = [];
-                        return [4 /*yield*/, this.recursiveGetChildNodeData(collection, rootNode, 3)];
+                        return [4 /*yield*/, this.recursiveGetChildNodeData(collection, rootNode, 3)
+                            // console.log(296296, result)
+                            // console.log(result)
+                            //
+                        ];
                     case 2:
                         result = _a.sent();
-                        console.log(296296, result);
                         return [4 /*yield*/, rootNode];
                     case 3: 
+                    // console.log(296296, result)
                     // console.log(result)
                     //
                     return [2 /*return*/, _a.sent()];
@@ -490,7 +494,12 @@ var MongoBackEnd = /** @class */ (function () {
                     case 0:
                         mongoClient = new mongodb_1.MongoClient(this.mongoUrl, {
                             useUnifiedTopology: true,
-                            useNewUrlParser: true
+                            useNewUrlParser: true,
+                            keepAlive: true,
+                            connectTimeoutMS: 300000,
+                            socketTimeoutMS: 300000,
+                            bufferMaxEntries: 0,
+                            poolSize: 10
                         });
                         console.info("connection to MongoDB");
                         return [4 /*yield*/, mongoClient.connect()];

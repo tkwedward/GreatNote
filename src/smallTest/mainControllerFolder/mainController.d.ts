@@ -16,6 +16,7 @@ export declare class MainController implements MainControllerInterface {
     attributeControllerMapping: any;
     layerController: any;
     changeList: any[];
+    uniqueNodeId: string;
     constructor();
     /** to append data to the database
     return: the HTMLObject related to, the accessID of the object in the database

@@ -1,5 +1,6 @@
 import {MainControllerInterface} from "../mainControllerFolder/mainControllerInterface"
 import * as pageViewHelperFunction from "../pageViewHelperFunction"
+import {socket} from "../socketFunction"
 
 export function buildUserController(mainController: MainControllerInterface){
     let userControllerNavbarTitle = document.createElement("div");
@@ -22,6 +23,16 @@ export function buildUserController(mainController: MainControllerInterface){
     // controller bar
     let userControllerBar = document.createElement("div")
     userControllerBar.classList.add("userControllerBar")
+
+    let checkCurrentUserButton = document.createElement("button")
+    checkCurrentUserButton.classList.add("checkCurrentUser")
+
+    checkCurrentUserButton.innerText = "check User"
+    checkCurrentUserButton.addEventListener("click", e=>{
+        socket.emit("clientAskUserData", mainController.notebookID)
+    })
+
+
     let addUserButton = document.createElement("button")
     addUserButton.classList.add("addUserButton")
     addUserButton.innerText = "add User"
@@ -31,7 +42,7 @@ export function buildUserController(mainController: MainControllerInterface){
         userViewer.append(userRow)
     })
 
-    userControllerBar.append(addUserButton)
+    userControllerBar.append(addUserButton, checkCurrentUserButton)
     userControllerWrapper.append(userViewer, userControllerBar)
     return [userControllerNavbarTitle, userControllerWrapper]
 }

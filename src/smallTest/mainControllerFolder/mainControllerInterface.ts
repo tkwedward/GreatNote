@@ -50,6 +50,7 @@ export interface MainControllerInterface {
     layerController: LayerControllerInterface
     selectedObjectArray: any[]
     changeList: any[]
+    uniqueNodeId: string
 
     /** Functions related to save and update data in the database */
     addData(arrayID: string, htmlObject: GNObjectInterface|HTMLElement, temporaryPointer: string, insertPosition?:number|boolean, dataPointer?:string, specialMessage?: string): [HTMLElement, string]
@@ -121,7 +122,8 @@ export interface UpdateDataFormatInterface {
     metaData: {
       action: string,
       notebookID: string,
-      latestUpdateTime: string
+      latestUpdateTime: string,
+      uniqueNodeId: string
     }
 }
 
@@ -133,6 +135,7 @@ export interface AddDatabaseFormatInterface {
       parentAccessPointer: string,
       accessPointer: string,
       dataPointer?: string,
-      notebookID: string
+      notebookID: string,
+      uniqueNodeId: string
   }
 }
