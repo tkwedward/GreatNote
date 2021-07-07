@@ -25,6 +25,7 @@ export class MainController {
             "overviewPageSize": Setting.pageSizeInfo.overviewPageSize
         };
         this.pageController = PageController.initializePageController(this);
+        this.notebookID = "";
         this.uniqueNodeId = "nodeNumber_" + `${Date.now().toString(36) + Math.random().toString(36).substr(2)}`;
     }
     // ******************************************
@@ -72,7 +73,7 @@ export class MainController {
     }
     //@auto-fold here
     /** when ever the htmlObject is updated, we fetch newData from thfe HTMLObjectt, and then go to the database and update the relevant data*/
-    saveHTMLObjectToDatabase(htmlObject) {
+    saveHTMLObjectToDatabase(htmlObject, insertPosition) {
         let newData = htmlObject.extract();
         let latestUpdateTime = htmlObject.getAttribute("latestUpdateTime");
         // console.log(96969696, newData)
@@ -82,7 +83,8 @@ export class MainController {
                 action: "update",
                 notebookID: this.notebookID,
                 latestUpdateTime: latestUpdateTime,
-                uniqueNodeId: this.uniqueNodeId
+                uniqueNodeId: this.uniqueNodeId,
+                insertPosition: insertPosition
             }
         };
         this.changeList.push(updateMessage);
@@ -183,11 +185,16 @@ export class MainController {
         });
         // console.log(201201, this.mainDocArray)
     }
+    savePageChangeToDatabase(newPageOrderArray) {
+        socket.emit("savePageChangeToDatabase", {
+            notebookID: this.notebookID,
+            newPageOrderArray: newPageOrderArray
+        });
+    }
     processChangeData(changeData) {
         let { htmlObjectData, metaData } = changeData;
         // console.log(215215, metaData.socketId , socket.id)
         console.log(254254, changeData);
-        // if (metaData.socketId == socket.id) return
         if (changeData.metaData.action == "create") {
             let item = document.querySelector(`*[accessPointe='${changeData.htmlObjectData._identity.accessPointer}']`);
             console.log(245245, item, changeData.htmlObjectData._identity.accessPointer);
@@ -196,10 +203,12 @@ export class MainController {
             processCreationDataHelper(this, changeData);
         } // create
         if (changeData.metaData.action == "update") {
-            // console.log(213213, changeData)
             let _object = document.querySelector(`*[accessPointer='${htmlObjectData._identity.accessPointer}']`);
             let pageHtmlObject = this.tracePageFromElement(_object);
             pageHtmlObject.setAttribute("latestUpdateTime", changeData.metaData.latestUpdateTime);
+            if (changeData.metaData.insertPosition && _object.GNType == "GNPage") {
+                this.pageController.movePage(_object, changeData.metaData.insertPosition);
+            }
             htmlObjectData._identity.linkArray.forEach((p) => {
                 // to chheck if the socket id are different and if the aaaccessPointer of the object is different from the looped aaccessPointer of the linkedObject
                 // console.log(changeData.metaData.socketId, socket.id, _object._identity.accessPointer, p)

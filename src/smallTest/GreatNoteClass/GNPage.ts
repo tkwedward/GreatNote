@@ -12,6 +12,7 @@ export function GNPage(createData: CreateGreatNoteObjectInterface) : GNPageInter
     _object._dataStructure = []
     _object._styleStructure = []
     _object.groupData = []
+    _object.sectionDataArray = []
 
     // add classname
     _object._classNameList = _classNameList || []
@@ -25,6 +26,8 @@ export function GNPage(createData: CreateGreatNoteObjectInterface) : GNPageInter
          _object.specialGNType = injectedData.specialGNType
 
          _object.groupData = injectedData.data.groupData || []
+
+         _object.sectionDataArray = injectedData.data.sectionDataArray || []
 
         if (injectedData._classNameList) injectedData._classNameList.forEach((p:any)=>_object.classList.add(p))
 
@@ -55,6 +58,7 @@ export function GNPage(createData: CreateGreatNoteObjectInterface) : GNPageInter
 
         // data structure
         dataObject["data"]["groupData"] = _object["groupData"]
+        dataObject["data"]["sectionDataArray"] = _object["sectionDataArray"]
 
         if (_object.smallViewHTMLObject){
           dataObject["data"]["smallViewData"] = _object.smallViewHTMLObject.extract()
@@ -64,9 +68,9 @@ export function GNPage(createData: CreateGreatNoteObjectInterface) : GNPageInter
         return dataObject
     }
 
-  _object.getGroupData = function(){
-      return _object.groupData
-  }
+    _object.getGroupData = function(){
+        return _object.groupData
+    }
 
     _object.addGroupToPage = function(groupData:{
       groupName: string, accessPointerArray: string[]

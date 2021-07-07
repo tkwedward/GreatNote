@@ -64,22 +64,27 @@ var MongoBackEnd = /** @class */ (function () {
         this.mongoUrl = "mongodb://127.0.0.1:27017";
         this.client = null;
         this.collection = null;
+        this.connect();
     }
     MongoBackEnd.prototype.testConnection = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var mongoClient, database, allNotebookDB, result;
+            var database, allNotebookDB, result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.connect()];
+                    case 0:
+                        if (!(!this.client || !this.client.isConnected())) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.connect()];
                     case 1:
-                        mongoClient = _a.sent();
-                        database = mongoClient.db(notebookDataBaseName);
+                        _a.sent();
+                        _a.label = 2;
+                    case 2:
+                        database = this.client.db(notebookDataBaseName);
                         allNotebookDB = database.collection("allNotebookDB");
                         return [4 /*yield*/, allNotebookDB.findOne({})];
-                    case 2:
+                    case 3:
                         result = _a.sent();
                         return [4 /*yield*/, this.client.close()];
-                    case 3:
+                    case 4:
                         _a.sent();
                         return [2 /*return*/, result];
                 }
@@ -88,24 +93,27 @@ var MongoBackEnd = /** @class */ (function () {
     };
     MongoBackEnd.prototype.createNewNoteBook = function (notebookInfo) {
         return __awaiter(this, void 0, void 0, function () {
-            var mongoClient, database, newNotebookDB, overallNoteBookInfoDB;
+            var database, newNotebookDB, overallNoteBookInfoDB;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.connect()];
+                    case 0:
+                        if (!(!this.client || !this.client.isConnected())) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.connect()];
                     case 1:
-                        mongoClient = _a.sent();
-                        database = mongoClient.db(notebookDataBaseName);
+                        _a.sent();
+                        _a.label = 2;
+                    case 2:
+                        database = this.client.db(notebookDataBaseName);
                         newNotebookDB = database.collection(notebookInfo.notebookID);
                         return [4 /*yield*/, newNotebookDB.insertOne(notebookInfo)
                             // this is tthe overall
                         ];
-                    case 2:
-                        _a.sent();
-                        overallNoteBookInfoDB = database.collection("overallNoteBookInfoDB");
-                        return [4 /*yield*/, overallNoteBookInfoDB.insertOne(notebookInfo)];
                     case 3:
                         _a.sent();
-                        return [4 /*yield*/, this.disconnect()];
+                        overallNoteBookInfoDB = database.collection("overallNoteBookInfoDB");
+                        return [4 /*yield*/, overallNoteBookInfoDB.insertOne(notebookInfo)
+                            // await this.disconnect()
+                        ];
                     case 4:
                         _a.sent();
                         return [2 /*return*/];
@@ -115,24 +123,25 @@ var MongoBackEnd = /** @class */ (function () {
     };
     MongoBackEnd.prototype.deleteNoteBook = function (notebookID) {
         return __awaiter(this, void 0, void 0, function () {
-            var mongoClient, database, newNotebookDB, overallNoteBookInfoDB;
+            var database, newNotebookDB, overallNoteBookInfoDB;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.connect()];
+                    case 0:
+                        if (!(!this.client || !this.client.isConnected())) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.connect()];
                     case 1:
-                        mongoClient = _a.sent();
-                        database = mongoClient.db(notebookDataBaseName);
+                        _a.sent();
+                        _a.label = 2;
+                    case 2:
+                        database = this.client.db(notebookDataBaseName);
                         newNotebookDB = database.collection(notebookID);
                         return [4 /*yield*/, newNotebookDB.drop()
                             // this is tthe overall
                         ];
-                    case 2:
+                    case 3:
                         _a.sent();
                         overallNoteBookInfoDB = database.collection("overallNoteBookInfoDB");
                         overallNoteBookInfoDB.deleteOne({ notebookID: notebookID });
-                        return [4 /*yield*/, this.disconnect()];
-                    case 3:
-                        _a.sent();
                         return [2 /*return*/];
                 }
             });
@@ -140,18 +149,22 @@ var MongoBackEnd = /** @class */ (function () {
     };
     MongoBackEnd.prototype.getOverallNotebookData = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var mongoClient, database, overallNoteBookInfoDB;
+            var database, overallNoteBookInfoDB;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.connect()];
+                    case 0:
+                        if (!(!this.client || !this.client.isConnected())) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.connect()];
                     case 1:
-                        mongoClient = _a.sent();
-                        database = mongoClient.db(notebookDataBaseName);
+                        _a.sent();
+                        _a.label = 2;
+                    case 2:
+                        database = this.client.db(notebookDataBaseName);
                         overallNoteBookInfoDB = database.collection("overallNoteBookInfoDB");
                         return [4 /*yield*/, overallNoteBookInfoDB.find({}, {
                                 projection: { notebookName: 1, notebookID: 1, _id: 0 }
                             }).toArray()];
-                    case 2: return [2 /*return*/, _a.sent()];
+                    case 3: return [2 /*return*/, _a.sent()];
                 }
             });
         });
@@ -204,28 +217,31 @@ var MongoBackEnd = /** @class */ (function () {
     };
     MongoBackEnd.prototype.initializeFirstNotebook = function (notebookID) {
         return __awaiter(this, void 0, void 0, function () {
-            var mongoClient, database, allNotebookDB, count;
+            var database, allNotebookDB, count;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         console.log(125125, notebookID);
+                        if (!(!this.client || !this.client.isConnected())) return [3 /*break*/, 2];
                         return [4 /*yield*/, this.connect()];
                     case 1:
-                        mongoClient = _a.sent();
-                        database = mongoClient.db(notebookDataBaseName);
+                        _a.sent();
+                        _a.label = 2;
+                    case 2:
+                        database = this.client.db(notebookDataBaseName);
                         allNotebookDB = database.collection(notebookID);
                         return [4 /*yield*/, allNotebookDB.countDocuments()
                             // await allNotebookDB.drop()
                         ];
-                    case 2:
-                        count = _a.sent();
-                        if (!(count <= 1)) return [3 /*break*/, 4];
-                        return [4 /*yield*/, this.createEmptyNotebook(allNotebookDB)];
                     case 3:
+                        count = _a.sent();
+                        if (!(count <= 1)) return [3 /*break*/, 5];
+                        return [4 /*yield*/, this.createEmptyNotebook(allNotebookDB)];
+                    case 4:
                         _a.sent();
-                        _a.label = 4;
-                    case 4: return [4 /*yield*/, this.getInitializeNotebookData(allNotebookDB)];
-                    case 5: return [2 /*return*/, _a.sent()];
+                        _a.label = 5;
+                    case 5: return [4 /*yield*/, this.getInitializeNotebookData(allNotebookDB)];
+                    case 6: return [2 /*return*/, _a.sent()];
                 }
             });
         });
@@ -416,6 +432,24 @@ var MongoBackEnd = /** @class */ (function () {
             });
         });
     }; // getChildNodeData
+    MongoBackEnd.prototype.savePageChangeToDatabase = function (collection, newPageOrderArray) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, collection.updateOne({
+                            GNType: "mainArray_pageFull"
+                        }, {
+                            "$set": { "_identity.children": newPageOrderArray }
+                        } // push
+                        )]; // updateONes
+                    case 1:
+                        _a.sent(); // updateONes
+                        console.log("finishh update array");
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     MongoBackEnd.prototype.getInitializeNotebookData = function (collection) {
         return __awaiter(this, void 0, void 0, function () {
             var rootNode, result;
@@ -488,11 +522,14 @@ var MongoBackEnd = /** @class */ (function () {
     // }
     MongoBackEnd.prototype.connect = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var mongoClient;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        mongoClient = new mongodb_1.MongoClient(this.mongoUrl, {
+                        if (!(this.client && this.client.isConnected())) return [3 /*break*/, 1];
+                        console.log("reuse the connection.");
+                        return [3 /*break*/, 3];
+                    case 1:
+                        this.client = new mongodb_1.MongoClient(this.mongoUrl, {
                             useUnifiedTopology: true,
                             useNewUrlParser: true,
                             keepAlive: true,
@@ -502,8 +539,11 @@ var MongoBackEnd = /** @class */ (function () {
                             poolSize: 10
                         });
                         console.info("connection to MongoDB");
-                        return [4 /*yield*/, mongoClient.connect()];
-                    case 1: return [2 /*return*/, _a.sent()];
+                        return [4 /*yield*/, this.client.connect()];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
                 }
             });
         });

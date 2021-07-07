@@ -128,18 +128,90 @@ export function addFunctionToSmallViewHTMLObject(pageController, smallViewHTMLOb
         e.preventDefault();
     }, false);
     smallViewHTMLObject.addEventListener("drop", e => {
-        let draggedItem = document.querySelector(".smallView.draggedItem");
+        var _a, _b;
         let rect = smallViewHTMLObject.getBoundingClientRect();
         let middleLine = rect.x + rect.width / 2;
-        if (e.pageX > middleLine) {
-            overviewModeDiv.insertBefore(draggedItem, smallViewHTMLObject);
-            overviewModeDiv.insertBefore(smallViewHTMLObject, draggedItem);
-            console.log("insert to the right");
+        let draggedItem = document.querySelector(".smallView.draggedItem");
+        let allSelectedSmallView = document.querySelectorAll(".selectedSmallViewHTMLObject");
+        let targetPgeObject = smallViewHTMLObject.fullPageHTMLObject.soul;
+        let currentObject;
+        let nextObject;
+        // this is the node before the first selected item. It will be aassigned to a new value for the next disconnected item.
+        let alphaNode = allSelectedSmallView[0].fullPageHTMLObject.soul.previous;
+        let betaNode;
+        for (let i = 0; i < allSelectedSmallView.length; i++) {
+            currentObject = allSelectedSmallView[i].fullPageHTMLObject.soul;
+            nextObject = (_a = allSelectedSmallView[i + 1]) === null || _a === void 0 ? void 0 : _a.fullPageHTMLObject.soul;
+            if (!nextObject) {
+                console.log("no nextObject. At the ned of the chain");
+                alphaNode.next = currentObject.next;
+                currentObject.next.prevous = alphaNode;
+                currentObject.next = null;
+                continue;
+            } // if no nextObject, thaat means the item is at the end of the chain. connect the alphaNode with the next node of currentNode
+            // skip if two are linked
+            if (currentObject.next == nextObject) {
+                // that means the  currentOBject and the nextObject are connected
+                continue;
+            }
+            else {
+                // that means the  currentOBject and the nextObject are disconnected. The nodeNeededToConnect will connect with the currentObject.next. ANd then node will become the next nodeNeededToConnect
+                if (!alphaNode)
+                    continue;
+                betaNode = currentObject.next;
+                alphaNode.next = betaNode;
+                betaNode.previous = alphaNode;
+                alphaNode = betaNode;
+                currentObject.next = nextObject;
+            }
         }
+        if (e.pageX > middleLine) {
+            console.log("insert to the right");
+            for (let i = allSelectedSmallView.length - 1; i >= 0; i--) {
+                alphaNode = smallViewHTMLObject.fullPageHTMLObject.soul.previous;
+                betaNode = smallViewHTMLObject.fullPageHTMLObject.soul;
+                if (i == allSelectedSmallView.length - 1) {
+                    console.log("the end node of the lefts");
+                    betaNode.previous = allSelectedSmallView[i].fullPageHTMLObject.soul;
+                    allSelectedSmallView[i].fullPageHTMLObject.soul.next = betaNode;
+                }
+                if (i == 0) {
+                    console.log("the end node of the right");
+                    alphaNode.next = allSelectedSmallView[0].fullPageHTMLObject.soul;
+                    allSelectedSmallView[0].fullPageHTMLObject.soul.previoous = alphaNode;
+                }
+                overviewModeDiv.insertBefore(allSelectedSmallView[i], smallViewHTMLObject);
+                overviewModeDiv.insertBefore(smallViewHTMLObject, allSelectedSmallView[i]);
+            }
+        } //e.pageX > middleLine
         if (e.pageX < middleLine) {
             console.log("insert to the left");
-            overviewModeDiv.insertBefore(draggedItem, smallViewHTMLObject);
+            alphaNode = smallViewHTMLObject.fullPageHTMLObject.soul.previous;
+            betaNode = smallViewHTMLObject.fullPageHTMLObject.soul;
+            for (let i = 0; i < allSelectedSmallView.length; i++) {
+                if (i == 0) {
+                    console.log("the end node of the lefts");
+                    alphaNode.next = allSelectedSmallView[0].fullPageHTMLObject.soul;
+                    allSelectedSmallView[0].fullPageHTMLObject.soul.previoous = alphaNode;
+                }
+                if (i == allSelectedSmallView.length - 1) {
+                    console.log("the end node of the lefts");
+                    betaNode.previous = allSelectedSmallView[i].fullPageHTMLObject.soul;
+                    allSelectedSmallView[i].fullPageHTMLObject.soul.next = betaNode;
+                }
+                overviewModeDiv.insertBefore(allSelectedSmallView[i], smallViewHTMLObject);
+            } // for loop with allSelectedSmallView.length
+        } // e.pageX < middleLine
+        currentObject = pageController.startPage.next;
+        let newPageOrderArray = [];
+        while (currentObject) {
+            let accessPointer = (_b = currentObject.fullPageHTMLObject) === null || _b === void 0 ? void 0 : _b.getAccessPointer();
+            if (accessPointer)
+                newPageOrderArray.push(accessPointer);
+            currentObject = currentObject.next;
         }
+        console.log(newPageOrderArray);
+        pageController.savePageChangeToDatabase(newPageOrderArray);
         draggedItem.classList.toggle("draggedItem");
     }); // smallViewHTMLObject.addEventListener("drop0
     smallViewHTMLObject.extract = function () {

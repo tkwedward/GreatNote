@@ -6,6 +6,8 @@ const fs = require("fs")
 const Automerge = require("automerge")
 const app = express()
 const talkNotes = require("./routes/talkNotes")
+// const cryptoRouter = require("./routes/crypto")
+const CoinGecko = require('coingecko-api');
 import {AutomergeMainDoc, AutomergeMainDocInterface} from "./automergeHelperFunction"
 // server.set("view engine", "ejs")
 app.use(express.static(path.join(__dirname, './dist')));
@@ -13,9 +15,31 @@ app.use(express.static(path.join(__dirname, './build')));
 app.set("views", [path.join(__dirname, "./dist/templates")])
 
 app.use("/talkNotes", talkNotes)
+// app.use("/crpyto", cryptoRouter)
 
 const server = require("http").Server(app);
 const io = require("socket.io")(server)
+
+
+const CoinGeckoClient = new CoinGecko();
+
+app.get("/allCrpytoData", async (req, res)=>{
+  let data = await CoinGeckoClient.coins.markets({
+      vs_currency: "usd",
+      order: "market_cap_desc",
+      per_page: 1000,
+      page: 1,
+      sparkline: false,
+      price_change_percentage: "24h"
+  })
+
+  res.json(data)
+})
+
+app.get("/crpyto", async (req, res)=>{
+    res.render("crpyto.ejs")
+})
+
 
 app.get("/board", (req, res)=>{
   res.sendFile(__dirname + "/public/board.html")
@@ -80,30 +104,25 @@ io.on("connection", socket=>{
       if (changeListArray.length>0){
           let item = changeListArray.shift()
 
-          let notebooID = item.metaData.notebookID
-          let mongoClient
-          try {
-            mongoClient = await automergeMainDoc.mongoDB.connect()
-          }
-          catch (err) {
-              console.log(err)
-              io.to(notebooID).emit("mongoDBError")
-          }
-
-          const database =  mongoClient.db("GreatNote")
-          let allNotebookDB = database.collection(notebooID)
-
-          try {
-            await automergeMainDoc.processChangeDataFromClients(allNotebookDB, item, socket.id)
-          } catch(err) {
-              console.log(err)
-              io.to(notebooID).emit("mongoDBError")
-          }
+          let notebookID = item.metaData.notebookID
 
 
+          let mongoClient = await automergeMainDoc.mongoDB.connect()
 
-          io.to(notebooID).emit("message", "finish saving")
-          io.to(notebooID).emit("serverSendChangeFileToClient", item)
+          const database = await automergeMainDoc.mongoDB.client.db("GreatNote")
+          let allNotebookDB = database.collection(notebookID)
+          //
+          // try {
+          await automergeMainDoc.processChangeDataFromClients(allNotebookDB, item, socket.id)
+          // } catch(err) {
+          //     console.log(err)
+          //     io.to(notebookID).emit("mongoDBError")
+          // }
+          //
+          //
+          //
+          io.to(notebookID).emit("message", "finish saving")
+          io.to(notebookID).emit("serverSendChangeFileToClient", item)
 
           processChangeList()
       } else {
@@ -139,7 +158,7 @@ io.on("connection", socket=>{
 
   socket.on("getPageData", async (requestData: { notebookID:string, pageID:string})=>{
       let mongoClient = await automergeMainDoc.mongoDB.connect()
-      const database =  mongoClient.db("GreatNote")
+      const database =  automergeMainDoc.mongoDB.client.db("GreatNote")
       let allNotebookDB = database.collection(requestData.notebookID)
       let pageObject = await allNotebookDB.findOne({ "_identity.accessPointer": requestData.pageID })
 
@@ -151,6 +170,17 @@ io.on("connection", socket=>{
       io.in(roomId).emit("serverSendUserData", connectedNodeIdArray)
   })
 
+  socket.on("savePageChangeToDatabase", async (changeData: {notebookID: string, newPageOrderArray: string[]})=>{
+
+      console.log("I am doing savePageChangeToDatabase")
+      let mongoClient = await automergeMainDoc.mongoDB.connect()
+
+      const database = await automergeMainDoc.mongoDB.client.db("GreatNote")
+      let collection = database.collection(changeData.notebookID)
+
+
+      automergeMainDoc.mongoDB.savePageChangeToDatabase(collection, changeData.newPageOrderArray)
+  })
 
 
   socket.on("disconnect", ()=>{

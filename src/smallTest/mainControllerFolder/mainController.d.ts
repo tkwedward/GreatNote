@@ -31,7 +31,7 @@ export declare class MainController implements MainControllerInterface {
     /** to initiate the data so that you can store the data to the db*/
     createDummyData(data?: {}): any;
     /** when ever the htmlObject is updated, we fetch newData from thfe HTMLObjectt, and then go to the database and update the relevant data*/
-    saveHTMLObjectToDatabase(htmlObject: any): void;
+    saveHTMLObjectToDatabase(htmlObject: any, insertPosition?: number): void;
     tracePageFromElement(htmlObject: HTMLElement): any;
     deleteFromDataBase(htmlObject: any): void;
     sendChangeToServer(): void;
@@ -45,5 +45,6 @@ export declare class MainController implements MainControllerInterface {
     renderDataToHTML(data: communicationDataStructure, arrayHTMLObject?: any): void;
     createGNObjectThroughName(objectName: string, createData: CreateGreatNoteObjectInterface): any;
     loadMainDoc(data: any): void;
+    savePageChangeToDatabase(newPageOrderArray: string[]): void;
     processChangeData(changeData: any): void;
 }

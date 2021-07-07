@@ -83,7 +83,6 @@ export class AutomergeMainDoc implements AutomergeMainDocInterface {
 
     async initializeRootArray(notebookID: string){
         let result = await this.mongoDB.initializeFirstNotebook(notebookID)
-        await this.mongoDB.disconnect()
         return result
         // result.then(p=>{
         //     return p
@@ -134,24 +133,24 @@ export class AutomergeMainDoc implements AutomergeMainDocInterface {
         // console.log(153153, data)
 
         if (data.metaData.action=="create"){
-            await this.mongoDB.createItem(collection, data).then(this.mongoDB.disconnect())
+            await this.mongoDB.createItem(collection, data)
 
         } // create
 
         if (data.metaData.action=="update"){
-            await this.mongoDB.updateItem(collection, data).then(this.mongoDB.disconnect())
+            await this.mongoDB.updateItem(collection, data)
         } // update
 
         if (data.metaData.action=="delete"){
             // let deleteMessage = this.deleteFromDatabase(data)
             // return deleteMessage
-            await this.mongoDB.deleteItem(collection, data).then(this.mongoDB.disconnect())
+            await this.mongoDB.deleteItem(collection, data)
         } // delete
 
 
         if (data.metaData.action=="microUpdate"){
           console.log("received microUpdateData")
-          await this.mongoDB.microUpdate(collection, data).then(this.mongoDB.disconnect())
+          await this.mongoDB.microUpdate(collection, data)
         }
     }
 }

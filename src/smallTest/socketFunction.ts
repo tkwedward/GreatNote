@@ -4,6 +4,7 @@ import {mainController} from "../index"
 export var socket:any
 import * as CommunicatorController from "./communicationFolder/communitcationController"
 import * as Automerge from 'automerge'
+import { renderSmallView } from "./pageControllerFolder/smallViewHelperFunction"
 
 socket = io.io()
 
@@ -45,7 +46,6 @@ socket.on("saveDataToServer", (data:any)=>{
     mainController.saveMainDoc(true)
 })
 
-import { renderSmallView } from "./pageControllerFolder/smallViewHelperFunction"
 
 socket.on("receivePageDataFromServer", (data: any)=>{
   console.log(49494949, data)
@@ -88,7 +88,7 @@ socket.on("serverSendUserData", (data:[string, string, string])=>{
     // data = []
     console.log(9349343, data)
 
-    
+
 })
 
 socket.on("socketConnectionUpdate", (data:any)=>{

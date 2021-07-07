@@ -9,6 +9,7 @@ export function GNPage(createData) {
     _object._dataStructure = [];
     _object._styleStructure = [];
     _object.groupData = [];
+    _object.sectionDataArray = [];
     // add classname
     _object._classNameList = _classNameList || [];
     _classNameList === null || _classNameList === void 0 ? void 0 : _classNameList.forEach(p => {
@@ -18,6 +19,7 @@ export function GNPage(createData) {
         _object.GNSpecialCreationMessage = injectedData.GNSpecialCreationMessage;
         _object.specialGNType = injectedData.specialGNType;
         _object.groupData = injectedData.data.groupData || [];
+        _object.sectionDataArray = injectedData.data.sectionDataArray || [];
         if (injectedData._classNameList)
             injectedData._classNameList.forEach((p) => _object.classList.add(p));
         _object._identity = injectedData._identity;
@@ -40,6 +42,7 @@ export function GNPage(createData) {
         dataObject["_classNameList"] = Array.from(_object.classList).filter(p => p != "currentPage");
         // data structure
         dataObject["data"]["groupData"] = _object["groupData"];
+        dataObject["data"]["sectionDataArray"] = _object["sectionDataArray"];
         if (_object.smallViewHTMLObject) {
             dataObject["data"]["smallViewData"] = _object.smallViewHTMLObject.extract();
         }

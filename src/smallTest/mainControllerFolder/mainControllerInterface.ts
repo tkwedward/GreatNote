@@ -60,7 +60,7 @@ export interface MainControllerInterface {
     createDummyData(name:string, age: number, sex: string):any
     createUniqueID():string
 
-    saveHTMLObjectToDatabase(htmlObject: GNObjectInterface):void
+    saveHTMLObjectToDatabase(htmlObject: GNObjectInterface, insertPosition?: number):void
 
     deleteFromDataBase(htmlObject:GNObjectInterface):void
 
@@ -98,6 +98,8 @@ export interface MainControllerInterface {
 
     processChangeData(changeDataArray:Set<string>):void
 
+    savePageChangeToDatabase(newPageOrderArray: string[]):void
+
 }
 
 
@@ -123,7 +125,8 @@ export interface UpdateDataFormatInterface {
       action: string,
       notebookID: string,
       latestUpdateTime: string,
-      uniqueNodeId: string
+      uniqueNodeId: string,
+      insertPosition?: number
     }
 }
 

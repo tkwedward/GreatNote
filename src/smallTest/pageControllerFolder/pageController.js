@@ -51,6 +51,7 @@ export function initializePageController(mainController) {
         let _currentPageNumber = initialPage.pageNumber;
         let _currentPage = initialPage;
         while (_currentPage) {
+            console.log(108109, _currentPage);
             _currentPage.pageNumber = _currentPageNumber;
             _currentPageNumber += 1;
             _currentPage = _currentPage.next;
@@ -65,11 +66,30 @@ export function initializePageController(mainController) {
         let annotationObject = pageObject.annotationArray.filter(p => p.accessPointer == annotationAccessPointer);
         return annotationObject;
     };
+    pageController.movePage = function (fullPageHtmlObject, pageNumber, relativePosition = "after") {
+        // connect the new bonding
+        console.log(130130, fullPageHtmlObject.soul);
+        let alpha = pageController.getPage(pageNumber);
+        // remove the original bonding
+        let oldPreviousPage = fullPageHtmlObject.soul.previous;
+        let oldNextPage = fullPageHtmlObject.soul.next;
+        console.log(137137, oldPreviousPage, oldNextPage);
+        oldPreviousPage.next = oldNextPage;
+        oldNextPage.previous = oldPreviousPage;
+        let beta = alpha.next;
+        alpha.next = fullPageHtmlObject.soul;
+        beta.previous = fullPageHtmlObject.soul;
+        fullPageHtmlObject.previous = alpha;
+        fullPageHtmlObject.next = beta;
+        fullPageHtmlObject.parentElement.insertBefore(fullPageHtmlObject, alpha.fullPageHTMLObject);
+        fullPageHtmlObject.parentElement.insertBefore(alpha.fullPageHTMLObject, fullPageHtmlObject);
+        pageController.updatePageNumber(pageController.startPage);
+    };
     pageController.addPage = function (fullPageHTMLObject) {
         var _a;
+        let alpha = pageController.currentPage;
         let newPage = new PageObject();
         fullPageHTMLObject.soul = newPage;
-        let alpha = pageController.currentPage;
         let beta = pageController.currentPage.next;
         newPage.previous = alpha;
         newPage.next = beta;
@@ -99,6 +119,7 @@ export function initializePageController(mainController) {
         smallViewHTMLObject.fullPageHTMLObject = fullPageHTMLObject;
         fullPageHTMLObject.smallViewHTMLObject = smallViewHTMLObject;
         smallViewHTMLObject.setAttribute("smallViewAccessPoiniter", fullPageHTMLObject.getAccessPointer());
+        smallViewHTMLObject.classList.add(fullPageHTMLObject.getAccessPointer());
         let smallViewContent = document.createElement("div");
         smallViewContent.classList.add("smallViewContent");
         smallViewContent.innerText = pageController.currentPage.pageNumber;
@@ -155,6 +176,10 @@ export function initializePageController(mainController) {
         if (pageNumber == pageController.currentPage.pageNumber)
             return;
         let _targetPage = pageController.getPage(pageNumber);
+        if (_targetPage.name == "startPage" || _targetPage.name == "endPage") {
+            console.log("You are hitting the start page or the end page.");
+            return;
+        }
         _targetPage.fullPageHTMLObject.style.display = "block";
         // set the position of the page according to the position relative to the targetPage
         pageController.currentPage.fullPageHTMLObject.classList.remove("currentPage");
@@ -218,6 +243,9 @@ export function initializePageController(mainController) {
         }
         return pageNumber;
     };
+    pageController.savePageChangeToDatabase = function (newPageOrderArray) {
+        mainController.savePageChangeToDatabase(newPageOrderArray);
+    };
     window.pageController = pageController;
     return pageController;
 }
@@ -266,6 +294,9 @@ export function pageControllerHTMLObject(pageController, subPanelContainer) {
         removeCurrrentPageChildren(pageController.currentPage.fullPageHTMLObject);
         if (pageController.currentPage.pageNumber < pageController.totalPageNumber) {
             pageController.goToPage(+pageNumberInput.value + 1, pageNumberInput);
+        }
+        else {
+            console.log(4100, "Over size");
         }
     }
     rightButton.addEventListener("click", rightButtonClickEvent);

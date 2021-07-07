@@ -43,6 +43,8 @@ export class MainController implements MainControllerInterface{
         }
         this.pageController = PageController.initializePageController(this)
 
+        this.notebookID = ""
+
         this.uniqueNodeId = "nodeNumber_" + `${Date.now().toString(36) + Math.random().toString(36).substr(2)}`
     }
 
@@ -96,7 +98,7 @@ export class MainController implements MainControllerInterface{
     }
     //@auto-fold here
     /** when ever the htmlObject is updated, we fetch newData from thfe HTMLObjectt, and then go to the database and update the relevant data*/
-    saveHTMLObjectToDatabase(htmlObject:any){
+    saveHTMLObjectToDatabase(htmlObject:any, insertPosition?: number){
         let newData = htmlObject.extract()
         let latestUpdateTime = htmlObject.getAttribute("latestUpdateTime")
 
@@ -108,7 +110,8 @@ export class MainController implements MainControllerInterface{
                 action: "update",
                 notebookID: this.notebookID,
                 latestUpdateTime: latestUpdateTime,
-                uniqueNodeId: this.uniqueNodeId
+                uniqueNodeId: this.uniqueNodeId,
+                insertPosition: insertPosition
             }
         }
         this.changeList.push(updateMessage)
@@ -234,6 +237,12 @@ export class MainController implements MainControllerInterface{
       // console.log(201201, this.mainDocArray)
     }
 
+    savePageChangeToDatabase(newPageOrderArray: string[]){
+        socket.emit("savePageChangeToDatabase", {
+          notebookID: this.notebookID,
+          newPageOrderArray: newPageOrderArray
+        })
+    }
 
     processChangeData(changeData: any){
           let {htmlObjectData, metaData} = changeData
@@ -241,10 +250,6 @@ export class MainController implements MainControllerInterface{
           // console.log(215215, metaData.socketId , socket.id)
 
           console.log(254254, changeData)
-
-
-
-
 
           if (changeData.metaData.action=="create"){
               let item = document.querySelector(`*[accessPointe='${changeData.htmlObjectData._identity.accessPointer}']`)
@@ -255,11 +260,15 @@ export class MainController implements MainControllerInterface{
           }// create
 
           if (changeData.metaData.action=="update"){
-              // console.log(213213, changeData)
+
               let _object = <any> document.querySelector(`*[accessPointer='${htmlObjectData._identity.accessPointer}']`)
 
               let pageHtmlObject = this.tracePageFromElement(_object)
               pageHtmlObject.setAttribute("latestUpdateTime", changeData.metaData.latestUpdateTime)
+
+              if (changeData.metaData.insertPosition && _object.GNType == "GNPage"){
+                  this.pageController.movePage(_object, changeData.metaData.insertPosition)
+              }
 
               htmlObjectData._identity.linkArray.forEach((p:string)=>{
                   // to chheck if the socket id are different and if the aaaccessPointer of the object is different from the looped aaccessPointer of the linkedObject
@@ -271,7 +280,6 @@ export class MainController implements MainControllerInterface{
                       // linkedObject.loadFromData(htmlObjectData, true)
                       linkedObject.loadFromData(htmlObjectData, false)
                   }
-
               })
 
 

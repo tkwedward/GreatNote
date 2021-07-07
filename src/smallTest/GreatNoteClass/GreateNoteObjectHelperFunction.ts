@@ -57,7 +57,7 @@ export function superGNObject(_object:any, saveToDatabase?:boolean, arrayID?:str
         let latestUpdateTime =  `${new Date()}`
         _object.setAttribute("latestUpdateTime", latestUpdateTime)
 
-        mainController.saveHTMLObjectToDatabase(_object)
+        mainController.saveHTMLObjectToDatabase(_object, insertPosition)
         window.markedObject = _object
         let pageHtmlObject = mainController.tracePageFromElement(_object)
         pageHtmlObject.setAttribute("latestUpdateTime",latestUpdateTime)

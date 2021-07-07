@@ -61,7 +61,17 @@ export function createImageContainerAttributeController() {
         var _a;
         (_a = imageContainerAttributeController.targetImageContainer) === null || _a === void 0 ? void 0 : _a.deleteFromDatabase();
     });
-    imageContainerAttributeController.append(widthInputDiv, heightInputDiv, xPositionInputDiv, yPositionInputDiv, smallImage, updateButton, deleteButton);
+    let defaultSizeDropList = document.createElement("select");
+    defaultSizeDropList.classList.add("defaultSizeDropList");
+    let defaultSizeOpt500 = document.createElement("option");
+    defaultSizeOpt500.value = "500";
+    defaultSizeOpt500.innerText = "500";
+    let defaultSizeOpt600 = document.createElement("option");
+    defaultSizeOpt600.value = "600";
+    defaultSizeOpt600.innerText = "600";
+    defaultSizeDropList.append(defaultSizeOpt500, defaultSizeOpt600);
+    imageContainerAttributeController.append(widthInputDiv, heightInputDiv, defaultSizeDropList, smallImage, updateButton, deleteButton);
+    // imageContainerAttributeController.append(widthInputDiv, heightInputDiv, xPositionInputDiv, yPositionInputDiv, smallImage, updateButton, deleteButton)
     imageContainerAttributeController.renderImage = function () {
         let imgContainer = imageContainerAttributeController.targetImageContainer;
         widthInput.value = imgContainer.style.width.replace("px", "");

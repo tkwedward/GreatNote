@@ -29,7 +29,16 @@ export function addPasteImageEvent(mainController: MainControllerInterface){
                        + "/image/" + responseImgSrc +".png"
 
                        targetDiv.appendChild(newImg)
-                       newImg.setImageSize({width:500})
+
+                       let defaultSizeDropList = <HTMLSelectElement> document.querySelector(".defaultSizeDropList")
+
+                       console.log(defaultSizeDropList)
+                       let defaultWidth = 500
+                       if (defaultSizeDropList){
+                          defaultWidth = +defaultSizeDropList.value
+                       }
+
+                       newImg.setImageSize({width:defaultWidth})
                        newImg.setMovable()
                        newImg.style["top"] = document.querySelector(".pageContentContainer")?.scrollTop + "px"
                        newImg.saveHTMLObjectToDatabase()

@@ -114,7 +114,8 @@ export function showCurrentPageButtonFunction(mainController, layerView) {
     if (currentPageData.array.length == 0) {
         let layerArray = mainController.pageController.currentPage.fullPageHTMLObject.children;
         Array.from(layerArray).forEach((p) => {
-            currentPageData.array.push(p.extract());
+            if (p.extract)
+                currentPageData.array.push(p.extract());
         });
     }
     let layerObject = buildLayerContentFunction(mainController, currentPageData, layerView);

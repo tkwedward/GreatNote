@@ -56,7 +56,7 @@ export interface MainControllerInterface {
     updateData(_object: GNObjectInterface, dataPointerType: boolean): void;
     createDummyData(name: string, age: number, sex: string): any;
     createUniqueID(): string;
-    saveHTMLObjectToDatabase(htmlObject: GNObjectInterface): void;
+    saveHTMLObjectToDatabase(htmlObject: GNObjectInterface, insertPosition?: number): void;
     deleteFromDataBase(htmlObject: GNObjectInterface): void;
     sendChangeToServer(): void;
     tracePageFromElement(htmlObject: HTMLElement): any;
@@ -78,6 +78,7 @@ export interface MainControllerInterface {
     /** To load string into the mainDoc */
     loadMainDoc(data: string): void;
     processChangeData(changeDataArray: Set<string>): void;
+    savePageChangeToDatabase(newPageOrderArray: string[]): void;
 }
 export interface HtmlObjectDataInterface {
     htmlObjectData: {
@@ -102,6 +103,7 @@ export interface UpdateDataFormatInterface {
         notebookID: string;
         latestUpdateTime: string;
         uniqueNodeId: string;
+        insertPosition?: number;
     };
 }
 export interface AddDatabaseFormatInterface {

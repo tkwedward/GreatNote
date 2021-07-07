@@ -22,7 +22,13 @@ export function addPasteImageEvent(mainController) {
                         img.src = window.location.origin
                             + "/image/" + responseImgSrc + ".png";
                         targetDiv.appendChild(newImg);
-                        newImg.setImageSize({ width: 500 });
+                        let defaultSizeDropList = document.querySelector(".defaultSizeDropList");
+                        console.log(defaultSizeDropList);
+                        let defaultWidth = 500;
+                        if (defaultSizeDropList) {
+                            defaultWidth = +defaultSizeDropList.value;
+                        }
+                        newImg.setImageSize({ width: defaultWidth });
                         newImg.setMovable();
                         newImg.style["top"] = ((_a = document.querySelector(".pageContentContainer")) === null || _a === void 0 ? void 0 : _a.scrollTop) + "px";
                         newImg.saveHTMLObjectToDatabase();

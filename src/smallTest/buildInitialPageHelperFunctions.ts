@@ -19,7 +19,7 @@ import {socket} from "./socketFunction"
 import * as GNCommentController from "./commentFolder/commentController"
 
 import * as CommentSidebarController from "./commentFolder/commentSidebarController"
-
+import * as SectionController from "./sectionControllerFolder/sectionController"
 import * as LayerConroller from "./layerControllerFolder/layerController"
 import {MainControllerInterface} from "./mainControllerFolder/mainControllerInterface"
 import * as PageController from "./pageControllerFolder/pageController"
@@ -205,7 +205,9 @@ export function buildPageControllerButtonArray(mainController:MainControllerInte
   })
 
 
-  editorController.append(objectIDGetter, objectIDGetterSubmit, testFieldButton, showMainDocButton, showAnnotationButton)
+  let sectionControllerHTMLObject = SectionController.createSectionController(mainController)
+
+  editorController.append(sectionControllerHTMLObject, objectIDGetter, objectIDGetterSubmit, testFieldButton, showMainDocButton, showAnnotationButton)
 
   // toolBoxObject
   let toolBoxHtmlObject = buildToolBoxHtmlObject(mainController)
@@ -214,7 +216,10 @@ export function buildPageControllerButtonArray(mainController:MainControllerInte
 
   let annotationPage = document.querySelector(".annotationPage")
 
-  return {pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, showMainDocButton, showAnnotationButton, annotationPage, scaleController}
+
+
+
+  return {pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, showMainDocButton, showAnnotationButton, annotationPage, scaleController, sectionControllerHTMLObject}
 } // buildPageControllerButtonArray
 
 
@@ -270,6 +275,9 @@ export function buildPageController(mainController: MainControllerInterface, boo
   //
   // })
 
+  // let sectionControllerHTMLObject = SectionController.createSectionController(mainController)
+
+
 
   let layerControllerHTMLObject =  LayerConroller.createLayerController(mainController)
 
@@ -305,9 +313,6 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
       middleSubPanel.addTabAndTabContent(groupControllerNavbarTitle, groupControllerContent, false)
       middleSubPanel.addTabAndTabContent(bookmarkSubPanelNavbarTitle, bookmarkSubPanelContent)
 
-
-
-
       //===================== bookmarkSubPanel ==================//
 
       buildPageController(mainController, bookmarkSubPanelContent, fullPageModeDiv, overviewModeDiv, pageContentContainer)
@@ -318,7 +323,7 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
       commentSubPanelContent.setAttribute("accessPointer", mainController.mainDocArray["mainArray_bookmark"])
       bottomSubPanel.addTabAndTabContent(commentSubPanelNavbarTitle, commentSubPanelContent)
 
-      //
+
       // let commentSidebar = CommentSidebarController.GNCommentSidebar()
       // commentSubPanelContent.append(commentSidebar)
       // add events: initalizeWindowObject, addPasteImageEvent, swipeDetection
@@ -328,8 +333,6 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
       pageViewHelperFunction.shortNotice("inital Value")
 
       socket.emit("clientAskServerForSocketData")
-
-
 
       window.mainController = mainController
 
@@ -342,6 +345,7 @@ export function buildInitialPage(mainController:MainControllerInterface, saveToD
     let overviewModeDiv = <HTMLDivElement> document.querySelector(".overviewModeDiv")
     let commentSubPanelContent = <HTMLDivElement> document.querySelector(".commentSubPanel")
     let groupControllerWrapper = <any> document.querySelector(".groupControllerWrapper")
+    let allSectionView = <any> document.querySelector(".allSectionView")
     let collectionControllerWrapper = <any> document.querySelector(".collectionControllerWrapper")
 
     createGNDataStructureMapping(mainController)
@@ -393,22 +397,25 @@ export function buildInitialPage(mainController:MainControllerInterface, saveToD
           pageNotRendered.push(pageID)
         }
 
+        // add new section rows
+        allSectionView.addNewRow(i+1, pageFullArray[i]._identity.accessPointer, pageFullArray[i].data.sectionDataArray)
+
         // if (i==0){
     }
 
-    // let loadPages = setInterval(()=>{
-    //
-    //     if (pageNotRendered.length > 0){
-    //
-    //       let pageID = <string >pageNotRendered.pop()
-    //       let targetPage = <HTMLDivElement> document.querySelector(`*[accessPointer=${pageID}]`)
-    //
-    //       if (targetPage.getAttribute("loaded")!="true") {
-    //         targetPage.setAttribute("loaded", "true")
-    //         getPageDataFromServer(mainController, pageID)
-    //       }
-    //     }
-    // }, 10000)
+    let loadPages = setInterval(()=>{
+
+        if (pageNotRendered.length > 0){
+
+          let pageID = <string >pageNotRendered.pop()
+          let targetPage = <HTMLDivElement> document.querySelector(`*[accessPointer=${pageID}]`)
+
+          if (targetPage.getAttribute("loaded")!="true") {
+            targetPage.setAttribute("loaded", "true")
+            getPageDataFromServer(mainController, pageID)
+          }
+        }
+    }, 500)
 
     // pageNotRendered.forEach(p=>getPageDataFromServer(mainController, p))
 

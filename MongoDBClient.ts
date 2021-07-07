@@ -33,6 +33,7 @@ interface ItemToBeAddedInterface {
 export interface MongoBackEndInterface {
   connect():any
   disconnect():void
+  client: MongoClient
 
   createNewNoteBook(notebookInfo: any): void
   deleteNoteBook(notebookID: string): void
@@ -42,10 +43,13 @@ export interface MongoBackEndInterface {
   getOverallNotebookData():any
   recursiveGetChildNodeData(collection:Collection, nodeData: any, level?: number)
 
+  savePageChangeToDatabase(connection:Collection, newPageOrderArray: string[])
+
 
   getItem(collection: Collection, databaseMessage: any): void
   createItem(collection: Collection, databaseMessage: any): void
   updateItem(collection: Collection, databaseMessage: any): void
+
 }
 
 
@@ -58,11 +62,12 @@ export class MongoBackEnd implements MongoBackEndInterface {
         this.mongoUrl = "mongodb://127.0.0.1:27017"
         this.client = null
         this.collection = null
+        this.connect()
     }
 
     async testConnection(){
-        let mongoClient = await this.connect()
-        const database =  mongoClient.db(notebookDataBaseName)
+        if (!this.client || !this.client.isConnected()) await this.connect()
+        const database =  this.client.db(notebookDataBaseName)
         let allNotebookDB = database.collection("allNotebookDB")
         let result = await allNotebookDB.findOne({})
         await this.client.close()
@@ -70,8 +75,8 @@ export class MongoBackEnd implements MongoBackEndInterface {
     }
 
     async createNewNoteBook(notebookInfo: {notebookID: string, notebookName: string}){
-        let mongoClient = await this.connect()
-        const database =  mongoClient.db(notebookDataBaseName)
+        if (!this.client || !this.client.isConnected()) await this.connect()
+        const database =  this.client.db(notebookDataBaseName)
 
         // this is a particular notebook
         let newNotebookDB = database.collection(notebookInfo.notebookID)
@@ -84,12 +89,13 @@ export class MongoBackEnd implements MongoBackEndInterface {
         await overallNoteBookInfoDB.insertOne(notebookInfo)
 
 
-        await this.disconnect()
+        // await this.disconnect()
     }
 
     async deleteNoteBook(notebookID: string){
-        let mongoClient = await this.connect()
-        const database =  mongoClient.db(notebookDataBaseName)
+        if (!this.client || !this.client.isConnected()) await this.connect()
+
+        const database =  this.client.db(notebookDataBaseName)
 
         // this is a particular notebook
         let newNotebookDB = database.collection(notebookID)
@@ -99,12 +105,13 @@ export class MongoBackEnd implements MongoBackEndInterface {
         let overallNoteBookInfoDB = database.collection("overallNoteBookInfoDB")
         overallNoteBookInfoDB.deleteOne({notebookID: notebookID})
 
-        await this.disconnect()
+        // await this.disconnect()
     }
 
     async getOverallNotebookData(){
-      let mongoClient = await this.connect()
-      const database =  mongoClient.db(notebookDataBaseName)
+      if (!this.client || !this.client.isConnected()) await this.connect()
+
+      const database =  this.client.db(notebookDataBaseName)
       let overallNoteBookInfoDB = database.collection("overallNoteBookInfoDB")
 
       return await overallNoteBookInfoDB.find({}, {
@@ -140,9 +147,9 @@ export class MongoBackEnd implements MongoBackEndInterface {
 
     async initializeFirstNotebook(notebookID:string){
         console.log(125125, notebookID)
+        if (!this.client || !this.client.isConnected()) await this.connect()
 
-        let mongoClient = await this.connect()
-        const database =  mongoClient.db(notebookDataBaseName)
+        const database =  this.client.db(notebookDataBaseName)
         let allNotebookDB = database.collection(notebookID)
         let count = await allNotebookDB.countDocuments()
 
@@ -287,6 +294,18 @@ export class MongoBackEnd implements MongoBackEndInterface {
         }
     } // getChildNodeData
 
+    async savePageChangeToDatabase(collection: Collection, newPageOrderArray: string[]){
+        await collection.updateOne(
+          {
+            GNType: "mainArray_pageFull"
+          },
+          {
+            "$set": {"_identity.children": newPageOrderArray}
+          } // push
+        )// updateONes
+        console.log("finishh update array")
+    }
+
     async getInitializeNotebookData(collection){
         let rootNode = await collection.findOne({ "_identity.accessPointer": "00000-00000" })
         rootNode["array"] = []
@@ -345,18 +364,24 @@ export class MongoBackEnd implements MongoBackEndInterface {
     // }
 
     async connect(){
-        const mongoClient = new MongoClient(this.mongoUrl, {
-          useUnifiedTopology: true,
-          useNewUrlParser: true,
-          keepAlive: true,
-          connectTimeoutMS: 300000,
-          socketTimeoutMS: 300000,
-          bufferMaxEntries: 0,
-          poolSize: 10
-        })
+        if (this.client && this.client.isConnected()){
+          console.log("reuse the connection.")
+        } else {
+          this.client = new MongoClient(this.mongoUrl, {
+            useUnifiedTopology: true,
+            useNewUrlParser: true,
+            keepAlive: true,
+            connectTimeoutMS: 300000,
+            socketTimeoutMS: 300000,
+            bufferMaxEntries: 0,
+            poolSize: 10
+          })
 
-        console.info("connection to MongoDB")
-        return await mongoClient.connect()
+          console.info("connection to MongoDB")
+          await this.client.connect()
+        }
+
+
     }
 
 

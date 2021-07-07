@@ -1,0 +1,9 @@
+[
+  { "abbreviation": "doge", "name": "Ethereum Classic","average_cost": 0.3011, "quantity": 372.00},
+  { "abbreviation": "etc", "name": "Ethereum Classic","average_cost": 54.60, "quantity": 1.847649},
+  { "abbreviation": "btc", "name": "Bitcoin","average_cost": 32362.46, "quantity": 0.0000309},
+  { "abbreviation": "eth", "name": "Ethereum","average_cost": 2399.95, "quantity": 0.20835},
+  { "abbreviation": "ltc", "name": "Litecoin","average_cost": 162.44, "quantity": 2.46268969},
+  { "abbreviation": "vet", "name": "VeChain","average_cost": 0.0859, "quantity": 3492},
+  { "abbreviation": "vtho", "name": "VeThor Token","average_cost": 0.0067, "quantity": 29850}
+]

@@ -115,9 +115,6 @@ var AutomergeMainDoc = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.mongoDB.initializeFirstNotebook(notebookID)];
                     case 1:
                         result = _a.sent();
-                        return [4 /*yield*/, this.mongoDB.disconnect()];
-                    case 2:
-                        _a.sent();
                         return [2 /*return*/, result
                             // result.then(p=>{
                             //     return p
@@ -161,13 +158,13 @@ var AutomergeMainDoc = /** @class */ (function () {
                     case 0:
                         data.metaData.socketId = socketID;
                         if (!(data.metaData.action == "create")) return [3 /*break*/, 2];
-                        return [4 /*yield*/, this.mongoDB.createItem(collection, data).then(this.mongoDB.disconnect())];
+                        return [4 /*yield*/, this.mongoDB.createItem(collection, data)];
                     case 1:
                         _a.sent();
                         _a.label = 2;
                     case 2:
                         if (!(data.metaData.action == "update")) return [3 /*break*/, 4];
-                        return [4 /*yield*/, this.mongoDB.updateItem(collection, data).then(this.mongoDB.disconnect())];
+                        return [4 /*yield*/, this.mongoDB.updateItem(collection, data)];
                     case 3:
                         _a.sent();
                         _a.label = 4;
@@ -175,7 +172,7 @@ var AutomergeMainDoc = /** @class */ (function () {
                         if (!(data.metaData.action == "delete")) return [3 /*break*/, 6];
                         // let deleteMessage = this.deleteFromDatabase(data)
                         // return deleteMessage
-                        return [4 /*yield*/, this.mongoDB.deleteItem(collection, data).then(this.mongoDB.disconnect())];
+                        return [4 /*yield*/, this.mongoDB.deleteItem(collection, data)];
                     case 5:
                         // let deleteMessage = this.deleteFromDatabase(data)
                         // return deleteMessage
@@ -184,7 +181,7 @@ var AutomergeMainDoc = /** @class */ (function () {
                     case 6:
                         if (!(data.metaData.action == "microUpdate")) return [3 /*break*/, 8];
                         console.log("received microUpdateData");
-                        return [4 /*yield*/, this.mongoDB.microUpdate(collection, data).then(this.mongoDB.disconnect())];
+                        return [4 /*yield*/, this.mongoDB.microUpdate(collection, data)];
                     case 7:
                         _a.sent();
                         _a.label = 8;

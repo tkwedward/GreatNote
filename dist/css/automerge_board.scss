@@ -381,6 +381,26 @@ select, option {
         // .layerlevel
 
     }
+} // layerConttrollerr
+
+.sectionControllerHTMLObject{
+    background: red;
+    width: 90%;
+    height: 250px;
+    margin: auto;
+    display: block;
+
+    .allSectionViewWrapper{
+        background: lightblue;
+        height: 150px;
+        overflow: scroll;
+
+        .selectedRow {
+          background: gold
+        }
+    }
+
+    .pageSectionViewWrapper{}
 }
 
 

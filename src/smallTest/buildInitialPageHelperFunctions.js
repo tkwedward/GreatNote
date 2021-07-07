@@ -11,6 +11,7 @@ import * as GroupController from "./groupControllerFolder/groupController";
 import { getAllPageAnnotation, buildAnnotationPage } from "./pageControllerFolder/annotationHelperFunctions";
 import { socket } from "./socketFunction";
 import * as GNCommentController from "./commentFolder/commentController";
+import * as SectionController from "./sectionControllerFolder/sectionController";
 import * as LayerConroller from "./layerControllerFolder/layerController";
 import * as PageController from "./pageControllerFolder/pageController";
 import * as pageViewHelperFunction from "./pageViewHelperFunction";
@@ -160,12 +161,13 @@ export function buildPageControllerButtonArray(mainController) {
         let pageWrapper = document.querySelector(".pageWrapper");
         pageWrapper.classList.toggle("minimizedBar");
     });
-    editorController.append(objectIDGetter, objectIDGetterSubmit, testFieldButton, showMainDocButton, showAnnotationButton);
+    let sectionControllerHTMLObject = SectionController.createSectionController(mainController);
+    editorController.append(sectionControllerHTMLObject, objectIDGetter, objectIDGetterSubmit, testFieldButton, showMainDocButton, showAnnotationButton);
     // toolBoxObject
     let toolBoxHtmlObject = buildToolBoxHtmlObject(mainController);
     pageControllerSubPanelContent.append(toolBoxHtmlObject, minimizedBarButton, editorController, scaleController);
     let annotationPage = document.querySelector(".annotationPage");
-    return { pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, showMainDocButton, showAnnotationButton, annotationPage, scaleController };
+    return { pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, showMainDocButton, showAnnotationButton, annotationPage, scaleController, sectionControllerHTMLObject };
 } // buildPageControllerButtonArray
 export function buildToolBoxHtmlObject(mainController) {
     let toolBoxHtmlObject = mainController.toolBox.createToolboxHtmlObject();
@@ -205,6 +207,7 @@ export function buildPageController(mainController, bookmarkSubPanelContent, ful
     //     socket.emit("saveNotebookUsingClientData", saveData)
     //
     // })
+    // let sectionControllerHTMLObject = SectionController.createSectionController(mainController)
     let layerControllerHTMLObject = LayerConroller.createLayerController(mainController);
     bookmarkSubPanelContent.append(createNewDivButton, deletePageButton, switchViewModeButton, layerControllerHTMLObject);
 }
@@ -232,7 +235,6 @@ export function buildInitialHTMLSkeleton(mainController) {
     let [commentSubPanelNavbarTitle, commentSubPanelContent] = pageViewHelperFunction.createSubPanel("comment", true);
     commentSubPanelContent.setAttribute("accessPointer", mainController.mainDocArray["mainArray_bookmark"]);
     bottomSubPanel.addTabAndTabContent(commentSubPanelNavbarTitle, commentSubPanelContent);
-    //
     // let commentSidebar = CommentSidebarController.GNCommentSidebar()
     // commentSubPanelContent.append(commentSidebar)
     // add events: initalizeWindowObject, addPasteImageEvent, swipeDetection
@@ -247,6 +249,7 @@ export function buildInitialPage(mainController, saveToDatabase = false) {
     let overviewModeDiv = document.querySelector(".overviewModeDiv");
     let commentSubPanelContent = document.querySelector(".commentSubPanel");
     let groupControllerWrapper = document.querySelector(".groupControllerWrapper");
+    let allSectionView = document.querySelector(".allSectionView");
     let collectionControllerWrapper = document.querySelector(".collectionControllerWrapper");
     createGNDataStructureMapping(mainController);
     let pageController = mainController.pageController;
@@ -288,21 +291,20 @@ export function buildInitialPage(mainController, saveToDatabase = false) {
         else {
             pageNotRendered.push(pageID);
         }
+        // add new section rows
+        allSectionView.addNewRow(i + 1, pageFullArray[i]._identity.accessPointer, pageFullArray[i].data.sectionDataArray);
         // if (i==0){
     }
-    // let loadPages = setInterval(()=>{
-    //
-    //     if (pageNotRendered.length > 0){
-    //
-    //       let pageID = <string >pageNotRendered.pop()
-    //       let targetPage = <HTMLDivElement> document.querySelector(`*[accessPointer=${pageID}]`)
-    //
-    //       if (targetPage.getAttribute("loaded")!="true") {
-    //         targetPage.setAttribute("loaded", "true")
-    //         getPageDataFromServer(mainController, pageID)
-    //       }
-    //     }
-    // }, 10000)
+    let loadPages = setInterval(() => {
+        if (pageNotRendered.length > 0) {
+            let pageID = pageNotRendered.pop();
+            let targetPage = document.querySelector(`*[accessPointer=${pageID}]`);
+            if (targetPage.getAttribute("loaded") != "true") {
+                targetPage.setAttribute("loaded", "true");
+                getPageDataFromServer(mainController, pageID);
+            }
+        }
+    }, 500);
     // pageNotRendered.forEach(p=>getPageDataFromServer(mainController, p))
     let annotationButton = document.querySelector(".showAnnotationButton");
     let switchViewModeButton = document.querySelector(".switchViewModeButton");
