@@ -4,6 +4,7 @@ import { GNContainerDiv } from "./GreatNoteClass/GreatNoteDataClass";
 import { GNImageContainer } from "./GreatNoteClass/GNImageContainer";
 import { GNInputField } from "./GreatNoteClass/GNInputField";
 import { GNTextContainer } from "./GreatNoteClass/GNTextContainer";
+import { GNTextBox } from "./GreatNoteClass/GNTextBox";
 import { GNBookmark } from "./bookmarkFolder/GNBookmark";
 import { GNPage } from "./GreatNoteClass/GNPage";
 import * as GreatNoteSvgDataClass from "./GreatNoteClass/GreatNoteSvgDataClass";
@@ -30,6 +31,7 @@ export function createGNDataStructureMapping(mainController) {
         GNBookmark: GNBookmark,
         GNPage: GNPage,
         GNTextContainer: GNTextContainer,
+        GNTextBox: GNTextBox,
         // svg
         GNSvg: GreatNoteSvgDataClass.GNSvg,
         GNSvgCircle: GreatNoteSvgDataClass.GNSvgCircle,
@@ -179,6 +181,7 @@ export function buildToolBoxHtmlObject(mainController) {
     let moveObjectInDivButton = mainController.toolBox.createMoveObjectInDivButton(toolBoxHtmlObject);
     let addBookmarkButton = mainController.toolBox.createAddBookmarkButton(toolBoxHtmlObject);
     let textToolButton = mainController.toolBox.createTextToolItemButton(toolBoxHtmlObject);
+    let simpleTextBoxButton = mainController.toolBox.createTextBoxItemButton(toolBoxHtmlObject);
     let bothLayerSelectionToolItemButton = mainController.toolBox.createBothLayerSelectionToolItemButton(toolBoxHtmlObject);
     toolBoxHtmlObject.append(eraserItemButton, polylineItemButton, selectionToolItemButton, mouseRectangleSelectionToolItemButton, addCommentItemButton, moveObjectInDivButton, addBookmarkButton, textToolButton, bothLayerSelectionToolItemButton);
     return toolBoxHtmlObject;

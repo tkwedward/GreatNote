@@ -1,0 +1,57 @@
+.pendingDivWrapper{
+
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+
+    .itemCard {
+        width: 90%;
+        display: block; margin: 10px auto;
+
+    }
+
+    .categoryBox{
+      .title{
+        text-align: center;
+        background: gold;
+        height: 30px;
+        font-size: 20px;
+      }
+
+      margin: 5px; height: 500px;
+      border: 2px solid black;
+      overflow-y: scroll;
+    }
+}
+
+.projectItemHtmlObject{
+    .taskListField{
+        border: 1px solid black;
+        .taskItem { margin: 20px;}
+    }
+}
+
+.projectDetailDivWrapper{
+    background: Aliceblue;
+    height: 500px;
+
+    .taskRow{
+      margin: 15px;
+
+      .frontRow {
+        display: grid;
+        grid-template-columns: 3fr 1fr 1fr 1fr 1fr;
+        background: wheat;
+        padding: 15px;
+
+        .addToTaskPageButton, .statusSelectField, .deleteTaskPageButton{
+          width: 60%; margin: 0px auto; display: block;
+
+        }
+      }// frontRow
+
+      .hiddenRow {
+          padding: 15px;
+          display: none
+      }
+    }
+}

@@ -260,9 +260,7 @@ var MongoBackEnd = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        console.log(129129, databaseMessage, databaseMessage.htmlObjectData);
-                        return [4 /*yield*/, collection.insertOne(databaseMessage.htmlObjectData)]; // insertOne
+                    case 0: return [4 /*yield*/, collection.insertOne(databaseMessage.htmlObjectData)]; // insertOne
                     case 1:
                         _a.sent(); // insertOne
                         if (!!databaseMessage.metaData.insertPosition) return [3 /*break*/, 3];

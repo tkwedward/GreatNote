@@ -164,9 +164,6 @@ export class MongoBackEnd implements MongoBackEndInterface {
 
 
     async createItem(collection: Collection, databaseMessage: any){
-
-      console.log(129129, databaseMessage, databaseMessage.htmlObjectData)
-
       await collection.insertOne( databaseMessage.htmlObjectData) // insertOne
 
       if (!databaseMessage.metaData.insertPosition){

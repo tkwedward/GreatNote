@@ -7,6 +7,7 @@ import {GNContainerDiv} from "./GreatNoteClass/GreatNoteDataClass"
 import {GNImageContainer} from "./GreatNoteClass/GNImageContainer"
 import {GNInputField} from "./GreatNoteClass/GNInputField"
 import {GNTextContainer} from "./GreatNoteClass/GNTextContainer"
+import {GNTextBox} from "./GreatNoteClass/GNTextBox"
 import { GNBookmark } from "./bookmarkFolder/GNBookmark"
 import { GNPage } from "./GreatNoteClass/GNPage"
 import { GNBookmarkLinkedObject} from "./bookmarkFolder/GNBookmarkLinkedObject"
@@ -44,6 +45,7 @@ export function createGNDataStructureMapping(mainController:MainControllerInterf
       GNBookmark: GNBookmark,
       GNPage: GNPage,
       GNTextContainer: GNTextContainer,
+      GNTextBox: GNTextBox,
 
       // svg
       GNSvg: GreatNoteSvgDataClass.GNSvg,
@@ -207,7 +209,7 @@ export function buildPageControllerButtonArray(mainController:MainControllerInte
 
   let sectionControllerHTMLObject = SectionController.createSectionController(mainController)
 
-  editorController.append(sectionControllerHTMLObject, objectIDGetter, objectIDGetterSubmit, testFieldButton, showMainDocButton, showAnnotationButton)
+  editorController.append(sectionControllerHTMLObject)
 
   // toolBoxObject
   let toolBoxHtmlObject = buildToolBoxHtmlObject(mainController)
@@ -236,10 +238,11 @@ export function buildToolBoxHtmlObject(mainController: any){
   let moveObjectInDivButton = mainController.toolBox.createMoveObjectInDivButton(toolBoxHtmlObject)
   let addBookmarkButton = mainController.toolBox.createAddBookmarkButton(toolBoxHtmlObject)
   let textToolButton = mainController.toolBox.createTextToolItemButton(toolBoxHtmlObject)
+  let simpleTextBoxButton = mainController.toolBox.createTextBoxItemButton(toolBoxHtmlObject)
   let bothLayerSelectionToolItemButton = mainController.toolBox.createBothLayerSelectionToolItemButton(toolBoxHtmlObject)
 
 
-  toolBoxHtmlObject.append(eraserItemButton, polylineItemButton, selectionToolItemButton, mouseRectangleSelectionToolItemButton, addCommentItemButton, moveObjectInDivButton, addBookmarkButton, textToolButton, bothLayerSelectionToolItemButton)
+  toolBoxHtmlObject.append(eraserItemButton, polylineItemButton, selectionToolItemButton, mouseRectangleSelectionToolItemButton, addCommentItemButton, moveObjectInDivButton, addBookmarkButton, textToolButton)
 
   return toolBoxHtmlObject
 }
@@ -292,7 +295,6 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
 
       let annotationPage = buildAnnotationPage(mainController)
 
-
       let [topSubPanel, topSubPanelTabBar, topSubPanelTabContent] = pageViewHelperFunction.subPanelTab("topSubPanel")
       // usr controller
       let [userControllerSubPanelNavbarTitle, userpageControllerSubPanelContent, userViewer] = UserControllerHelperFunction.buildUserController(mainController)
@@ -302,10 +304,8 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
       let {pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent, testFieldButton, showMainDocButton, showAnnotationButton} =  buildPageControllerButtonArray(mainController)
       topSubPanel.addTabAndTabContent(pageControllerSubPanelNavbarTitle, pageControllerSubPanelContent)
 
-
       let [middleSubPanel, middleSubPanelTabBar, middleSubPanelTabContent] = pageViewHelperFunction.subPanelTab("middleSubPanel")
       let {pageArrayID, panelContainer, pageContentContainer, fullPageModeDiv, overviewModeDiv, bookmarkSubPanelNavbarTitle, bookmarkSubPanelContent} = getImportantDivFromHTML(mainController)
-
 
       let [groupControllerNavbarTitle, groupControllerContent] = GroupController.GroupController(mainController)
       let [collectionControllerNavbarTitle, collectionControllerContent] = CollectionController.CollectionController(mainController)

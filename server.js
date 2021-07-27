@@ -46,13 +46,13 @@ var app = express();
 var talkNotes = require("./routes/talkNotes");
 // const cryptoRouter = require("./routes/crypto")
 var CoinGecko = require('coingecko-api');
+var ScheduleMongoDBClient_1 = require("./ScheduleMongoDBClient");
 var automergeHelperFunction_1 = require("./automergeHelperFunction");
 // server.set("view engine", "ejs")
 app.use(express.static(path.join(__dirname, './dist')));
 app.use(express.static(path.join(__dirname, './build')));
 app.set("views", [path.join(__dirname, "./dist/templates")]);
 app.use("/talkNotes", talkNotes);
-// app.use("/crpyto", cryptoRouter)
 var server = require("http").Server(app);
 var io = require("socket.io")(server);
 var CoinGeckoClient = new CoinGecko();
@@ -78,6 +78,12 @@ app.get("/allCrpytoData", function (req, res) { return __awaiter(void 0, void 0,
 app.get("/crpyto", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         res.render("crpyto.ejs");
+        return [2 /*return*/];
+    });
+}); });
+app.get("/schedule", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        res.render("schedule.ejs");
         return [2 /*return*/];
     });
 }); });
@@ -265,6 +271,124 @@ io.on("connection", function (socket) {
         console.log("After delete", connectedNodeIdArray);
     }); // disconnect
 }); // io.on(connection)
+// about the schedule app
+var scheduleMongoDB = new ScheduleMongoDBClient_1.ScheduleMongoDBClient();
+app.get("/schedule/api/test", function (req, res) {
+    res.status(200).json({ "status": "success" });
+});
+app.get("/schedule/api/getInitialData", function (req, res) {
+    var _this = this;
+    var body = '';
+    req.on('data', function (chunk) {
+        body += chunk.toString(); // convert Buffer to string
+    });
+    req.on('end', function () { return __awaiter(_this, void 0, void 0, function () {
+        var _a, _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    _b = (_a = res.status(200)).json;
+                    return [4 /*yield*/, scheduleMongoDB.getInitialData()];
+                case 1:
+                    _b.apply(_a, [_c.sent()]);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+});
+app.post("/schedule/api/getItem", function (req, res) {
+    var _this = this;
+    var body = '';
+    req.on('data', function (chunk) {
+        body += chunk.toString(); // convert Buffer to string
+    });
+    req.on('end', function () { return __awaiter(_this, void 0, void 0, function () {
+        var jsonData, _a, _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    jsonData = JSON.parse(body);
+                    _b = (_a = res.status(200)).json;
+                    return [4 /*yield*/, scheduleMongoDB.getItem(jsonData)];
+                case 1:
+                    _b.apply(_a, [_c.sent()]);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+});
+app.post("/schedule/api/create", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var body;
+    return __generator(this, function (_a) {
+        body = '';
+        req.on('data', function (chunk) {
+            body += chunk.toString(); // convert Buffer to string
+        });
+        req.on('end', function () { return __awaiter(void 0, void 0, void 0, function () {
+            var jsonData;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        jsonData = JSON.parse(body);
+                        return [4 /*yield*/, scheduleMongoDB.createItem(jsonData)];
+                    case 1:
+                        _a.sent();
+                        res.status(200).json({ "status": jsonData });
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+        return [2 /*return*/];
+    });
+}); });
+app.post("/schedule/api/update", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var body;
+    return __generator(this, function (_a) {
+        body = '';
+        req.on('data', function (chunk) {
+            body += chunk.toString(); // convert Buffer to string
+        });
+        req.on('end', function () { return __awaiter(void 0, void 0, void 0, function () {
+            var jsonData;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        jsonData = JSON.parse(body);
+                        return [4 /*yield*/, scheduleMongoDB.updateItem(jsonData)];
+                    case 1:
+                        _a.sent();
+                        res.status(200).json({ "status": "finish update" });
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+        return [2 /*return*/];
+    });
+}); });
+app.post("/schedule/api/delete", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var body;
+    return __generator(this, function (_a) {
+        body = '';
+        req.on('data', function (chunk) {
+            body += chunk.toString(); // convert Buffer to string
+        });
+        req.on('end', function () { return __awaiter(void 0, void 0, void 0, function () {
+            var jsonData;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        jsonData = JSON.parse(body);
+                        return [4 /*yield*/, scheduleMongoDB.deleteItem(jsonData)];
+                    case 1:
+                        _a.sent();
+                        res.status(200).json({ "status": "finish update" });
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+        return [2 /*return*/];
+    });
+}); });
 server.listen(port, function () {
     console.log("Server is running on port " + port);
 });

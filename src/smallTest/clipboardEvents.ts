@@ -8,7 +8,6 @@ export function addPasteImageEvent(mainController: MainControllerInterface){
         let currentPage = mainController.pageController.currentPage.fullPageHTMLObject
         let targetDiv = currentPage.querySelector(".divLayer")
 
-
         for (var index in items) {
             var item = items[index];
             if (item.kind === 'file') {
@@ -30,19 +29,27 @@ export function addPasteImageEvent(mainController: MainControllerInterface){
 
                        targetDiv.appendChild(newImg)
 
-                       let defaultSizeDropList = <HTMLSelectElement> document.querySelector(".defaultSizeDropList")
+                       img.onload = function(){
+                          console.log(1234, img.width + 'x' + img.height);
+                          newImg.setImageSize({width:img.naturalWidth/2.3})
 
-                       console.log(defaultSizeDropList)
-                       let defaultWidth = 500
-                       if (defaultSizeDropList){
-                          defaultWidth = +defaultSizeDropList.value
+
+
+                          newImg.setMovable()
+                          newImg.style["top"] = document.querySelector(".pageContentContainer")?.scrollTop + "px"
+                          newImg.saveHTMLObjectToDatabase()
+                          targetDiv.appendChild(newImg)
                        }
 
-                       newImg.setImageSize({width:defaultWidth})
-                       newImg.setMovable()
-                       newImg.style["top"] = document.querySelector(".pageContentContainer")?.scrollTop + "px"
-                       newImg.saveHTMLObjectToDatabase()
-                       targetDiv.appendChild(newImg)
+                       let defaultSizeDropList = <HTMLSelectElement> document.querySelector(".defaultSizeDropList")
+
+                       // let defaultWidth = 600
+                       // if (defaultSizeDropList){
+                       //    defaultWidth = +defaultSizeDropList.value
+                       // }
+                       //
+                       // newImg.setImageSize({width:defaultWidth})
+
                     };
                     xhr.send(event.target.result);
                 };

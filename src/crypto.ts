@@ -1,15 +1,154 @@
-console.log("crypto is crypto")
 // import cryptoData from "../dist/data/crpytoData.json"
 
 let cryptoData = [
-  { "abbreviation": "doge", "name": "Ethereum Classic","average_cost": 0.3011, "quantity": 372.00},
-  { "abbreviation": "etc", "name": "Ethereum Classic","average_cost": 54.60, "quantity": 1.847649},
-  { "abbreviation": "btc", "name": "Bitcoin","average_cost": 32362.46, "quantity": 0.0000309},
-  { "abbreviation": "eth", "name": "Ethereum","average_cost": 2399.95, "quantity": 0.20835},
-  { "abbreviation": "ltc", "name": "Litecoin","average_cost": 162.44, "quantity": 2.46268969},
-  { "abbreviation": "vet", "name": "VeChain","average_cost": 0.0859, "quantity": 3492},
-  { "abbreviation": "vtho", "name": "VeThor Token","average_cost": 0.0067, "quantity": 29850},
-  { "abbreviation": "ada", "name": "Cardano","average_cost": 1.40, "quantity": 143}
+  {
+    "abbreviation": "doge",
+    "name": "Dogecoin",
+    "market": [
+      {
+        "name": "Robinhood",
+        "date": "2021-06-22",
+        "average_cost": 0.3011,
+        "quantity": 372.00
+      },
+      {
+        "name": "Binance",
+        "date": "2021-07-08",
+        "average_cost": 0.2,
+        "quantity": 499
+      },
+    ]
+  },
+
+  {
+    "abbreviation": "etc",
+    "name": "Ethereum Classic",
+    "market":[
+      {
+        "name": "Robhinhood",
+        "date": "2021-06-22",
+        "average_cost": 54.60,
+        "quantity": 1.847649
+      },
+      {
+        "name": "Binance",
+        "date": "2021-07-08",
+        "average_cost": 48.0,
+        "quantity": 10.40
+      }
+    ]
+  },
+
+  {
+    "abbreviation": "btc",
+    "name": "Bitcoin",
+    "market":[
+      {
+        "name": "Robhinhood",
+        "date": "2021-06-25",
+        "average_cost": 32362.46,
+        "quantity": 0.0000309
+      },
+      {
+        "name": "Binance",
+        "date": "2021-07-08",
+        "average_cost": 32500,
+        "quantity": 0.015385
+      }
+    ]
+  },
+  {
+    "abbreviation": "eth",
+    "name": "Ethereum",
+    "market":[
+      {
+        "name": "Robhinhood",
+        "date": "2021-06-22",
+        "average_cost": 2399.95,
+        "quantity": 0.20835
+      },
+      {
+        "name": "Binance",
+        "date": "2021-07-08",
+        "average_cost": 2100,
+        "quantity": 0.47619
+      },
+      {
+        "name": "Binance",
+        "date": "2021-07-12",
+        "average_cost": 1900,
+        "quantity": 0.20578
+      }
+    ]
+  },
+
+  {
+    "abbreviation": "ltc",
+    "name": "Litecoin",
+    "market":[
+      {
+        "name": "Robhinhood",
+        "date": "2021-06-22",
+        "average_cost": 162.44,
+        "quantity": 2.46268969
+      }
+    ]
+  },
+
+  {
+    "abbreviation": "vet",
+    "name": "VeChain",
+    "market":[
+      {
+        "name": "Binance",
+        "date": "2021-07-02",
+        "average_cost": 0.0859,
+        "quantity": 3492
+      },
+      {
+        "name": "Binance",
+        "date": "2021-07-08",
+        "average_cost": 0.0768,
+        "quantity": 6628
+      }
+    ]
+  },
+  {
+    "abbreviation": "vtho",
+    "name": "VeThor Token",
+    "market":[
+      {
+        "name": "Binance",
+        "date": "2021-07-02",
+        "average_cost": 0.0067,
+        "quantity": 29850
+      }
+    ]
+  },
+  {
+    "abbreviation": "ada",
+    "name": "Cardano",
+    "market":[
+      {
+        "name": "Binance",
+        "date": "2021-07-05",
+        "average_cost": 1.40,
+        "quantity": 143
+      },
+      {
+        "name": "Binance",
+        "date": "2021-07-09",
+        "average_cost": 1.3000,
+        "quantity": 384.6
+      },
+      {
+        "name": "Binance",
+        "date": "2021-07-12",
+        "average_cost": 1.3000,
+        "quantity": 76.5
+      }
+    ]
+  }
 ]
 
 
@@ -37,12 +176,31 @@ cryptoTable.append(headerRow)
 function createRow(_coin:any, allData: any){
   let symbol = _coin["abbreviation"]
   let item = allData.filter((p:any)=>p.symbol==symbol)[0]
-  let equity:number = _coin["quantity"] * item["current_price"]
-  let cost:number = _coin["quantity"] * _coin["average_cost"]
-  let totalReturn = equity - cost
 
-  console.log("round x")
-  console.log(symbol, equity, cost, totalReturn)
+  let totalQuantity: number
+  if (_coin["market"].length == 1){
+      totalQuantity = _coin["market"][0]["quantity"]
+  } else {
+      totalQuantity = _coin["market"].reduce((x:any, y:any) => x.quantity + y.quantity);
+  }
+
+  let equity:number
+  if (_coin["market"].length == 1){
+      equity = _coin["market"][0]["quantity"] * item["current_price"]
+  } else {
+      equity = _coin["market"].reduce((x:any, y:any) => x["quantity"] * item["current_price"] + y["quantity"] * item["current_price"]);
+  }
+
+  let cost:number
+  if (_coin["market"].length == 1){
+      cost = _coin["market"][0]["quantity"] * _coin["market"][0]["average_cost"]
+      console.log(177, cost)
+  } else {
+      cost = _coin["market"].reduce((x:any, y:any) => x["quantity"] * x["average_cost"] + y["quantity"] * y["average_cost"]);
+      console.log(cost)
+  }
+
+  let totalReturn = equity - cost
 
   let row = document.createElement("div")
   row.classList.add("crpytoRow")
@@ -53,13 +211,13 @@ function createRow(_coin:any, allData: any){
   symbolColumn.innerHTML = symbol
 
   let averagePriceColumn = document.createElement("div")
-  averagePriceColumn.innerHTML = _coin["average_cost"]
+  averagePriceColumn.innerHTML = `${cost / totalQuantity}`
 
   let currentPriceColumn = document.createElement("div")
   currentPriceColumn.innerHTML = item["current_price"]
 
   let percentageChangeColumn = document.createElement("div")
-  percentageChangeColumn.innerHTML = `${(item["current_price"] - _coin["average_cost"])/_coin["average_cost"] * 100}`
+  percentageChangeColumn.innerHTML = `${(item["current_price"] * totalQuantity - cost)/cost * 100}`
 
   let costColumn = document.createElement("div")
   costColumn.innerHTML = `${cost}`

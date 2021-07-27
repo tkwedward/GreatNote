@@ -7,7 +7,8 @@ let iconName = {
     commentTool: "/graphics/toolBox/commentTool.png",
     movableTool: "/graphics/toolBox/movableTool.png",
     penTool: "/graphics/toolBox/penTool.png",
-    textTool: "/graphics/toolBox/textTool.png"
+    textTool: "/graphics/toolBox/textTool.png",
+    textBox: "/graphics/toolBox/textBox.png"
 };
 export class ToolBoxClass {
     constructor() {
@@ -48,6 +49,10 @@ export class ToolBoxClass {
             textToolItemButton: {
                 status: false,
                 attributeController: "textToolController"
+            },
+            textBoxItemButton: {
+                status: false,
+                attributeController: "textBoxController"
             },
             bothLayerSelectionToolItemButton: {
                 status: false,
@@ -223,6 +228,20 @@ export class ToolBoxClass {
         toolBoxItem.addEventListener("click", (e) => {
             console.log("Text Tool item button is activated");
             this.activateButtonFunction(toolBoxItem, "textToolItemButton");
+        });
+        toolBoxItem.activate = function () {
+            changeSvgEventPointer("svgLayer", "none");
+        };
+        toolBoxItem.deactivate = function () {
+            changeSvgEventPointer("svgLayer", "auto");
+        };
+        return toolBoxItem;
+    }
+    createTextBoxItemButton(toolBoxHtmlObject) {
+        let toolBoxItem = this.createToolBoxItem("textBox", toolBoxHtmlObject, iconName.textBox);
+        toolBoxItem.addEventListener("click", (e) => {
+            console.log("Text Tool item button is activated");
+            this.activateButtonFunction(toolBoxItem, "textBoxItemButton");
         });
         toolBoxItem.activate = function () {
             changeSvgEventPointer("svgLayer", "none");

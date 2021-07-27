@@ -49,8 +49,8 @@ export function superGNObject(_object:any, saveToDatabase?:boolean, arrayID?:str
 
 
     // when the data is first created, add it to the database
-    _object.addToDatabase = function(arrayID: string, insertPosition?:number|boolean, dataPointer?:string, specialCreationMessage?: string){
-        mainController.addData(arrayID, _object, accessPointer, insertPosition, dataPointer, specialCreationMessage)
+    _object.addToDatabase = function(arrayID: string, insertPosition?:number|boolean, dataPointer?:string, specialMessage?: string){
+        mainController.addData(arrayID, _object, accessPointer, insertPosition, dataPointer, specialMessage)
     }
 
     _object.saveHTMLObjectToDatabase = function(){
@@ -157,7 +157,10 @@ export function superGNObject(_object:any, saveToDatabase?:boolean, arrayID?:str
 
 
     if (saveToDatabase){
-        _object.addToDatabase(arrayID, insertPosition, dataPointer, specialCreationMessage)
+        let specialMessage = {
+          page: insertPosition || "insert At", insert: "back"
+        }
+        _object.addToDatabase(arrayID, insertPosition, dataPointer, specialMessage)
         // _object.editEvent(editEvent)
     }
 }

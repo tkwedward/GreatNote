@@ -78,6 +78,14 @@ export function renderDataToHTML(mainController: MainControllerInterface, data:c
             newHTMLObject.setMovable()
         }
 
+        if (p.GNType == "GNTextBox"){
+            newHTMLObject =  mainController.GNDataStructureMapping["GNTextBox"]({name: "name", arrayID: arrayHTMLObject.getAccessPointer(),  saveToDatabase:false, injectedData: p})
+            newHTMLObject._identity = p._identity
+
+            newHTMLObject.loadFromData(p)
+            newHTMLObject.setMovable()
+        }
+
         if (p.GNType=="GNTextContainer" || p.GNType=="GNTextDiv"){
             newHTMLObject =  mainController.GNDataStructureMapping["GNTextContainer"]({name: "name", arrayID: arrayHTMLObject.getAccessPointer(),  saveToDatabase:false, injectedData: p})
             newHTMLObject._identity = p._identity

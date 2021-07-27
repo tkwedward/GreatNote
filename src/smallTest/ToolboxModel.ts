@@ -12,7 +12,8 @@ let iconName = {
     commentTool: "/graphics/toolBox/commentTool.png",
     movableTool: "/graphics/toolBox/movableTool.png",
     penTool: "/graphics/toolBox/penTool.png",
-    textTool: "/graphics/toolBox/textTool.png"
+    textTool: "/graphics/toolBox/textTool.png",
+    textBox: "/graphics/toolBox/textBox.png"
 }
 
 
@@ -36,6 +37,8 @@ export interface ToolBoxInterface extends HTMLDivElement{
     createAddBookmarkButton(toolBoxHtmlObject:any):HTMLDivElement
 
     createMouseRectangleSelectionToolItemButton(toolBoxHtmlObject:any):HTMLDivElement
+
+    createTexttBoxItemButton(toolBoxHtmlObject:any):HTMLDivElement
 
 
 
@@ -62,7 +65,8 @@ interface ToolBoxItemStatusInterface {
     addCommentItemButton: {status: boolean, attributeController: string}
     moveObjectInDivButton: {status: boolean, attributeController: string}
     addBookmarkButton: {status: boolean, attributeController: string}
-    textToolItemButton: {status: boolean, attributeController: string}
+    textToolItemButton: {status: boolean, attributeController: string},
+    textBoxItemButton: {status: boolean, attributeController: string}
     bothLayerSelectionToolItemButton: {status: boolean, attributeController: string}
 }
 
@@ -110,6 +114,10 @@ export class ToolBoxClass implements ToolBoxInterface {
         textToolItemButton: {
             status: false,
             attributeController: "textToolController"
+        },
+        textBoxItemButton: {
+            status: false,
+            attributeController: "textBoxController"
         },
         bothLayerSelectionToolItemButton: {
             status: false,
@@ -346,6 +354,26 @@ export class ToolBoxClass implements ToolBoxInterface {
         toolBoxItem.addEventListener("click", (e)=>{
             console.log("Text Tool item button is activated")
             this.activateButtonFunction(toolBoxItem, "textToolItemButton")
+        })
+
+
+        toolBoxItem.activate = function(){
+          changeSvgEventPointer("svgLayer", "none")
+        }
+
+        toolBoxItem.deactivate = function(){
+          changeSvgEventPointer("svgLayer", "auto")
+        }
+
+        return toolBoxItem
+    }
+
+    createTextBoxItemButton(toolBoxHtmlObject:any){
+        let toolBoxItem = this.createToolBoxItem("textBox", toolBoxHtmlObject, iconName.textBox)
+
+        toolBoxItem.addEventListener("click", (e)=>{
+            console.log("Text Tool item button is activated")
+            this.activateButtonFunction(toolBoxItem, "textBoxItemButton")
         })
 
 

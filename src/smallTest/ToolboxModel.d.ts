@@ -13,6 +13,7 @@ export interface ToolBoxInterface extends HTMLDivElement {
     createToolBoxItem(name: string, toolBoxHtmlObject: HTMLDivElement): HTMLDivElement;
     createAddBookmarkButton(toolBoxHtmlObject: any): HTMLDivElement;
     createMouseRectangleSelectionToolItemButton(toolBoxHtmlObject: any): HTMLDivElement;
+    createTexttBoxItemButton(toolBoxHtmlObject: any): HTMLDivElement;
     registerSvg(svgLayer: any): void;
 }
 export interface ToolBoxItemInterface extends HTMLDivElement {
@@ -58,6 +59,10 @@ interface ToolBoxItemStatusInterface {
         status: boolean;
         attributeController: string;
     };
+    textBoxItemButton: {
+        status: boolean;
+        attributeController: string;
+    };
     bothLayerSelectionToolItemButton: {
         status: boolean;
         attributeController: string;
@@ -85,6 +90,7 @@ export declare class ToolBoxClass implements ToolBoxInterface {
     createAddBookmarkButton(toolBoxHtmlObject: any): ToolBoxItemInterface;
     createMoveObjectInDivButton(toolBoxHtmlObject: any): ToolBoxItemInterface;
     createTextToolItemButton(toolBoxHtmlObject: any): ToolBoxItemInterface;
+    createTextBoxItemButton(toolBoxHtmlObject: any): ToolBoxItemInterface;
     activateButtonFunction(toolBoxItem: any, itemName: string): void;
     registerSvg(svgLayer: any): void;
 }

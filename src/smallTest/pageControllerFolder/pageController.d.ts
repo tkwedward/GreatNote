@@ -13,7 +13,7 @@ export interface pageControllerInterface {
         sectionArray: any;
         annotationArray: any;
     };
-    addPage(fullPageHTMLObject: HTMLDivElement, smallViewHTMLObject?: HTMLDivElement): void;
+    addPage(fullPageHTMLObject: HTMLDivElement, targetPage?: number): void;
     deletePage(targetPage: any): void;
     getPage(pageNumber: number): any;
     goToPage(pageNumber: number): void;

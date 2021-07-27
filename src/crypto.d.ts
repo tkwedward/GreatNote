@@ -1,8 +1,12 @@
 declare let cryptoData: {
     abbreviation: string;
     name: string;
-    average_cost: number;
-    quantity: number;
+    market: {
+        name: string;
+        date: string;
+        average_cost: number;
+        quantity: number;
+    }[];
 }[];
 declare let allData: any;
 declare let bodyWrapper: HTMLDivElement;

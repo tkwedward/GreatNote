@@ -69,7 +69,10 @@ export function createImageContainerAttributeController() {
     let defaultSizeOpt600 = document.createElement("option");
     defaultSizeOpt600.value = "600";
     defaultSizeOpt600.innerText = "600";
-    defaultSizeDropList.append(defaultSizeOpt500, defaultSizeOpt600);
+    let defaultSizeOpt700 = document.createElement("option");
+    defaultSizeOpt700.value = "700";
+    defaultSizeOpt700.innerText = "700";
+    defaultSizeDropList.append(defaultSizeOpt500, defaultSizeOpt600, defaultSizeOpt700);
     imageContainerAttributeController.append(widthInputDiv, heightInputDiv, defaultSizeDropList, smallImage, updateButton, deleteButton);
     // imageContainerAttributeController.append(widthInputDiv, heightInputDiv, xPositionInputDiv, yPositionInputDiv, smallImage, updateButton, deleteButton)
     imageContainerAttributeController.renderImage = function () {

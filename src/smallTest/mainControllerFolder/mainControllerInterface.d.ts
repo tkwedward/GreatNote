@@ -52,7 +52,7 @@ export interface MainControllerInterface {
     changeList: any[];
     uniqueNodeId: string;
     /** Functions related to save and update data in the database */
-    addData(arrayID: string, htmlObject: GNObjectInterface | HTMLElement, temporaryPointer: string, insertPosition?: number | boolean, dataPointer?: string, specialMessage?: string): [HTMLElement, string];
+    addData(arrayID: string, htmlObject: GNObjectInterface | HTMLElement, temporaryPointer: string, insertPosition?: number | boolean, dataPointer?: string, specialMessage?: any): AddDatabaseFormatInterface;
     updateData(_object: GNObjectInterface, dataPointerType: boolean): void;
     createDummyData(name: string, age: number, sex: string): any;
     createUniqueID(): string;
@@ -116,5 +116,6 @@ export interface AddDatabaseFormatInterface {
         dataPointer?: string;
         notebookID: string;
         uniqueNodeId: string;
+        specialMessage: any;
     };
 }

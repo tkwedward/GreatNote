@@ -56,7 +56,7 @@ export class MainController implements MainControllerInterface{
     the last paraameter is used only for the first tiee to initialize the object, no need to worry about it when used later
     */
     //@auto-fold here
-    addData(parentAccessPointer: string, htmlObject:GNObjectInterface|any, accessPointer:string, insertPosition?:number|boolean, dataPointer?:string, specialCreationMessage?: string, ):AddDatabaseFormatInterface{
+    addData(parentAccessPointer: string, htmlObject:GNObjectInterface|any, accessPointer:string, insertPosition?:number|boolean, dataPointer?:string, specialMessage?: any):AddDatabaseFormatInterface{
       // Step 1: register an accessPointer in the database
         //@auto-fold here
         let dataMessage:AddDatabaseFormatInterface = {
@@ -68,7 +68,8 @@ export class MainController implements MainControllerInterface{
                 accessPointer: accessPointer,
                 dataPointer: dataPointer,
                 notebookID: this.notebookID,
-                uniqueNodeId: this.uniqueNodeId
+                uniqueNodeId: this.uniqueNodeId,
+                specialMessage: specialMessage
             }
         }
         // socket.emit("databaseOperation", dataMessage)
@@ -255,6 +256,8 @@ export class MainController implements MainControllerInterface{
               let item = document.querySelector(`*[accessPointe='${changeData.htmlObjectData._identity.accessPointer}']`)
               console.log(245245, item, changeData.htmlObjectData._identity.accessPointer)
               if (item) return
+
+              // debugger
 
               processCreationDataHelper(this, changeData)
           }// create

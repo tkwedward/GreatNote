@@ -6,8 +6,11 @@ const fs = require("fs")
 const Automerge = require("automerge")
 const app = express()
 const talkNotes = require("./routes/talkNotes")
+
 // const cryptoRouter = require("./routes/crypto")
 const CoinGecko = require('coingecko-api');
+
+import {ScheduleMongoDBClient} from "./ScheduleMongoDBClient"
 import {AutomergeMainDoc, AutomergeMainDocInterface} from "./automergeHelperFunction"
 // server.set("view engine", "ejs")
 app.use(express.static(path.join(__dirname, './dist')));
@@ -15,7 +18,6 @@ app.use(express.static(path.join(__dirname, './build')));
 app.set("views", [path.join(__dirname, "./dist/templates")])
 
 app.use("/talkNotes", talkNotes)
-// app.use("/crpyto", cryptoRouter)
 
 const server = require("http").Server(app);
 const io = require("socket.io")(server)
@@ -38,6 +40,10 @@ app.get("/allCrpytoData", async (req, res)=>{
 
 app.get("/crpyto", async (req, res)=>{
     res.render("crpyto.ejs")
+})
+
+app.get("/schedule", async (req, res)=>{
+    res.render("schedule.ejs")
 })
 
 
@@ -194,6 +200,83 @@ io.on("connection", socket=>{
       console.log("After delete", connectedNodeIdArray)
   })// disconnect
 }) // io.on(connection)
+
+
+// about the schedule app
+let scheduleMongoDB = new ScheduleMongoDBClient()
+
+app.get("/schedule/api/test", (req, res) => {
+  res.status(200).json({"status": "success"});
+})
+
+app.get("/schedule/api/getInitialData", function(req, res){
+  let body = '';
+
+  req.on('data', chunk => {
+      body += chunk.toString(); // convert Buffer to string
+  })
+
+  req.on('end', async () =>{
+    res.status(200).json(await scheduleMongoDB.getInitialData());
+  })
+})
+
+app.post("/schedule/api/getItem", function(req, res){
+  let body = '';
+
+  req.on('data', chunk => {
+      body += chunk.toString(); // convert Buffer to string
+  })
+
+  req.on('end', async () =>{
+    let jsonData = JSON.parse(body)
+
+    res.status(200).json(await scheduleMongoDB.getItem(jsonData));
+  })
+})
+
+app.post("/schedule/api/create", async (req, res) => {
+    let body = '';
+
+    req.on('data', chunk => {
+        body += chunk.toString(); // convert Buffer to string
+    })
+
+    req.on('end', async () =>{
+      let jsonData = JSON.parse(body)
+      await scheduleMongoDB.createItem(jsonData)
+      res.status(200).json({"status": jsonData});
+    })
+})
+
+app.post("/schedule/api/update", async (req, res) => {
+    let body = '';
+
+    req.on('data', chunk => {
+        body += chunk.toString(); // convert Buffer to string
+    })
+
+    req.on('end', async () =>{
+      let jsonData = JSON.parse(body)
+      await scheduleMongoDB.updateItem(jsonData)
+      res.status(200).json({"status": "finish update"});
+    })
+})
+
+app.post("/schedule/api/delete", async (req, res) => {
+    let body = '';
+
+    req.on('data', chunk => {
+        body += chunk.toString(); // convert Buffer to string
+    })
+
+    req.on('end', async () =>{
+      let jsonData = JSON.parse(body)
+      await scheduleMongoDB.deleteItem(jsonData)
+      res.status(200).json({"status": "finish update"});
+    })
+})
+
 
 server.listen(port, ()=>{
   console.log(`Server is running on port ${port}`);

@@ -224,6 +224,8 @@ export function createNewPageEvent(currentStatus: any, fullPageModeDiv: HTMLDivE
     // when click the new page button, a new page is created.
     let clickEventAction = function (){
           let insertPosition = currentStatus.currentPage.pageNumber
+          console.log(227227, insertPosition)
+
           let saveToDatabase = true
           let newPage = createNewPage(currentStatus, fullPageModeDiv, false, saveToDatabase, insertPosition);
           // console.log(229229, newPage, newPage.getAccessPointer())

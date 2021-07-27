@@ -53,7 +53,7 @@ export interface MainControllerInterface {
     uniqueNodeId: string
 
     /** Functions related to save and update data in the database */
-    addData(arrayID: string, htmlObject: GNObjectInterface|HTMLElement, temporaryPointer: string, insertPosition?:number|boolean, dataPointer?:string, specialMessage?: string): [HTMLElement, string]
+    addData(arrayID: string, htmlObject: GNObjectInterface|HTMLElement, temporaryPointer: string, insertPosition?:number|boolean, dataPointer?:string, specialMessage?: any):AddDatabaseFormatInterface
 
     updateData(_object:GNObjectInterface, dataPointerType:boolean):void
 
@@ -139,6 +139,7 @@ export interface AddDatabaseFormatInterface {
       accessPointer: string,
       dataPointer?: string,
       notebookID: string,
-      uniqueNodeId: string
+      uniqueNodeId: string,
+      specialMessage: any
   }
 }

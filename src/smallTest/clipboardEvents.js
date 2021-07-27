@@ -13,7 +13,6 @@ export function addPasteImageEvent(mainController) {
                     let xhr = new XMLHttpRequest();
                     xhr.open('POST', '/talkNotes/processImageBase64Format', true);
                     xhr.onload = function () {
-                        var _a;
                         console.log("finish processing image");
                         let responseImgSrc = JSON.parse(this.responseText).imgsrc.replace("talkNotes/", "/");
                         // console.log(24242424, responseImgSrc)
@@ -22,17 +21,22 @@ export function addPasteImageEvent(mainController) {
                         img.src = window.location.origin
                             + "/image/" + responseImgSrc + ".png";
                         targetDiv.appendChild(newImg);
+                        img.onload = function () {
+                            var _a;
+                            console.log(1234, img.width + 'x' + img.height);
+                            newImg.setImageSize({ width: img.naturalWidth / 2.3 });
+                            newImg.setMovable();
+                            newImg.style["top"] = ((_a = document.querySelector(".pageContentContainer")) === null || _a === void 0 ? void 0 : _a.scrollTop) + "px";
+                            newImg.saveHTMLObjectToDatabase();
+                            targetDiv.appendChild(newImg);
+                        };
                         let defaultSizeDropList = document.querySelector(".defaultSizeDropList");
-                        console.log(defaultSizeDropList);
-                        let defaultWidth = 500;
-                        if (defaultSizeDropList) {
-                            defaultWidth = +defaultSizeDropList.value;
-                        }
-                        newImg.setImageSize({ width: defaultWidth });
-                        newImg.setMovable();
-                        newImg.style["top"] = ((_a = document.querySelector(".pageContentContainer")) === null || _a === void 0 ? void 0 : _a.scrollTop) + "px";
-                        newImg.saveHTMLObjectToDatabase();
-                        targetDiv.appendChild(newImg);
+                        // let defaultWidth = 600
+                        // if (defaultSizeDropList){
+                        //    defaultWidth = +defaultSizeDropList.value
+                        // }
+                        //
+                        // newImg.setImageSize({width:defaultWidth})
                     };
                     xhr.send(event.target.result);
                 };

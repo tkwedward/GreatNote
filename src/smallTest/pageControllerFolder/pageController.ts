@@ -18,7 +18,7 @@ export interface pageControllerInterface {
         sectionArray: any,
         annotationArray: any
     }
-    addPage(fullPageHTMLObject: HTMLDivElement, smallViewHTMLObject?: HTMLDivElement):void
+    addPage(fullPageHTMLObject: HTMLDivElement, targetPage?: number):void
     deletePage(targetPage:any):void
     getPage(pageNumber:number):any
     goToPage(pageNumber:number):void
@@ -48,7 +48,7 @@ export interface PageObjectInterface {
 }
 
 class PageObject implements PageObjectInterface {
-    pageNumber = -1
+    pageNumber = 1
     previous = null
     next = null
     fullPageHTMLObject =  null
@@ -103,9 +103,10 @@ export function initializePageController(mainController:MainControllerInterface)
     }
 
     pageController.updatePageNumber = function(initialPage = pageController.startPage){
+
         let _currentPageNumber = initialPage.pageNumber
         let _currentPage = initialPage
-        while (_currentPage){
+        while (_currentPage && _currentPage.pageNumber < pageController.totalPageNumber){
           console.log(108109, _currentPage)
             _currentPage.pageNumber = _currentPageNumber
             _currentPageNumber += 1
@@ -153,8 +154,20 @@ export function initializePageController(mainController:MainControllerInterface)
 
     }
 
-    pageController.addPage = function(fullPageHTMLObject:any){
-        let alpha = pageController.currentPage
+    pageController.addPage = function(fullPageHTMLObject:any, targetPage?: number){
+        let alpha
+
+        console.log(160160160, targetPage)
+        if (targetPage){
+            alpha = pageController.startPage.next
+            while (alpha){
+                if (alpha.pageNumber == targetPage) break
+                console.log(9384, alpha.pageNumber, targetPage)
+                alpha = alpha.next
+            }
+        } else {
+            alpha = pageController.currentPage
+        }
 
         let newPage = new PageObject()
 
@@ -269,6 +282,7 @@ export function initializePageController(mainController:MainControllerInterface)
 
         let _targetPage = pageController.getPage(pageNumber)
         if (_targetPage.name == "startPage" || _targetPage.name == "endPage" ){
+          console.log(_targetPage.name)
             console.log("You are hitting the start page or the end page.")
             return
         }
@@ -312,6 +326,12 @@ export function initializePageController(mainController:MainControllerInterface)
         for (let i = 0; i < range; i++){
           loadPageData(currentPage_in_forward_direction)
           currentPage_in_forward_direction = currentPage_in_forward_direction?.next
+        }
+
+        if (mainController.toolBox.currentActiveButton?.classList.contains("MoveObjectInDiv")){
+          console.log("click the move object in div again.")
+            let moveObjectInDivButton = <HTMLDivElement> document.querySelector(".MoveObjectInDiv")
+            moveObjectInDivButton.click()
         }
 
     } // go To Page

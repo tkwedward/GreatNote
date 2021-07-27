@@ -22,7 +22,7 @@ export declare class MainController implements MainControllerInterface {
     return: the HTMLObject related to, the accessID of the object in the database
     the last paraameter is used only for the first tiee to initialize the object, no need to worry about it when used later
     */
-    addData(parentAccessPointer: string, htmlObject: GNObjectInterface | any, accessPointer: string, insertPosition?: number | boolean, dataPointer?: string, specialCreationMessage?: string): AddDatabaseFormatInterface;
+    addData(parentAccessPointer: string, htmlObject: GNObjectInterface | any, accessPointer: string, insertPosition?: number | boolean, dataPointer?: string, specialMessage?: any): AddDatabaseFormatInterface;
     /** A function to update the data store in the database. There are two types of update, the first is to update the data in the dataAccess Point. Another is to update self  identity and its style.
     The last parameter updateType has two kinds. The first one is called dataPointer type.
     The second type is called accessPointer typer.

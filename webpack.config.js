@@ -6,6 +6,7 @@ module.exports = {
     entry: {
       "GreateNote": "./src/index.ts",
       "Crpyto": "./src/crypto.ts",
+      "Schedule": "./src/schedule.ts",
     },
     output: {
       path: path.join(__dirname, "build"),
@@ -52,12 +53,6 @@ module.exports = {
 
     // e. plugins: here we set what plugins we need in our app. As of this moment we only need the html-webpack-plugin which tells the server that the index.bundle.js should be injected (or added if you will) to our index.html file
     plugins: [
-        // new HtmlWebpackPlugin({
-        //     template: path.join(__dirname, "src", "index.html"),
-        //     filename: 'index.html'
-        // }),
-        //
-
         new HtmlWebpackPlugin({
           title: 'GreateNoteApp',
           template: path.join(__dirname, "src", "index.html"),
@@ -68,6 +63,12 @@ module.exports = {
           title: 'AnotherApp',
           template: path.join(__dirname, "src", "crpyto.html"),
           filename: 'crypto.html',
+          inject:false
+        }),
+        new HtmlWebpackPlugin({
+          title: 'Schedule',
+          template: path.join(__dirname, "src", "schedule.html"),
+          filename: 'schedule.html',
           inject:false
         })
     ],

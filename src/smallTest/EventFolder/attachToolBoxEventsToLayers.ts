@@ -6,6 +6,7 @@ import * as RectangleSelectionToolFunction from "../ToolboxFolder/rectangleSelec
 import * as AddCommentFunction from "../ToolboxFolder/addCommentFunction"
 import * as MoveObjectInDivFunction from "../ToolboxFolder/moveObjectInDivFunction"
 import * as TextToolFunction from "../ToolboxFolder/textToolHelperFunction"
+import * as TextBoxFunction from "../ToolboxFolder/textBoxHelperFunction"
 import * as AddBookmarkFunction from "../ToolboxFolder/addBookmarkFunction"
 
 export function attachEventListenerToSvgBoard(mainController: MainControllerInterface, svgBoard: SVGElement){
@@ -88,9 +89,16 @@ export function attachEventListenerToDivLayer(mainController: MainControllerInte
       TextToolFunction.textToolMouseDownFunction(e, mainController, divLayer, "mousemove", "mouseup")
     }
   }
+
+  let textBoxMouseDownFunction = {
+    eventNameList: ["mousedown"],
+    eventFunction: (e: any)=>{
+      TextBoxFunction.textBoxMouseDownFunction(e, mainController, divLayer, "mousemove", "mouseup")
+    }
+  }
   // let eventArray = [addCommentMouseDownFunction, moveObjectInDivMouseDownFunction]
-  let nameArray = ["addComment", "addBookmark", "moveObject", "textToolMouseDown"]
-  let eventArray = [addCommentMouseDownFunction, addBookmarkMouseDownFunction, moveObjectInDivMouseDownFunction,  textToolMouseDownFunction]
+  let nameArray = ["addComment", "addBookmark", "moveObject", "textToolMouseDown", "textBoxMouseDown"]
+  let eventArray = [addCommentMouseDownFunction, addBookmarkMouseDownFunction, moveObjectInDivMouseDownFunction,  textToolMouseDownFunction, textBoxMouseDownFunction]
   divLayer.greatNoteEventList = []
 
   eventArray.forEach((toolboxEvent: any, index :number)=>{

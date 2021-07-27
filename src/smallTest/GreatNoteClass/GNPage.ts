@@ -5,6 +5,8 @@ import {superGNObject, createDummyData} from "./GreateNoteObjectHelperFunction"
 
 export function GNPage(createData: CreateGreatNoteObjectInterface) : GNPageInterface {
     let {name, arrayID, insertPosition, dataPointer, saveToDatabase, specialCreationMessage, injectedData, contentEditable, _classNameList} = createData
+
+    console.log(9991234, createData)
     let _object = <any> document.createElement("div");
     _object.childrenList = {}
     _object.GNType = "GNPage"

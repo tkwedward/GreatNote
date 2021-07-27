@@ -66,7 +66,7 @@ export function GNTextBox(createData) {
     // _object.style.background = "lightblue";
     setObjectMovable(_object);
     _object.childrenList = {};
-    _object.GNType = "GNTextContainer";
+    _object.GNType = "GNTextBox";
     _object.GNSpecialCreationMessage = specialCreationMessage || "";
     _object._dataStructure = ["innerHTML"];
     _object._styleStructure = ["background", "width", "height", "position", "left", "top"];
@@ -96,6 +96,7 @@ export function GNTextBox(createData) {
         dataObject["GNType"] = _object.GNType;
         dataObject["GNSpecialCreationMessage"] = _object.GNSpecialCreationMessage;
         dataObject["specialGNType"] = _object.specialGNType || "";
+        _object.contentEditable = "true";
         if (_object._identity)
             dataObject["_identity"] = _object._identity;
         dataObject["_classNameList"] = Array.from(_object.classList);
@@ -127,5 +128,6 @@ export function GNTextBox(createData) {
         _object.setAttribute("accessPointer", _object._identity.accessPointer);
         _object.objectData = injectedData;
     }
+    _object.addEventListener("input", inputFunction(_object, _object));
     return _object;
 }

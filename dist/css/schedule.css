@@ -1,0 +1,53 @@
+.pendingDivWrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+.pendingDivWrapper .itemCard {
+  width: 90%;
+  display: block;
+  margin: 10px auto;
+}
+.pendingDivWrapper .categoryBox {
+  margin: 5px;
+  height: 500px;
+  border: 2px solid black;
+  overflow-y: scroll;
+}
+.pendingDivWrapper .categoryBox .title {
+  text-align: center;
+  background: gold;
+  height: 30px;
+  font-size: 20px;
+}
+
+.projectItemHtmlObject .taskListField {
+  border: 1px solid black;
+}
+.projectItemHtmlObject .taskListField .taskItem {
+  margin: 20px;
+}
+
+.projectDetailDivWrapper {
+  background: Aliceblue;
+  height: 500px;
+}
+.projectDetailDivWrapper .taskRow {
+  margin: 15px;
+}
+.projectDetailDivWrapper .taskRow .frontRow {
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr 1fr 1fr;
+  background: wheat;
+  padding: 15px;
+}
+.projectDetailDivWrapper .taskRow .frontRow .addToTaskPageButton, .projectDetailDivWrapper .taskRow .frontRow .statusSelectField, .projectDetailDivWrapper .taskRow .frontRow .deleteTaskPageButton {
+  width: 60%;
+  margin: 0px auto;
+  display: block;
+}
+.projectDetailDivWrapper .taskRow .hiddenRow {
+  padding: 15px;
+  display: none;
+}
+
+/*# sourceMappingURL=schedule.css.map */

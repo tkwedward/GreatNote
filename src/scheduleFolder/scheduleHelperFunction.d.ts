@@ -1,0 +1,13 @@
+import { createDataMessageInerface, updateDataMessageInerface, getDataMessageInterface, deleteDataMessageInterface } from "./taskDetail/taskItemInterface";
+export declare function sha256(secret: string): string;
+export declare function createSelectObject(optionArray: string[]): HTMLSelectElement;
+export declare function makeXMLHttpRequest(path: string, data?: any): void;
+export declare function getInitialDataFromDatabase(): void;
+export declare function renderRootArrayData(jsonData: any): void;
+export declare function makeXMLHttpPostRequest(path: string, data: any): void;
+export declare function createUniqueID(): string;
+export declare function intervalUpdateFunction(eventFunction: () => void, interval?: number): (e: any) => void;
+export declare function deleteObjectFromDatabase(dataMessage: deleteDataMessageInterface): void;
+export declare function getItemFromDatabase(dataMessage: getDataMessageInterface): void;
+export declare function createNewObjectInDatabase(dataMessage: createDataMessageInerface): void;
+export declare function updateObjectInDatabase(dataMessage: updateDataMessageInerface): void;

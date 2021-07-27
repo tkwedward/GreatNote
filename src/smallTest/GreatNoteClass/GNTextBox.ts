@@ -90,7 +90,7 @@ export function GNTextBox(createData: CreateGreatNoteObjectInterface) : GNTextBo
 
     _object.childrenList = {}
 
-    _object.GNType = "GNTextContainer"
+    _object.GNType = "GNTextBox"
     _object.GNSpecialCreationMessage = specialCreationMessage || ""
     _object._dataStructure = ["innerHTML"]
     _object._styleStructure = ["background", "width", "height", "position", "left", "top"]
@@ -130,6 +130,7 @@ export function GNTextBox(createData: CreateGreatNoteObjectInterface) : GNTextBo
         dataObject["GNType"] = _object.GNType
         dataObject["GNSpecialCreationMessage"] = _object.GNSpecialCreationMessage
         dataObject["specialGNType"] = _object.specialGNType || ""
+        _object.contentEditable = "true"
 
         if (_object._identity) dataObject["_identity"] = _object._identity
 
@@ -173,6 +174,9 @@ export function GNTextBox(createData: CreateGreatNoteObjectInterface) : GNTextBo
       _object.objectData = injectedData
 
     }
+
+
+    _object.addEventListener("input", inputFunction(_object, _object))
 
     return _object
 }
